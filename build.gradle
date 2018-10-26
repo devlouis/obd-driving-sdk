@@ -12,6 +12,10 @@ buildscript {
 
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
+
+        // Required plugins added to classpath to facilitate pushing to Jcenter/Bintray
+        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.7.3'
+        classpath 'com.github.dcendents:android-maven-gradle-plugin:2.0'
     }
 }
 
@@ -24,4 +28,27 @@ allprojects {
 
 task clean(type: Delete) {
     delete rootProject.buildDir
+}
+
+ext {
+    // Project
+    targetSdkVersion = 27
+    minSdkVersion = 14
+    compileSdkVersion = targetSdkVersion
+    buildToolsVersion = '27.0.3'
+    supportLibVersion = '27.0.2'
+    constraintLayoutVersion = "1.0.2"
+    junitVersion = "4.12"
+    testRunnerVersion = "1.0.1"
+    espressoCoreVersion = "3.0.1"
+
+    // ValidateTor Library Info
+    libVersionCode = 1
+    libVersionName = '1.0.0'
+    libPomUrl = 'https://bitbucket.org/devlouis/obd-driving-sdk'
+    libGithubRepo = 'devlouis/obd-driving-sdk'
+    libModuleName = 'obd-driving-sdk'
+    libModuleDesc = 'Android library for fast and simple string validation.'
+    libBintrayName = 'obd-driving-sdk'
+
 }
