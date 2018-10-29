@@ -4,6 +4,7 @@
 # -----
 # You can specify a custom docker image from Docker Hub as your build environment.
 image: mingc/android-build-box:latest
+<<<<<<< HEAD
 
 pipelines:
   default:
@@ -39,3 +40,14 @@ definitions:
     caches:
       android-sdk: android-sdk
 
+=======
+pipelines:
+    default:
+        - step:
+            caches:
+                - gradle
+            deployment: test
+            script:
+                - chmod +x gradlew
+                - ./gradlew assembleDebug
+>>>>>>> e6fe4e1ff886e3ef3e7b8e06ea66dd141f5ab212
