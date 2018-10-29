@@ -15,6 +15,8 @@ pipelines:
           # You must commit the Gradle wrapper to your repository
           # https://docs.gradle.org/current/userguide/gradle_wrapper.html
           - bash ./gradlew build
+
+          — ./build.sh
           # Download and unzip android sdk
           - wget --quiet --output-document=android-sdk.zip https://dl.google.com/android/repository/sdk-tools-linux-3859397.zip
           - unzip -o -qq android-sdk.zip -d android-sdk
@@ -35,6 +37,8 @@ pipelines:
           # Build apk
           - chmod a+x ./gradlew
           - ./gradlew assembleDebug
+
+
 definitions:
     caches:
       android-sdk: android-sdk
