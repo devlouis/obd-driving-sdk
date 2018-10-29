@@ -20,7 +20,7 @@ pipelines:
           - unzip -o -qq android-sdk.zip -d android-sdk
 
           # Define Android Home and add PATHs
-          - export ANDROID_HOME="/opt/atlassian/pipelines/agent/build/android-sdk"
+          - export ANDROID_HOME="/Users/louislopez/Library/Android/sdk"
           - export PATH="$ANDROID_HOME/tools:$ANDROID_HOME/tools/bin:$ANDROID_HOME/platform-tools:$PATH"
 
           # Download packages.
