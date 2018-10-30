@@ -5,6 +5,7 @@ buildscript {
     repositories {
         google()
         jcenter()
+        maven { url 'https://jitpack.io' }
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:3.2.1'
@@ -25,7 +26,6 @@ allprojects {
         jcenter()
         maven {
             url "https://jitpack.io"
-            credentials { username authToken }
         }
     }
 }
@@ -48,7 +48,7 @@ ext {
 
     // ValidateTor Library Info
     libVersionCode = 1
-    libVersionName = '0.0.1'
+    libVersionName = '0.0.2'
     libPomUrl = 'https://github.com/devlouis/obd-driving-sdk'
     libGithubRepo = 'devlouis/obd-driving-sdk'
     libModuleName = 'obd-driving-sdk'
