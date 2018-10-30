@@ -122,7 +122,7 @@ public abstract class CommandAvailabilityHelper {
     /**
      * Checks whether the command identified by commandPid is available, as noted by availabilityString.
      *
-     * This is a direct call to {@link com.github.pires.obd.utils.CommandAvailabilityHelper#isAvailable(String, int[])} with built-in String digestion
+     * This is a direct call to {@link com.mdp.innovation.obd_driving_api.utils.CommandAvailabilityHelper#isAvailable(String, int[])} with built-in String digestion
      *
      * @param commandPid a {@link String} object.
      * @param availabilityString a {@link String} object.
