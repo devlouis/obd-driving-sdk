@@ -50,7 +50,7 @@ ext {
     libVersionCode = 1
     libVersionName = '0.0.1'
     libPomUrl = 'https://github.com/devlouis/obd-driving-sdk'
-    libGithubRepo = 'devlouis.obd-driving-sdk'
+    libGithubRepo = 'devlouis/obd-driving-sdk'
     libModuleName = 'obd-driving-sdk'
     libModuleDesc = 'Android library for fast and simple string validation.'
     libBintrayName = 'obd-driving-sdk'
