@@ -12,7 +12,7 @@
  */
 package com.mdp.innovation.obd_driving_api.commands.protocol;
 
-import com.github.pires.obd.enums.AvailableCommandNames;
+import com.mdp.innovation.obd_driving_api.enums.AvailableCommandNames;
 
 /**
  * Retrieve available PIDs ranging from 01 to 20.
@@ -30,7 +30,7 @@ public class AvailablePidsCommand_01_20 extends AvailablePidsCommand {
     /**
      * Copy ctor.
      *
-     * @param other a {@link com.github.pires.obd.commands.protocol.AvailablePidsCommand} object.
+     * @param other a {@link com.mdp.innovation.obd_driving_api.commands.protocol.AvailablePidsCommand} object.
      */
     public AvailablePidsCommand_01_20(AvailablePidsCommand_01_20 other) {
         super(other);

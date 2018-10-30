@@ -28,7 +28,7 @@ public class ObdResetCommand extends ObdProtocolCommand {
     /**
      * <p>Constructor for ObdResetCommand.</p>
      *
-     * @param other a {@link com.github.pires.obd.commands.protocol.ObdResetCommand} object.
+     * @param other a {@link com.mdp.innovation.obd_driving_api.commands.protocol.ObdResetCommand} object.
      */
     public ObdResetCommand(ObdResetCommand other) {
         super(other);

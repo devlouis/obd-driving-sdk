@@ -28,7 +28,7 @@ public class ObdWarmstartCommand extends ObdProtocolCommand {
     /**
      * <p>Constructor for ObdWarmstartCommand.</p>
      *
-     * @param other a {@link com.github.pires.obd.commands.protocol.ObdWarmstartCommand} object.
+     * @param other a {@link com.mdp.innovation.obd_driving_api.commands.protocol.ObdWarmstartCommand} object.
      */
     public ObdWarmstartCommand(ObdWarmstartCommand other) {
         super(other);

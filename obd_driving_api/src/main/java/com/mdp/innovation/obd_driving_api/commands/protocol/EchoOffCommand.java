@@ -28,7 +28,7 @@ public class EchoOffCommand extends ObdProtocolCommand {
     /**
      * <p>Constructor for EchoOffCommand.</p>
      *
-     * @param other a {@link com.github.pires.obd.commands.protocol.EchoOffCommand} object.
+     * @param other a {@link com.mdp.innovation.obd_driving_api.commands.protocol.EchoOffCommand} object.
      */
     public EchoOffCommand(EchoOffCommand other) {
         super(other);

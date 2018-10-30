@@ -12,9 +12,9 @@
  */
 package com.mdp.innovation.obd_driving_api.commands.protocol;
 
-import com.github.pires.obd.commands.ObdCommand;
-import com.github.pires.obd.enums.AvailableCommandNames;
-import com.github.pires.obd.enums.ObdProtocols;
+import com.mdp.innovation.obd_driving_api.commands.ObdCommand;
+import com.mdp.innovation.obd_driving_api.enums.AvailableCommandNames;
+import com.mdp.innovation.obd_driving_api.enums.ObdProtocols;
 
 /**
  * Describe the Protocol by Number.
@@ -80,7 +80,7 @@ public class DescribeProtocolNumberCommand extends ObdCommand {
     /**
      * <p>Getter for the field <code>obdProtocol</code>.</p>
      *
-     * @return a {@link com.github.pires.obd.enums.ObdProtocols} object.
+     * @return a {@link com.mdp.innovation.obd_driving_api.enums.ObdProtocols} object.
      */
     public ObdProtocols getObdProtocol() {
         return obdProtocol;

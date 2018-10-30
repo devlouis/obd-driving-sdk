@@ -28,7 +28,7 @@ public class LineFeedOffCommand extends ObdProtocolCommand {
     /**
      * <p>Constructor for LineFeedOffCommand.</p>
      *
-     * @param other a {@link com.github.pires.obd.commands.protocol.LineFeedOffCommand} object.
+     * @param other a {@link com.mdp.innovation.obd_driving_api.commands.protocol.LineFeedOffCommand} object.
      */
     public LineFeedOffCommand(LineFeedOffCommand other) {
         super(other);

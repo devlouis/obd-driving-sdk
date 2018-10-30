@@ -12,7 +12,7 @@
  */
 package com.mdp.innovation.obd_driving_api.commands.protocol;
 
-import com.github.pires.obd.enums.AvailableCommandNames;
+import com.mdp.innovation.obd_driving_api.enums.AvailableCommandNames;
 
 /**
  * Describe the current Protocol.

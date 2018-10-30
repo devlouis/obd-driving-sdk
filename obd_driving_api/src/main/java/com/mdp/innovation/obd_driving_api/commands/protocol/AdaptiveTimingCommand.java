@@ -33,7 +33,7 @@ public class AdaptiveTimingCommand extends ObdProtocolCommand {
     /**
      * <p>Constructor for AdaptiveTimingCommand.</p>
      *
-     * @param other a {@link com.github.pires.obd.commands.protocol.AdaptiveTimingCommand} object.
+     * @param other a {@link com.mdp.innovation.obd_driving_api.commands.protocol.AdaptiveTimingCommand} object.
      */
     public AdaptiveTimingCommand(AdaptiveTimingCommand other) {
         super(other);

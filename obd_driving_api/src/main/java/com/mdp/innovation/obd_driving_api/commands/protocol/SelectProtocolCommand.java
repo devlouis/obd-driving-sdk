@@ -12,7 +12,7 @@
  */
 package com.mdp.innovation.obd_driving_api.commands.protocol;
 
-import com.github.pires.obd.enums.ObdProtocols;
+import com.mdp.innovation.obd_driving_api.enums.ObdProtocols;
 
 /**
  * Select the protocol to use.
@@ -25,7 +25,7 @@ public class SelectProtocolCommand extends ObdProtocolCommand {
     /**
      * <p>Constructor for SelectProtocolCommand.</p>
      *
-     * @param protocol a {@link com.github.pires.obd.enums.ObdProtocols} object.
+     * @param protocol a {@link com.mdp.innovation.obd_driving_api.enums.ObdProtocols} object.
      */
     public SelectProtocolCommand(final ObdProtocols protocol) {
         super("AT SP " + protocol.getValue());

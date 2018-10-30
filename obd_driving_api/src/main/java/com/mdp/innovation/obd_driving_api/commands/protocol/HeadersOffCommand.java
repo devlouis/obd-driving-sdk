@@ -28,7 +28,7 @@ public class HeadersOffCommand extends ObdProtocolCommand {
     /**
      * <p>Constructor for HeadersOffCommand.</p>
      *
-     * @param other a {@link com.github.pires.obd.commands.protocol.HeadersOffCommand} object.
+     * @param other a {@link com.mdp.innovation.obd_driving_api.commands.protocol.HeadersOffCommand} object.
      */
     public HeadersOffCommand(HeadersOffCommand other) {
         super(other);

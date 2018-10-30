@@ -12,7 +12,7 @@
  */
 package com.mdp.innovation.obd_driving_api.commands.protocol;
 
-import com.github.pires.obd.commands.ObdCommand;
+import com.mdp.innovation.obd_driving_api.commands.ObdCommand;
 
 /**
  * <p>Abstract ObdProtocolCommand class.</p>

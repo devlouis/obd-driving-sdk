@@ -12,7 +12,7 @@
  */
 package com.mdp.innovation.obd_driving_api.commands.protocol;
 
-import com.github.pires.obd.commands.PersistentCommand;
+import com.mdp.innovation.obd_driving_api.commands.PersistentCommand;
 
 /**
  * Retrieve available PIDs ranging from 21 to 40.
@@ -32,7 +32,7 @@ public abstract class AvailablePidsCommand extends PersistentCommand {
     /**
      * Copy ctor.
      *
-     * @param other a {@link com.github.pires.obd.commands.protocol.AvailablePidsCommand} object.
+     * @param other a {@link com.mdp.innovation.obd_driving_api.commands.protocol.AvailablePidsCommand} object.
      */
     public AvailablePidsCommand(AvailablePidsCommand other) {
         super(other);

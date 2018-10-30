@@ -32,7 +32,7 @@ public class TimeoutCommand extends ObdProtocolCommand {
     /**
      * <p>Constructor for TimeoutCommand.</p>
      *
-     * @param other a {@link com.github.pires.obd.commands.protocol.TimeoutCommand} object.
+     * @param other a {@link com.mdp.innovation.obd_driving_api.commands.protocol.TimeoutCommand} object.
      */
     public TimeoutCommand(TimeoutCommand other) {
         super(other);
