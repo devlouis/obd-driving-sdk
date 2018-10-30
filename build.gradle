@@ -49,7 +49,7 @@ ext {
     // ValidateTor Library Info
     libVersionCode = 1
     libVersionName = '0.0.1'
-    libPomUrl = 'https://bitbucket.org/devlouis/obd-driving-sdk'
+    libPomUrl = 'https://github.com/devlouis/obd-driving-sdk'
     libGithubRepo = 'devlouis.obd-driving-sdk'
     libModuleName = 'obd-driving-sdk'
     libModuleDesc = 'Android library for fast and simple string validation.'
