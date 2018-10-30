@@ -42,13 +42,13 @@ ext {
     buildToolsVersion = '27.0.3'
     supportLibVersion = '27.0.2'
     constraintLayoutVersion = "1.0.2"
-    //junitVersion = "4.12"
+    junitVersion = "4.12"
     testRunnerVersion = "1.0.1"
     espressoCoreVersion = "3.0.1"
 
     // ValidateTor Library Info
     libVersionCode = 1
-    libVersionName = '1.0.0'
+    libVersionName = '0.0.1'
     libPomUrl = 'https://bitbucket.org/devlouis/obd-driving-sdk'
     libGithubRepo = 'devlouis.obd-driving-sdk'
     libModuleName = 'obd-driving-sdk'
