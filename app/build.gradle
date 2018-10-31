@@ -36,5 +36,8 @@ dependencies {
     implementation "com.android.support.constraint:constraint-layout:$rootProject.ext.constraintLayoutVersion"
 
     //SDK OBD driving
-    implementation 'com.github.devlouis:obd-driving-sdk:0.0.5'
+    //implementation 'com.github.devlouis:obd-driving-sdk:0.0.5'
+
+    //SDK local
+    implementation project(':obd_driving_api')
 }

@@ -1,2 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          package="com.mdp.innovation.obd_driving_api"/>
+          package="com.mdp.innovation.obd_driving_api">
+
+    <application>
+        <activity android:name=".app.ui.PairObdActivity"
+                  android:theme="@style/AppTheme">
+        </activity>
+    </application>
+
+</manifest>
