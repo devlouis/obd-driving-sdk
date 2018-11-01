@@ -2,6 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
           package="com.mdp.innovation.obd_driving_api">
 
+    <uses-permission android:name="android.permission.BLUETOOTH"/>
     <application>
         <activity android:name=".app.ui.PairObdActivity"
                   android:theme="@style/AppTheme">
