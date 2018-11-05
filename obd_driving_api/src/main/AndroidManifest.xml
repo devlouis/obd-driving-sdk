@@ -3,9 +3,10 @@
           package="com.mdp.innovation.obd_driving_api">
 
     <uses-permission android:name="android.permission.BLUETOOTH"/>
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN"/>
     <application>
         <activity android:name=".app.ui.PairObdActivity"
-                  android:theme="@style/AppTheme">
+                  android:theme="@style/AppTheme.NoActionBar">
         </activity>
     </application>
 

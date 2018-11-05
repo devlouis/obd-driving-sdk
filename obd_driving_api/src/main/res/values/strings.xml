@@ -5,5 +5,6 @@
     <string name="pref_bluetooth_summaryOn">Bluetooth apagado</string>
     <string name="pref_bluetooth_summaryOff">Bluetooth encendido</string>
     <string name="pref_bluetooth_list_devices_title">Dispositivos bluetooth</string>
-    <string name="pref_bluetooth_list_devices_summary">Lista de dispositivos bluetooth emparejados.</string>
+    <string name="pref_bluetooth_list_devices_summary">Lista de dispositivos bluetooth emparejados</string>
+    <string name="pref_bluetooth_list_discovery">Lista de dispositivos bluetooth disponibles.</string>
 </resources>

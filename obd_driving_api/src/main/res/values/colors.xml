@@ -3,6 +3,9 @@
     <color name="colorPrimary">#008577</color>
     <color name="colorPrimaryDark">#00574B</color>
     <color name="colorAccent">#D81B60</color>
+
     <color name="window_background">#eeeeee</color>
+    <color name="linear">#a7a7a7</color>
+    <color name="white">#ffffff</color>
 
 </resources>

@@ -11,74 +11,53 @@ import android.widget.Toast
 import com.mdp.innovation.obd_driving_api.R
 import com.mdp.innovation.obd_driving_api.app.core.BaseAppCompat
 import java.util.ArrayList
+import android.bluetooth.BluetoothDevice
+import android.content.Intent
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.IntentFilter
+import com.mdp.innovation.obd_driving_api.app.utils.LogUtils
 
-class PairObdActivity : PreferenceActivity() {
+
+class PairObdActivity : BaseAppCompat() {
 
     val BLUETOOTH_LIST_KEY = "bluetooth_list_preference"
 
+
+    val NewsDeviceStrings = ArrayList<String>()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        //setContentView(R.layout.activity_pair_obd)
-        addPreferencesFromResource(R.xml.preferences)
-
-        val pairedDeviceStrings = ArrayList<CharSequence>()
-        val vals = ArrayList<CharSequence>()
-
-        val listBtDevices = preferenceScreen
-            .findPreference(BLUETOOTH_LIST_KEY) as ListPreference
-
-        /*
-     * Let's use this device Bluetooth adapter to select which paired OBD-II
-     * compliant device we'll use.
-     */
+        setContentView(R.layout.activity_pair_obd)
+        //F8:CF:C5:59:54:EB
         val mBtAdapter = BluetoothAdapter.getDefaultAdapter()
-        if (mBtAdapter == null) {
-            listBtDevices.entries = pairedDeviceStrings.toTypedArray()
-            listBtDevices.entryValues = vals.toTypedArray()
+        mBtAdapter.startDiscovery()
 
-            // we shouldn't get here, still warn user
-            Toast.makeText(
-                this, "This device does not support Bluetooth.",
-                Toast.LENGTH_LONG
-            ).show()
 
-            return
-        }
+        val filter = IntentFilter(BluetoothDevice.ACTION_FOUND)
+        registerReceiver(mReceiver, filter)
 
-        /*
-     * Listen for preferences click.
-     *
-     * TODO there are so many repeated validations :-/
+    }
+
+
+    /**
+     * Listar Bluetooth disponibles
      */
-        val thisActivity = this
-        listBtDevices.entries = arrayOfNulls(1)
-        listBtDevices.entryValues = arrayOfNulls(1)
-        listBtDevices.onPreferenceClickListener = Preference.OnPreferenceClickListener {
-            Log.v(" ConfigActivity", " Click Devices List")
-            // see what I mean in the previous comment?
-            if (mBtAdapter == null || !mBtAdapter.isEnabled) {
-                Toast.makeText(
-                    thisActivity,
-                    "This device does not support Bluetooth or it is disabled.",
-                    Toast.LENGTH_LONG
-                ).show()
-                return@OnPreferenceClickListener false
-            }
-            true
-        }
 
-        /**
-         * Get paired devices and populate preference list.
-         */
-        val pairedDevices = mBtAdapter.bondedDevices
-        if (pairedDevices.size > 0) {
-            for (device in pairedDevices) {
-                pairedDeviceStrings.add(device.name + "\n" + device.address)
-                vals.add(device.address)
+    // Create a BroadcastReceiver for ACTION_FOUND
+    private val mReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context, intent: Intent) {
+            val action = intent.action
+            // When discovery finds a device
+            if (BluetoothDevice.ACTION_FOUND == action) {
+                // Get the BluetoothDevice object from the Intent
+                val device = intent.getParcelableExtra<BluetoothDevice>(BluetoothDevice.EXTRA_DEVICE)
+                // Add the name and address to an array adapter to show in a ListView
+                NewsDeviceStrings.add(device.name + "\n" + device.address)
+                LogUtils().v( "ConfigActivity" , " :: ${device.name} - ${device.address}")
+
             }
         }
-        listBtDevices.entries = pairedDeviceStrings.toTypedArray()
-        listBtDevices.entryValues = vals.toTypedArray()
     }
 
 
