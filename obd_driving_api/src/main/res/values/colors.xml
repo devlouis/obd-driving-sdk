@@ -7,5 +7,8 @@
     <color name="window_background">#eeeeee</color>
     <color name="linear">#a7a7a7</color>
     <color name="white">#ffffff</color>
+    <color name="black">#000000</color>
 
+    <color name="black_transparent_dialog">#80323232</color>
+    <color name="black_transparent">#43000000</color>
 </resources>
