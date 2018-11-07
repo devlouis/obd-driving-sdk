@@ -19,11 +19,11 @@ import kotlinx.android.synthetic.main.activity_pair_obd.*
 
 
 class PairObdActivity : BaseAppCompat() {
-
+    val TAG = javaClass.simpleName
     val BLUETOOTH_LIST_KEY = "bluetooth_list_preference"
 
     var pairedAdapter: PairedAdapter? = null
-    val NewsDeviceStrings = ArrayList<EntityDevicesMac>()
+    val NewsDeviceStrings = ArrayList<BluetoothDevice>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -57,9 +57,17 @@ class PairObdActivity : BaseAppCompat() {
         rviDevicesNew.setHasFixedSize(true)
         rviDevicesNew.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL,false)
         pairedAdapter = PairedAdapter(this, NewsDeviceStrings){
-
+            LogUtils().v(TAG, " select: ${it.name} - ${it.address}")
+            val device = it
+            if (device.bondState == BluetoothDevice.BOND_BONDED) {
+                unpairDevice(device)
+            } else {
+                snackBarSucceso("Pairing...", claContent)
+                pairDevice(device)
+            }
         }
         rviDevicesNew.adapter = pairedAdapter
+        registerReceiver(mPairReceiver, IntentFilter(BluetoothDevice.ACTION_BOND_STATE_CHANGED))
     }
 
 
@@ -77,8 +85,8 @@ class PairObdActivity : BaseAppCompat() {
                 val device = intent.getParcelableExtra<BluetoothDevice>(BluetoothDevice.EXTRA_DEVICE)
                 // Add the name and address to an array adapter to show in a ListView
 
-                var deviceMac = EntityDevicesMac(device.name, device.address, device.type, device.bondState)
-                NewsDeviceStrings.add(deviceMac)
+                //var deviceMac = EntityDevicesMac(device.name, device.address, device.type, device.bondState)
+                NewsDeviceStrings.add(device)
                 rviDevicesNew.adapter = pairedAdapter
                 //pairedAdapter!!.notifyDataSetChanged()
 
@@ -88,5 +96,48 @@ class PairObdActivity : BaseAppCompat() {
         }
     }
 
+    /**
+     * Emparejar dispositivo
+     */
+    private fun pairDevice(device: BluetoothDevice) {
+        try {
+            val method = device.javaClass.getMethod("createBond", null as Class<*>)
+            method.invoke(device, null as Array<Any>?)
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+
+    }
+    /**
+     * Desemparejar dispositivo
+     */
+    private fun unpairDevice(device: BluetoothDevice) {
+        try {
+            val method = device.javaClass.getMethod("removeBond", null as Class<*>)
+            method.invoke(device, null as Array<Any>?)
+
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+
+    }
+
+    private val mPairReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context, intent: Intent) {
+            val action = intent.action
+
+            if (BluetoothDevice.ACTION_BOND_STATE_CHANGED == action) {
+                val state = intent.getIntExtra(BluetoothDevice.EXTRA_BOND_STATE, BluetoothDevice.ERROR)
+                val prevState = intent.getIntExtra(BluetoothDevice.EXTRA_PREVIOUS_BOND_STATE, BluetoothDevice.ERROR)
+
+                if (state == BluetoothDevice.BOND_BONDED && prevState == BluetoothDevice.BOND_BONDING) {
+                    snackBarSucceso("Paired", claContent)
+                } else if (state == BluetoothDevice.BOND_NONE && prevState == BluetoothDevice.BOND_BONDED) {
+                    snackBarFail("Unpaired", claContent)
+                }
+                //mAdapter.notifyDataSetChanged()
+            }
+        }
+    }
 
 }
