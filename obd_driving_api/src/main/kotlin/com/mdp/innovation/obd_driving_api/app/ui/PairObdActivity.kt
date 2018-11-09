@@ -22,7 +22,7 @@ class PairObdActivity : BaseAppCompat() {
 
     var pairedNewAdapter: PairedAdapter? = null
     var pairedAdapter: PairedAdapter? = null
-    val NewsDeviceStrings = ArrayList<BluetoothDevice>()
+    var NewsDeviceStrings = ArrayList<BluetoothDevice>()
 
     var mBtAdapter: BluetoothAdapter? = null
     var mProgressDlg: ProgressDialog? = null
@@ -78,7 +78,7 @@ class PairObdActivity : BaseAppCompat() {
 
         BluetoothPaired()
 
-        val filter = IntentFilter(BluetoothDevice.ACTION_FOUND)
+        val filter = IntentFilter()
         filter.addAction(BluetoothAdapter.ACTION_STATE_CHANGED)
         filter.addAction(BluetoothDevice.ACTION_BOND_STATE_CHANGED)
         filter.addAction(BluetoothDevice.ACTION_FOUND)
@@ -133,6 +133,7 @@ class PairObdActivity : BaseAppCompat() {
                 /**
                  * muestra carga mientras busca
                  */
+                NewsDeviceStrings.clear()
                 vLoadingDevices.visibility = View.VISIBLE
             }
             else if (BluetoothAdapter.ACTION_DISCOVERY_FINISHED == action){
