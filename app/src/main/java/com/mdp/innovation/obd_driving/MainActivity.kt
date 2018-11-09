@@ -7,6 +7,7 @@ import com.mdp.innovation.obd_driving_api.app.core.BaseAppCompat
 import com.mdp.innovation.obd_driving_api.app.ui.PairObdActivity
 import com.mdp.innovation.obd_driving_api.commands.ObdCommand
 import com.mdp.innovation.obd_driving_api.commands.control.ModuleVoltageCommand
+import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : BaseAppCompat() {
 
@@ -17,7 +18,9 @@ class MainActivity : BaseAppCompat() {
         val cmds = ArrayList<ObdCommand>()
         cmds.add(ModuleVoltageCommand())
 
-        nextActivity(PairObdActivity::class.java, true)
+        button.setOnClickListener {
+            nextActivity(PairObdActivity::class.java, true)
+        }
 
     }
 

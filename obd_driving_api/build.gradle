@@ -1,6 +1,10 @@
 apply plugin: 'com.android.library'
 
 android {
+    sourceSets {
+        main.java.srcDirs += 'src/main/kotlin'
+    }
+
     compileSdkVersion rootProject.ext.compileSdkVersion
     //buildToolsVersion rootProject.ext.buildToolsVersion
 
