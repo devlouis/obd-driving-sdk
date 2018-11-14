@@ -7,4 +7,13 @@
     <string name="pref_bluetooth_list_devices_title">Dispositivos bluetooth</string>
     <string name="pref_bluetooth_list_devices_summary">Lista de dispositivos bluetooth emparejados</string>
     <string name="pref_bluetooth_list_discovery">Lista de dispositivos bluetooth disponibles.</string>
+    <string name="text_bluetooth_nodevice">Ningún dispositivo Bluetooth seleccionado</string>
+    <string name="notification_action">Toque para abrir OBD-driving</string>
+    <string name="service_started">La conexión OBD ha comenzado.</string>
+    <string name="service_starting">Iniciando conexión OBD ...</string>
+    <string name="status_bluetooth_connected">conectado</string>
+    <string name="status_bluetooth_error_connecting">la conexión falló</string>
+    <string name="status_bluetooth_connecting">conectando</string>
+    <string name="status_bluetooth_disabled">discapacitado</string>
+    <string name="status_bluetooth_ok">Listo</string>
 </resources>
