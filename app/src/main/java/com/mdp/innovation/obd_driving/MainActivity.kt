@@ -2,6 +2,7 @@ package com.mdp.innovation.obd_driving
 
 import android.os.Bundle
 import com.mdp.innovation.obd_driving_api.app.core.BaseAppCompat
+import com.mdp.innovation.obd_driving_api.app.core.ConnectOBD
 import com.mdp.innovation.obd_driving_api.app.ui.activity.PairObdActivity
 import com.mdp.innovation.obd_driving_api.commands.ObdCommand
 import com.mdp.innovation.obd_driving_api.commands.control.ModuleVoltageCommand
@@ -19,7 +20,8 @@ class MainActivity : BaseAppCompat() {
         button.setOnClickListener {
             //nextActivity(PairObdActivity::class.java, true)
 
-             PairObdActivity().initUI()
+             //PairObdActivity().initUI()
+            ConnectOBD(this@MainActivity).init()
         }
 
     }

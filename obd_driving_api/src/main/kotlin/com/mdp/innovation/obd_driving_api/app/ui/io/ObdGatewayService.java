@@ -1,5 +1,6 @@
 package com.mdp.innovation.obd_driving_api.app.ui.io;
 
+import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
@@ -13,6 +14,7 @@ import android.util.Log;
 import android.widget.Toast;
 import com.google.inject.Inject;
 import com.mdp.innovation.obd_driving_api.R;
+import com.mdp.innovation.obd_driving_api.app.core.ConnectOBD;
 import com.mdp.innovation.obd_driving_api.app.ui.activity.PairObdActivity;
 import com.mdp.innovation.obd_driving_api.commands.protocol.*;
 import com.mdp.innovation.obd_driving_api.commands.temperature.AmbientAirTemperatureCommand;
@@ -47,11 +49,13 @@ public class ObdGatewayService extends AbstractGatewayService {
     String PROTOCOLS_LIST_KEY = "AUTO";
     SharedPreference appSharedPreference;
 
+    Activity activity;
+
 
 
     public void startService() throws IOException {
         Log.d(TAG, "Starting service..");
-
+        this.activity = activity;
         // get the remote Bluetooth device
         //final String remoteDevice = prefs.getString(ConfigActivity.BLUETOOTH_LIST_KEY, null);
         appSharedPreference = new SharedPreference(this);
@@ -227,12 +231,7 @@ public class ObdGatewayService extends AbstractGatewayService {
 
             if (job != null) {
                 final ObdCommandJob job2 = job;
-                ((PairObdActivity) ctx).runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        ((PairObdActivity) ctx).stateUpdate(job2);
-                    }
-                });
+                new ConnectOBD(ctx).stateUpdate(job2);
             }
         }
     }

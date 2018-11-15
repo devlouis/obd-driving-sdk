@@ -307,6 +307,11 @@ class PairObdActivity : BaseAppCompat(), ObdProgressListener {
     }
 
     override fun onPause() {
+        if (mBtAdapter != null) {
+            if (mBtAdapter!!.isDiscovering) {
+                mBtAdapter!!.cancelDiscovery()
+            }
+        }
         super.onPause()
 
 
