@@ -13,6 +13,7 @@ import android.util.Log
 import android.view.View
 import android.widget.Toast
 import com.mdp.innovation.obd_driving_api.R
+import com.mdp.innovation.obd_driving_api.app.`interface`.ObdGatewayVin
 import com.mdp.innovation.obd_driving_api.app.ui.config.ObdConfig
 import com.mdp.innovation.obd_driving_api.app.ui.io.*
 import com.mdp.innovation.obd_driving_api.app.utils.LogUtils
@@ -24,62 +25,64 @@ import kotlinx.android.synthetic.main.activity_pair_obd.*
 import roboguice.RoboGuice
 import java.io.IOException
 
-class ConnectOBD(context: Context): ObdProgressListener {
-
-    /**
-     * Actualización del estado
-     */
-    override fun stateUpdate(job: ObdCommandJob) {
-        val cmdName = job.command.name
-        val cmdID = LookUpCommand(cmdName)
-        //context.snackBarSucceso(cmdID, claContent)
-
-        updateTripStatistic(job, cmdID = cmdID)
-    }
-
+object ConnectOBD{
     val TAG = javaClass.simpleName
 
     private var service: AbstractGatewayService? = null
     private var isServiceBound: Boolean = false
     private var preRequisites = true
-    var context = context
+
+    lateinit var obdGatewayVin: ObdGatewayVin
     lateinit var appSharedPreference: SharedPreference
     var btStatus = ""
-    var VIN = ""
+    var context: Context? = null
+    var eo = ""
 
 
-    fun init(){
+
+
+    fun initialize(context: Context){
+        this.context = context
+        Log.d(TAG, " INIT")
         RoboGuice.setUseAnnotationDatabases(false)
         appSharedPreference = SharedPreference(context)
         var macDevice = appSharedPreference.getMacBluetooth()[appSharedPreference.MAC_DEVICE]!!
         LogUtils().v(TAG, " macDevice:: $macDevice")
-        startLiveData()
     }
 
-    fun startLiveData() {
+    fun verifyMacOBD(): Boolean{
+        var macDevice = appSharedPreference.getMacBluetooth()[appSharedPreference.MAC_DEVICE]!!
+        LogUtils().v(TAG, " macDevice:: $macDevice")
+        return macDevice.isNotEmpty()
+    }
 
-        Log.d(TAG, "Starting live data..")
-        Log.d(TAG, doBindService())
+    fun startLiveData(mObdGatewayVin: ObdGatewayVin) {
+        Log.d(TAG, "Starting live data...")
+        this.obdGatewayVin = mObdGatewayVin
+        var macDevice = appSharedPreference.getMacBluetooth()[appSharedPreference.MAC_DEVICE]!!
+        doBindService()
         // start command execution
         Handler().post(mQueueCommands)
     }
 
 
-    private val serviceConn = object : ServiceConnection {
+    val serviceConn = object : ServiceConnection {
         override fun onServiceConnected(className: ComponentName, binder: IBinder) {
             Log.d(TAG, className.toString() + " service is bound")
             isServiceBound = true
             service = (binder as AbstractGatewayService.AbstractGatewayServiceBinder).service
-            service!!.setContext(this@ConnectOBD.context)
-            Log.d(TAG, "Starting live data")
+            service!!.setContext(context)
+            Log.d(TAG, "onServiceConnected")
             try {
                 service!!.startService()
                 if (preRequisites)
-                    btStatus = context.getString(R.string.status_bluetooth_connected)
+                    btStatus = context!!.getString(R.string.status_bluetooth_connected)
             } catch (ioe: IOException) {
-                Log.e(TAG, "Failure Starting live data")
-                btStatus = context.getString(R.string.status_bluetooth_error_connecting)
+                LogUtils().v(TAG, "Failure Starting live data ${ioe.message.toString()}" )
+                btStatus = context!!.getString(R.string.status_bluetooth_error_connecting)
                 doUnbindService()
+                obdGatewayVin.errorConnect(context!!.getString(R.string.status_bluetooth_error_connecting))
+
             }
 
         }
@@ -90,7 +93,10 @@ class ConnectOBD(context: Context): ObdProgressListener {
         // So the isServiceBound attribute should also be set to false when we unbind from the service.
         override fun onServiceDisconnected(className: ComponentName) {
             Log.d(TAG, className.toString() + " service is unbound")
+            service!!.setContext(this@ConnectOBD.context)
+            eo = "banna"
             isServiceBound = false
+
         }
     }
     private fun queueCommands() {
@@ -103,32 +109,32 @@ class ConnectOBD(context: Context): ObdProgressListener {
     }
 
 
-    fun doBindService(): String{
+    fun doBindService(){
 
         if (!isServiceBound) {
             Log.d(TAG, "Binding OBD service..")
             if (preRequisites) {
-                btStatus = context.getString(R.string.status_bluetooth_connecting)
-                val serviceIntent = Intent(context.applicationContext, ObdGatewayService::class.java)
-                context.bindService(serviceIntent, serviceConn, Context.BIND_AUTO_CREATE)
+                btStatus = context!!.getString(R.string.status_bluetooth_connecting)
+                val serviceIntent = Intent(context!!.applicationContext, ObdGatewayService::class.java)
+                context!!.bindService(serviceIntent, serviceConn, Context.BIND_AUTO_CREATE)
             } else {
-                btStatus = context.getString(R.string.status_bluetooth_disabled)
-                val serviceIntent = Intent(context.applicationContext, MockObdGatewayService::class.java)
-                context.bindService(serviceIntent, serviceConn, Context.BIND_AUTO_CREATE)
+                btStatus = context!!.getString(R.string.status_bluetooth_disabled)
+                val serviceIntent = Intent(context!!.applicationContext, MockObdGatewayService::class.java)
+                serviceIntent.putExtra("OB","BOLI")
+                context!!.bindService(serviceIntent, serviceConn, Context.BIND_AUTO_CREATE)
             }
         }
-        return btStatus
     }
 
-    private fun doUnbindService() {
+    fun doUnbindService() {
         if (isServiceBound) {
             if (service!!.isRunning) {
                 service!!.stopService()
                 if (preRequisites)
-                    btStatus = context.getString(R.string.status_bluetooth_ok)
+                    btStatus = context!!.getString(R.string.status_bluetooth_ok)
             }
             Log.d(TAG, "Unbinding OBD service..")
-            context.unbindService(serviceConn)
+            context!!.unbindService(serviceConn)
             isServiceBound = false
 
             //OBD status
@@ -166,17 +172,22 @@ class ConnectOBD(context: Context): ObdProgressListener {
     private fun updateTripStatistic(job: ObdCommandJob, cmdID: String) {
         //Log.v(TAG, " updateTripStatistic ")
         //Toast.makeText(this, "updateTripStatistic", Toast.LENGTH_LONG).show()
-        if (cmdID == AvailableCommandNames.SPEED.toString()) run {
+        //Log.v(TAG, " VINnn ${context!!.getString(R.string.status_bluetooth_connecting)}")
+        var VIN = ""
+        if (cmdID == AvailableCommandNames.SPEED.toString()) {
             val command = job.command as SpeedCommand
             Log.v(TAG, " Speed" + command.metricSpeed)
             //Toast.makeText(this, " Speed: " + command.metricSpeed, Toast.LENGTH_LONG).show()
             //currentTrip.setSpeedMax(command.getMetricSpeed())
         }
-        if (cmdID == AvailableCommandNames.VIN.toString()) run {
+        if (cmdID == AvailableCommandNames.VIN.toString())  {
             if (VIN.isEmpty()) {
+                Log.v(TAG, " VIN;;; $VIN")
                 val command = job.command as VinCommand
                 VIN = command.formattedResult
+
                 Log.v(TAG, " VIN $VIN")
+                obdGatewayVin.getVin(VIN)
                 //Toast.makeText(this, " VIN: $VIN", Toast.LENGTH_LONG).show()
                 //currentTrip.setSpeedMax(command.getMetricSpeed())
             }else{
@@ -187,6 +198,18 @@ class ConnectOBD(context: Context): ObdProgressListener {
                 //Toast.makeText(this, " VAR VIN: $VIN", Toast.LENGTH_LONG).show()
             }
         }
+    }
+
+    /**
+     * Actualización del estado
+     */
+    @JvmStatic
+    fun stateUpdate(job2: ObdCommandJob, ctx: Context) {
+        this.context = ctx
+        val cmdName = job2.command.name
+        val cmdID = LookUpCommand(cmdName)
+        //context.snackBarSucceso(cmdID, claContent)
+        updateTripStatistic(job2, cmdID = cmdID)
     }
 
 }

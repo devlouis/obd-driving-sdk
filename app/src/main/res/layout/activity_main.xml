@@ -9,10 +9,29 @@
         tools:context=".MainActivity">
 
     <Button
-            android:text="Conectar"
+            android:text="Obtener VIN"
             android:layout_width="wrap_content"
             android:layout_height="47dp"
             android:id="@+id/button" app:layout_constraintTop_toTopOf="parent"
             android:layout_marginTop="16dp" app:layout_constraintStart_toStartOf="parent"
             android:layout_marginStart="16dp"/>
+
+    <Button
+            android:id="@+id/btnGoPair"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Buscar dispositivo OBD"
+            app:layout_constraintStart_toStartOf="parent"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="8dp"
+            app:layout_constraintTop_toBottomOf="@+id/button"/>
+    <TextView
+            android:text="TextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="20sp"
+            android:textColor="@color/white"
+            android:id="@+id/tviVIN" app:layout_constraintStart_toEndOf="@+id/button"
+            android:layout_marginStart="8dp" android:layout_marginTop="8dp"
+            app:layout_constraintTop_toTopOf="@+id/button"/>
 </android.support.constraint.ConstraintLayout>

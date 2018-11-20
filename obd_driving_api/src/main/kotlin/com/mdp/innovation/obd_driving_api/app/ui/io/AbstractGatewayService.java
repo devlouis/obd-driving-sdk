@@ -3,6 +3,7 @@ package com.mdp.innovation.obd_driving_api.app.ui.io;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Binder;
@@ -18,13 +19,14 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
 
-public abstract class AbstractGatewayService extends RoboService {
+public abstract class AbstractGatewayService extends Service {
     public static final int NOTIFICATION_ID = 1;
     private static final String TAG = AbstractGatewayService.class.getName();
     private final IBinder binder = new AbstractGatewayServiceBinder();
     //@Inject
     protected NotificationManager notificationManager;
     protected Context ctx;
+
     protected boolean isRunning = false;
     protected Long queueCounter = 0L;
     protected BlockingQueue<ObdCommandJob> jobsQueue = new LinkedBlockingQueue<>();

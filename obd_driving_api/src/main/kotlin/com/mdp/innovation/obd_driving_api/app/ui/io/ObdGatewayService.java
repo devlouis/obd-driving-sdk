@@ -36,7 +36,7 @@ import java.util.HashMap;
  * Secondarily, it will serve as a repository of ObdCommandJobs and at the same
  * time the application state-machine.
  */
-public class ObdGatewayService extends AbstractGatewayService {
+public class ObdGatewayService extends AbstractGatewayService  {
 
     private static final String TAG = ObdGatewayService.class.getName();
     /*@Inject
@@ -51,7 +51,11 @@ public class ObdGatewayService extends AbstractGatewayService {
 
     Activity activity;
 
+    Context context;
 
+    /*public ObdGatewayService(Context context) {
+        this.context = context;
+    }*/
 
     public void startService() throws IOException {
         Log.d(TAG, "Starting service..");
@@ -128,7 +132,7 @@ public class ObdGatewayService extends AbstractGatewayService {
         } catch (Exception e2) {
             Log.e(TAG, "There was an error while establishing Bluetooth connection. Stopping app..", e2);
             stopService();
-            throw new IOException();
+            throw new IOException("eoeoeoeoe");
         }
 
         // Let's configure the connection.
@@ -185,6 +189,7 @@ public class ObdGatewayService extends AbstractGatewayService {
      */
     protected void executeQueue() throws InterruptedException {
         Log.d(TAG, "Executing queue..");
+
         while (!Thread.currentThread().isInterrupted()) {
             ObdCommandJob job = null;
             try {
@@ -231,9 +236,10 @@ public class ObdGatewayService extends AbstractGatewayService {
 
             if (job != null) {
                 final ObdCommandJob job2 = job;
-                new ConnectOBD(ctx).stateUpdate(job2);
+                ConnectOBD.stateUpdate(job2,ctx);
             }
         }
+
     }
 
     /**

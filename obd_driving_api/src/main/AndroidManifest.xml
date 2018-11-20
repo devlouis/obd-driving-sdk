@@ -11,7 +11,10 @@
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_LOCATION_EXTRA_COMMANDS" />
 
-    <application>
+    <application
+            android:supportsRtl="true"
+    >
+
         <activity android:name=".app.ui.activity.PairObdActivity"
                   android:screenOrientation="portrait"
                   android:theme="@style/AppTheme.NoActionBar">

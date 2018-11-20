@@ -13,7 +13,10 @@ import android.support.v7.widget.LinearLayoutManager
 import android.util.Log
 import android.view.View
 import android.widget.Toast
+import com.mdp.innovation.obd_driving_api.app.`interface`.ObdGatewayVin
+import com.mdp.innovation.obd_driving_api.app.`interface`.OnItemClickListenerPair
 import com.mdp.innovation.obd_driving_api.app.ui.adapter.PairedAdapter
+import com.mdp.innovation.obd_driving_api.app.ui.adapter.SearchBlutoothAdapter
 import com.mdp.innovation.obd_driving_api.app.ui.config.ObdConfig
 import com.mdp.innovation.obd_driving_api.app.ui.io.*
 import com.mdp.innovation.obd_driving_api.app.utils.DevicePair
@@ -31,7 +34,6 @@ import java.util.*
 
 
 class PairObdActivity : BaseAppCompat(), ObdProgressListener {
-
     /**
      * Actualización del estado
      */
@@ -103,7 +105,7 @@ class PairObdActivity : BaseAppCompat(), ObdProgressListener {
     val BLUETOOTH_LIST_KEY = "bluetooth_list_preference"
     var VIN = ""
 
-    var pairedNewAdapter: PairedAdapter? = null
+    var pairedNewAdapter: SearchBlutoothAdapter? = null
     var pairedAdapter: PairedAdapter? = null
     var NewsDeviceStrings = ArrayList<BluetoothDevice>()
 
@@ -115,6 +117,7 @@ class PairObdActivity : BaseAppCompat(), ObdProgressListener {
     private var service: AbstractGatewayService? = null
     private var bluetoothDefaultIsEnable = false
 
+    var obdGatewayVin: ObdGatewayVin? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_pair_obd)
@@ -162,7 +165,7 @@ class PairObdActivity : BaseAppCompat(), ObdProgressListener {
 
         //Validar mac existente.
         appSharedPreference = SharedPreference(this)
-        var macDevice = appSharedPreference.getMacBluetooth()[appSharedPreference.MAC_DEVICE]!!
+        macDevice = appSharedPreference.getMacBluetooth()[appSharedPreference.MAC_DEVICE]!!
         LogUtils().v(TAG, " macDevice:: $macDevice")
 
         val btAdapter = BluetoothAdapter.getDefaultAdapter()
@@ -188,9 +191,10 @@ class PairObdActivity : BaseAppCompat(), ObdProgressListener {
 
         rviDevicesNew.setHasFixedSize(true)
         rviDevicesNew.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL,false)
-        pairedNewAdapter = PairedAdapter(this, NewsDeviceStrings, false, -1) { bluetoothDevice: BluetoothDevice, pos: Int ->
+        pairedNewAdapter = SearchBlutoothAdapter(this, NewsDeviceStrings) { bluetoothDevice: BluetoothDevice ->
             LogUtils().v(TAG, " select: ${bluetoothDevice.name} - ${bluetoothDevice.address}")
-            LogUtils().v(TAG, " POS: ${pos}")
+            macDevice = bluetoothDevice.address
+            LogUtils().v(TAG, " MAC_: ${macDevice}")
             val device = bluetoothDevice
             if (device.bondState == BluetoothDevice.BOND_BONDED) {
                 DevicePair().unpairDevice(device)
@@ -265,7 +269,8 @@ class PairObdActivity : BaseAppCompat(), ObdProgressListener {
     /**
      * Lista de bluetooth emparejados
      */
-    var posPaiered = -1
+
+    var macDevice = ""
     fun BluetoothPaired(){
         val pairedDevices = mBtAdapter!!.bondedDevices
         if (pairedDevices == null || pairedDevices.size == 0) {
@@ -276,15 +281,7 @@ class PairObdActivity : BaseAppCompat(), ObdProgressListener {
 
             rviDevicesPaired.setHasFixedSize(true)
             rviDevicesPaired.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL,false)
-            pairedAdapter = PairedAdapter(this, list, true, posPaiered) { bluetoothDevice: BluetoothDevice, pos: Int ->
-                LogUtils().v(TAG, " select: ${bluetoothDevice.name} - ${bluetoothDevice.address}")
-                LogUtils().v(TAG, " POS: ${pos + 1}")
-                posPaiered = (pos + 1)
-                appSharedPreference.saveMacBluetooth(bluetoothDevice.address)
-                BluetoothPaired()
-
-
-            }
+            pairedAdapter = PairedAdapter(this, list, macDevice)
             rviDevicesPaired.adapter = pairedAdapter
            /* val intent = Intent(this@MainActivity, DeviceListActivity::class.java)
             intent.putParcelableArrayListExtra("device.list", list)
@@ -308,7 +305,7 @@ class PairObdActivity : BaseAppCompat(), ObdProgressListener {
 
     override fun onPause() {
         if (mBtAdapter != null) {
-            if (mBtAdapter!!.isDiscovering) {
+            if (mBtAdapter!!.isDiscovering()) {
                 mBtAdapter!!.cancelDiscovery()
             }
         }
