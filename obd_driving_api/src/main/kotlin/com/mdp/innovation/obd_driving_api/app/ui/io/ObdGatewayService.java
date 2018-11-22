@@ -64,7 +64,7 @@ public class ObdGatewayService extends AbstractGatewayService  {
         //final String remoteDevice = prefs.getString(ConfigActivity.BLUETOOTH_LIST_KEY, null);
         appSharedPreference = new SharedPreference(this);
         HashMap<String, String> Macdevice = appSharedPreference.getMacBluetooth();
-        final String remoteDevice = Macdevice.get(appSharedPreference.getMAC_DEVICE());
+        final String remoteDevice = ""; //Macdevice.get(appSharedPreference.getMAC_DEVICE());
         Log.v(" remoteDevice: ", remoteDevice);
         if (remoteDevice == null || "".equals(remoteDevice)) {
             Toast.makeText(ctx, getString(R.string.text_bluetooth_nodevice), Toast.LENGTH_LONG).show();

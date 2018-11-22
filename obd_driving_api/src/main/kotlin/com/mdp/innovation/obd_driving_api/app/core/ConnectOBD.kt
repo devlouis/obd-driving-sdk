@@ -38,33 +38,43 @@ object ConnectOBD{
     var context: Context? = null
     var eo = ""
 
-
+    var macDevice = ""
 
 
     fun initialize(context: Context){
         this.context = context
-        Log.d(TAG, " INIT")
+        LogUtils().v(TAG, " INIT")
         RoboGuice.setUseAnnotationDatabases(false)
         appSharedPreference = SharedPreference(context)
-        var macDevice = appSharedPreference.getMacBluetooth()[appSharedPreference.MAC_DEVICE]!!
+        //macDevice = appSharedPreference.getMacBluetooth()[appSharedPreference.MAC_DEVICE]!!
         LogUtils().v(TAG, " macDevice:: $macDevice")
     }
 
-    fun verifyMacOBD(): Boolean{
-        var macDevice = appSharedPreference.getMacBluetooth()[appSharedPreference.MAC_DEVICE]!!
+    /**
+     * Verificar si la mac del OBD esta guardado.
+     */
+    data class Result(val result: Boolean, val macBluetooth: String)
+    fun verifyMacOBD():Result{
+        //var macDevice = appSharedPreference.getMacBluetooth()[appSharedPreference.MAC_DEVICE]!!
         LogUtils().v(TAG, " macDevice:: $macDevice")
-        return macDevice.isNotEmpty()
+        return Result(macDevice.isNotEmpty(), macDevice)
     }
 
     fun startLiveData(mObdGatewayVin: ObdGatewayVin) {
         Log.d(TAG, "Starting live data...")
         this.obdGatewayVin = mObdGatewayVin
-        var macDevice = appSharedPreference.getMacBluetooth()[appSharedPreference.MAC_DEVICE]!!
-        doBindService()
-        // start command execution
-        Handler().post(mQueueCommands)
+        if (macDevice.isNotEmpty()) {
+            doBindService()
+            // start command execution
+            Handler().post(mQueueCommands)
+        }else{
+            obdGatewayVin.errorConnect(context!!.getString(R.string.mac_bluetooh_empty))
+        }
     }
 
+    fun stopLiveData(){
+        doUnbindService()
+    }
 
     val serviceConn = object : ServiceConnection {
         override fun onServiceConnected(className: ComponentName, binder: IBinder) {
@@ -109,7 +119,7 @@ object ConnectOBD{
     }
 
 
-    fun doBindService(){
+    private fun doBindService(){
 
         if (!isServiceBound) {
             Log.d(TAG, "Binding OBD service..")
@@ -126,7 +136,7 @@ object ConnectOBD{
         }
     }
 
-    fun doUnbindService() {
+     private fun doUnbindService() {
         if (isServiceBound) {
             if (service!!.isRunning) {
                 service!!.stopService()
@@ -200,6 +210,8 @@ object ConnectOBD{
         }
     }
 
+
+
     /**
      * Actualización del estado
      */
@@ -212,4 +224,17 @@ object ConnectOBD{
         updateTripStatistic(job2, cmdID = cmdID)
     }
 
+    /**
+     * Verificar service OBD
+     */
+    fun CheckConecction(): Boolean{
+        return isServiceBound
+    }
+
+    /**
+     * DUMMY
+     */
+    fun getVInDummy():String{
+        return "M4N4N4T3CU3NT0"
+    }
 }

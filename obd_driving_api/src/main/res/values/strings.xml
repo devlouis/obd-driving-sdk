@@ -12,7 +12,8 @@
     <string name="service_started">La conexión OBD ha comenzado.</string>
     <string name="service_starting">Iniciando conexión OBD ...</string>
     <string name="status_bluetooth_connected">conectado</string>
-    <string name="status_bluetooth_error_connecting">la conexión falló</string>
+    <string name="status_bluetooth_error_connecting">la conexión falló, verificar OBD</string>
+    <string name="mac_bluetooh_empty">No hay dispositivo emparejado</string>
     <string name="status_bluetooth_connecting">conectando</string>
     <string name="status_bluetooth_disabled">discapacitado</string>
     <string name="status_bluetooth_ok">Listo</string>

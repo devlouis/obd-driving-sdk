@@ -8,6 +8,15 @@
         android:background="#000"
         tools:context=".MainActivity">
 
+    <TextView
+            android:text="TextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="20sp"
+            android:textColor="@color/white"
+            android:id="@+id/tviVIN" app:layout_constraintStart_toEndOf="@+id/button"
+            android:layout_marginStart="8dp" android:layout_marginTop="8dp"
+            app:layout_constraintTop_toTopOf="@+id/button"/>
     <Button
             android:text="Obtener VIN"
             android:layout_width="wrap_content"
@@ -25,13 +34,33 @@
             android:layout_marginStart="16dp"
             android:layout_marginTop="8dp"
             app:layout_constraintTop_toBottomOf="@+id/button"/>
-    <TextView
-            android:text="TextView"
+    <Button
+            android:id="@+id/btnCheckConecction"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="20sp"
+            android:text="Verificar Conexion OBD"
+            app:layout_constraintStart_toStartOf="parent"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="8dp"
+            app:layout_constraintTop_toBottomOf="@+id/btnGoPair"/>
+
+    <Button
+            android:id="@+id/btnVerifyMac"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Verificar MAC OBD"
+            app:layout_constraintStart_toStartOf="parent"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="8dp"
+            app:layout_constraintTop_toBottomOf="@+id/btnCheckConecction"/>
+    <TextView
+            android:text="..."
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="16sp"
             android:textColor="@color/white"
-            android:id="@+id/tviVIN" app:layout_constraintStart_toEndOf="@+id/button"
-            android:layout_marginStart="8dp" android:layout_marginTop="8dp"
-            app:layout_constraintTop_toTopOf="@+id/button"/>
+            android:id="@+id/tviVerifyMac" app:layout_constraintStart_toEndOf="@+id/btnVerifyMac"
+            android:layout_marginStart="8dp"
+            app:layout_constraintTop_toTopOf="@+id/btnVerifyMac"
+            app:layout_constraintBottom_toBottomOf="@+id/btnVerifyMac"/>
 </android.support.constraint.ConstraintLayout>
