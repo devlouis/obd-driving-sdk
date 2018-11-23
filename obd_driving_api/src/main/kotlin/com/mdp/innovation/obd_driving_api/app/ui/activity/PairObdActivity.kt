@@ -31,6 +31,7 @@ import java.io.FileNotFoundException
 import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.*
+import kotlin.concurrent.schedule
 
 
 class PairObdActivity : BaseAppCompat(), ObdProgressListener {
@@ -109,7 +110,7 @@ class PairObdActivity : BaseAppCompat(), ObdProgressListener {
     var pairedAdapter: PairedAdapter? = null
     var NewsDeviceStrings = ArrayList<BluetoothDevice>()
 
-    var mBtAdapter: BluetoothAdapter? = null
+    lateinit var mBtAdapter: BluetoothAdapter
     var mProgressDlg: ProgressDialog? = null
 
     lateinit var appSharedPreference: SharedPreference
@@ -131,17 +132,24 @@ class PairObdActivity : BaseAppCompat(), ObdProgressListener {
     }
 
     fun onClickListener(){
+        cviDialog.setOnClickListener {  }
         llaBluetoothDiscovery.setOnClickListener {
-           /* mBtAdapter!!.startDiscovery()
-            viewDialogDevicesNew.visibility = View.VISIBLE*/
-            startLiveData()
+            rviDevicesNew.removeAllViews()
+            mBtAdapter.startDiscovery()
+            //startLiveData()
+            Handler().postDelayed({
+                viewDialogDevicesNew.visibility = View.VISIBLE
+            }, 600)
+
+
 
         }
         viewDialogDevicesNew.setOnClickListener {
             viewDialogDevicesNew.visibility = View.GONE
+            mBtAdapter.cancelDiscovery()
         }
         tviBluetoothStatus.setOnClickListener {
-            if (!mBtAdapter!!.isEnabled){
+            if (!mBtAdapter.isEnabled){
                 val intent = Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)
                 startActivityForResult(intent, 1000)
             }
@@ -150,7 +158,7 @@ class PairObdActivity : BaseAppCompat(), ObdProgressListener {
     }
 
     fun BluetoohEnable(){
-        tviBluetoothStatus.text = "Bluetooth conectado"
+        tviBluetoothStatus.text = "Bluetooth disponible"
         tviBluetoothStatus.setTextColor(resources.getColor(R.color.new_verder))
         tviBluetoothStatus.isClickable = false
     }
@@ -170,10 +178,10 @@ class PairObdActivity : BaseAppCompat(), ObdProgressListener {
 
         val btAdapter = BluetoothAdapter.getDefaultAdapter()
         if (btAdapter != null)
-            bluetoothDefaultIsEnable = btAdapter!!.isEnabled
+            bluetoothDefaultIsEnable = btAdapter.isEnabled
 
         mBtAdapter = BluetoothAdapter.getDefaultAdapter()
-        if (mBtAdapter!!.isEnabled){
+        if (mBtAdapter.isEnabled){
             BluetoohEnable()
         }else{
             BluetoothDisabled()
@@ -226,9 +234,14 @@ class PairObdActivity : BaseAppCompat(), ObdProgressListener {
             }else if (BluetoothDevice.ACTION_BOND_STATE_CHANGED == action) {
                 val state = intent.getIntExtra(BluetoothDevice.EXTRA_BOND_STATE, BluetoothDevice.ERROR)
                 val prevState = intent.getIntExtra(BluetoothDevice.EXTRA_PREVIOUS_BOND_STATE, BluetoothDevice.ERROR)
+                val device = intent.getParcelableExtra<BluetoothDevice>(BluetoothDevice.EXTRA_DEVICE)
 
                 if (state == BluetoothDevice.BOND_BONDED && prevState == BluetoothDevice.BOND_BONDING) {
                     snackBarSucceso("Vinculado", claContent)
+                    appSharedPreference.saveMacBluetooth(device.address)
+                    BluetoothPaired()
+                    viewDialogDevicesNew.visibility = View.GONE
+
                 } else if (state == BluetoothDevice.BOND_NONE && prevState == BluetoothDevice.BOND_BONDED) {
                     snackBarFail("Desvinculado", claContent)
                 }
@@ -272,7 +285,7 @@ class PairObdActivity : BaseAppCompat(), ObdProgressListener {
 
     var macDevice = ""
     fun BluetoothPaired(){
-        val pairedDevices = mBtAdapter!!.bondedDevices
+        val pairedDevices = mBtAdapter.bondedDevices
         if (pairedDevices == null || pairedDevices.size == 0) {
             snackBarFail("No Paired Devices Found", claContent)
         } else {
@@ -305,8 +318,8 @@ class PairObdActivity : BaseAppCompat(), ObdProgressListener {
 
     override fun onPause() {
         if (mBtAdapter != null) {
-            if (mBtAdapter!!.isDiscovering()) {
-                mBtAdapter!!.cancelDiscovery()
+            if (mBtAdapter.isDiscovering) {
+                mBtAdapter.cancelDiscovery()
             }
         }
         super.onPause()
@@ -398,6 +411,16 @@ class PairObdActivity : BaseAppCompat(), ObdProgressListener {
             //OBD status
             //obdStatusTextView.setText(getString(R.string.status_obd_disconnected))
         }
+    }
+
+    override fun onBackPressed() {
+        if (viewDialogDevicesNew.visibility == View.VISIBLE){
+            viewDialogDevicesNew.visibility = View.GONE
+            mBtAdapter.cancelDiscovery()
+        }else{
+            super.onBackPressed()
+        }
+
     }
 
 

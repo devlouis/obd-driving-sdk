@@ -7,6 +7,7 @@ import com.mdp.innovation.obd_driving_api.app.ui.activity.SensorActivity
 import com.mdp.innovation.obd_driving_api.app.`interface`.ObdGatewayVin
 import com.mdp.innovation.obd_driving_api.app.core.BaseAppCompat
 import com.mdp.innovation.obd_driving_api.app.core.ConnectOBD
+import com.mdp.innovation.obd_driving_api.app.ui.activity.PairObdActivity
 import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : BaseAppCompat(), ObdGatewayVin {
@@ -45,8 +46,8 @@ class MainActivity : BaseAppCompat(), ObdGatewayVin {
         }
 
         btnGoPair.setOnClickListener {
-            //nextActivity(PairObdActivity::class.java, true)
-            nextActivity(SensorActivity::class.java, true)
+            nextActivity(PairObdActivity::class.java, true)
+            //nextActivity(SensorActivity::class.java, true)
         }
         btnCheckConecction.setOnClickListener {
             ConnectOBD.CheckConecction()

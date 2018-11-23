@@ -11,6 +11,7 @@
    <android.support.v7.widget.CardView
             xmlns:card_view="http://schemas.android.com/apk/res-auto"
             android:id="@+id/cviGiftCard"
+
             card_view:cardBackgroundColor="@color/white"
             card_view:cardCornerRadius="1dp"
             card_view:cardUseCompatPadding="true"
@@ -77,7 +78,12 @@
                 android:textStyle="bold"
                 android:textSize="16sp"
                 android:text="Dispositivos bluetooth emparejados"/>
-
+        <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textStyle="bold"
+                android:textSize="12sp"
+                android:text="Por favor, seleccione OBD."/>
 
             <android.support.v7.widget.RecyclerView
                     android:id="@+id/rviDevicesPaired"
@@ -97,15 +103,18 @@
     <RelativeLayout android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:id="@+id/viewDialogDevicesNew"
-                    android:elevation="50dp"
+                    android:elevation="4dp"
                     android:visibility="gone"
                     android:background="@color/black_transparent_dialog"
                     android:padding="32dp"
                     app:layout_constraintTop_toTopOf="parent" app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintBottom_toBottomOf="parent" app:layout_constraintStart_toStartOf="parent">
         <android.support.v7.widget.CardView
+                android:id="@+id/cviDialog"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:elevation="24dp"
+                app:cardCornerRadius="4dp"
                 android:layout_centerHorizontal="true"
                 android:layout_centerVertical="true">
 
@@ -114,10 +123,10 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
                 <LinearLayout
-                        android:padding="8dp"
+
                         android:gravity="center"
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent"
+                        android:layout_height="64dp"
                         android:orientation="horizontal">
 
                     <TextView android:layout_width="0dp"
@@ -125,16 +134,11 @@
                               android:layout_height="wrap_content"
                               android:text="Dispositivos disponibles"
                               android:textStyle="bold"
-                              android:textSize="16sp"
-                              android:layout_marginLeft="8dp"
+                              android:textSize="20sp"
+                              android:layout_marginLeft="20dp"
                               android:textColor="@color/black"
                               android:background="@color/white"
                               android:layout_above="@+id/rviDevicesNew"/>
-                    <ProgressBar
-                            android:id="@+id/vLoadingDevices"
-                            android:layout_gravity="center"
-                            android:layout_width="40dp"
-                            android:layout_height="wrap_content"/>
                 </LinearLayout>
 
 
@@ -142,13 +146,19 @@
                         android:id="@+id/rviDevicesNew"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:padding="16dp"
+
                         android:layout_centerVertical="true"
                         android:layout_centerHorizontal="true"
                         android:background="@color/white"
                 >
 
                 </android.support.v7.widget.RecyclerView>
+                <ProgressBar
+                        android:id="@+id/vLoadingDevices"
+                        android:layout_gravity="center"
+                        android:layout_margin="8dp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"/>
             </LinearLayout>
 
         </android.support.v7.widget.CardView>

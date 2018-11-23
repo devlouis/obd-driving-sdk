@@ -38,7 +38,7 @@ object ConnectOBD{
     var context: Context? = null
     var eo = ""
 
-    var macDevice = ""
+    private var macDevice = ""
 
 
     fun initialize(context: Context){
@@ -46,7 +46,7 @@ object ConnectOBD{
         LogUtils().v(TAG, " INIT")
         RoboGuice.setUseAnnotationDatabases(false)
         appSharedPreference = SharedPreference(context)
-        //macDevice = appSharedPreference.getMacBluetooth()[appSharedPreference.MAC_DEVICE]!!
+        macDevice = appSharedPreference.getMacBluetooth()[appSharedPreference.MAC_DEVICE]!!
         LogUtils().v(TAG, " macDevice:: $macDevice")
     }
 
@@ -55,7 +55,6 @@ object ConnectOBD{
      */
     data class Result(val result: Boolean, val macBluetooth: String)
     fun verifyMacOBD():Result{
-        //var macDevice = appSharedPreference.getMacBluetooth()[appSharedPreference.MAC_DEVICE]!!
         LogUtils().v(TAG, " macDevice:: $macDevice")
         return Result(macDevice.isNotEmpty(), macDevice)
     }
@@ -152,10 +151,6 @@ object ConnectOBD{
         }
     }
 
-
-
-
-
     /**
      * Comando de búsqueda
      */
@@ -166,13 +161,10 @@ object ConnectOBD{
         return txt
     }
 
-
-
     private val mQueueCommands = object : Runnable {
         override fun run() {
             if (service != null && service!!.isRunning && service!!.queueEmpty()) {
                 queueCommands()
-
             }
             // run again in period defined in preferences
             Handler().postDelayed(this, 4000)
@@ -181,8 +173,6 @@ object ConnectOBD{
 
     private fun updateTripStatistic(job: ObdCommandJob, cmdID: String) {
         //Log.v(TAG, " updateTripStatistic ")
-        //Toast.makeText(this, "updateTripStatistic", Toast.LENGTH_LONG).show()
-        //Log.v(TAG, " VINnn ${context!!.getString(R.string.status_bluetooth_connecting)}")
         var VIN = ""
         if (cmdID == AvailableCommandNames.SPEED.toString()) {
             val command = job.command as SpeedCommand

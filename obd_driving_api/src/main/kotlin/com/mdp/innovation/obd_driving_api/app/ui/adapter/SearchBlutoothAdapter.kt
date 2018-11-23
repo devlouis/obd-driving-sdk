@@ -21,11 +21,18 @@ class SearchBlutoothAdapter(val mContext: Context, val listParied: ArrayList<Blu
     override fun onBindViewHolder(holder: ViewHolder, position: Int) = holder.bind(position, mContext, listParied[position], listener)
 
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        val TAG = javaClass.simpleName
+
         fun bind(position: Int, mContext: Context, devicesMac: BluetoothDevice, listener: (BluetoothDevice) -> Unit) = with(itemView){
-            //val position = adapterPosition
             tviStatus.visibility = View.GONE
             var name = if(devicesMac.name == null) "" else "${devicesMac.name} "
-            tviDevice.text = "$name\n${devicesMac.address}"
+
+            if(name.isEmpty()){
+                tviDevice.text = "${devicesMac.address}"
+            }else {
+                tviDevice.text = "$name\n${devicesMac.address}"
+            }
+
             setOnClickListener { listener(devicesMac) }
         }
     }
