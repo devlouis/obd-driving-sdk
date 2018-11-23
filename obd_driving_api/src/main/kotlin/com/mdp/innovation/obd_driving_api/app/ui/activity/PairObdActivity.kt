@@ -268,13 +268,11 @@ class PairObdActivity : BaseAppCompat(), ObdProgressListener {
                 val device = intent.getParcelableExtra<BluetoothDevice>(BluetoothDevice.EXTRA_DEVICE)
                 //
                 //Agregue el nombre y la dirección a un adaptador de matriz para mostrar en un Recyclerview, que no este emparejado
-                if (device.bondState != BluetoothDevice.BOND_BONDED)
+                if (device.bondState != BluetoothDevice.BOND_BONDED) {
+                    LogUtils().v(" BOND_BONDED ", " :: ${device.name}")
                     NewsDeviceStrings.add(device)
-                rviDevicesNew.adapter = pairedNewAdapter
-                //pairedAdapter!!.notifyDataSetChanged()
-
-                LogUtils().v( "ConfigActivity" , " :: ${device.name}")
-
+                    rviDevicesNew.adapter = pairedNewAdapter
+                }
             }
         }
     }
