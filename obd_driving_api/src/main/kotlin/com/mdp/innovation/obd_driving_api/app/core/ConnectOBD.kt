@@ -56,6 +56,7 @@ object ConnectOBD{
     data class Result(val result: Boolean, val macBluetooth: String)
     fun verifyMacOBD():Result{
         LogUtils().v(TAG, " macDevice:: $macDevice")
+        macDevice = appSharedPreference.getMacBluetooth()[appSharedPreference.MAC_DEVICE]!!
         return Result(macDevice.isNotEmpty(), macDevice)
     }
 

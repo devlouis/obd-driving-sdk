@@ -11,11 +11,13 @@ import java.util.ArrayList
 import android.widget.Toast
 import android.widget.RadioButton
 import android.widget.TextView
+import com.mdp.innovation.obd_driving_api.app.core.ConnectOBD
 import com.mdp.innovation.obd_driving_api.app.utils.LogUtils
 import com.mdp.innovation.obd_driving_api.data.store.SharedPreference
 
 
 class PairedAdapter(val mContext: Context, val listParied: ArrayList<BluetoothDevice>, var mac: String) : RecyclerView.Adapter<PairedAdapter.ViewHolder>() {
+    val TAG = javaClass.simpleName
     var mMacDevice = ""
     var lastSelectedPosition = -1
 
@@ -57,6 +59,8 @@ class PairedAdapter(val mContext: Context, val listParied: ArrayList<BluetoothDe
             lastSelectedPosition = adapterPosition
             SharedPreference(mContext).saveMacBluetooth(listParied[lastSelectedPosition].address)
             notifyItemRangeChanged(0, listParied.size)
+            LogUtils().v(TAG, " SharedPreference ${SharedPreference(mContext).getMacBluetooth()}")
+            LogUtils().v(TAG, " ConnectOBD ${ConnectOBD.verifyMacOBD()}")
         }
 
         init {
