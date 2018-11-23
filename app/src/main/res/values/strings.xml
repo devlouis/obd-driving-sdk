@@ -1,3 +1,25 @@
 <resources>
     <string name="app_name">OBD Driving</string>
+    <string name="title_main">Inicio</string>
+    <string name="title_home">Mi Calificación</string>
+    <string name="title_menu">Menú</string>
+    <string name="drawer_open">Open</string>
+    <string name="drawer_close">Close</string>
+    <string name="dcp">Digital Car Platform</string>
+    <string name="home_title">Tu promedio de manejo es:</string>
+    <string name="collect_data_title">Estamos recolectando tus datos...</string>
+    <string name="collect_data_subtitle">El proceso es automático. Solo conduce con responsabilidad.</string>
+    <string name="subtitle_connect">Para empezar, conéctate vía Bluetooth a tu OBD.</string>
+    <string name="subtitle_start_trip">Para empezar un nuevo viaje, presiona el botón INICIAR VIAJE.</string>
+    <string name="subtitle_end_trip">Para finalizar el viaje, presiona el botón TERMINAR VIAJE.</string>
+    <string name="btn_connect">CONECTAR</string>
+    <string name="btn_start_trip">INICIAR VIAJE</string>
+    <string name="btn_end_trip">TERMINAR VIAJE</string>
+    <string name="alert">Alerta</string>
+    <string name="notice">Atención</string>
+    <string name="alert_cancel_collect">¿Estás seguro que deseas finalizar tu viaje?.</string>
+    <string name="alert_end_trip">Estamos procesando los datos de tu viaje. \n Te notificaremos cuando terminemos.</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

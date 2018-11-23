@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+             xmlns:tools="http://schemas.android.com/tools"
+              xmlns:app="http://schemas.android.com/apk/res-auto"
+             android:layout_width="match_parent"
+             android:layout_height="match_parent"
+              android:orientation="vertical"
+             tools:context=".ui.fragment.MyScoreFragment">
+
+    <include
+            android:id="@+id/includeToolbar"
+            layout="@layout/toolbar" />
+
+    <android.support.constraint.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@drawable/background2"
+            tools:context=".ui.activity.MainActivity">
+
+        <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toTopOf="parent"
+                android:layout_marginTop="12dp"
+                android:gravity="center"
+                app:layout_constraintStart_toStartOf="parent"
+                android:id="@+id/tv_vin"
+                android:text="Mi VIN es:"/>
+
+        <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toTopOf="parent"
+                android:layout_marginTop="46dp"
+                style="@style/tvScreenTitle"
+                android:gravity="center"
+                app:layout_constraintStart_toStartOf="parent"
+                android:layout_marginStart="40dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:layout_marginEnd="40dp"
+                android:id="@+id/tv_home_title"
+                android:text="@string/collect_data_title"/>
+
+        <ProgressBar
+                style="?android:attr/progressBarStyleLarge"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/progress_bar"
+                android:theme="@style/AppTheme.BlueAccent"
+                android:progressDrawable="@drawable/circular_progress_bar"
+                app:layout_constraintTop_toBottomOf="@id/tv_home_title"
+                android:layout_marginTop="24dp"
+                app:layout_constraintStart_toStartOf="parent"
+                android:layout_marginStart="40dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:layout_marginEnd="40dp" />
+
+        <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toBottomOf="@id/progress_bar"
+                android:layout_marginTop="24dp"
+                style="@style/tvScreenSubTitle"
+                android:gravity="center"
+                app:layout_constraintStart_toStartOf="parent"
+                android:layout_marginStart="40dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:layout_marginEnd="40dp"
+                android:id="@+id/tv_home_prom_text"
+                android:text="@string/collect_data_subtitle"/>
+
+        <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toBottomOf="@id/tv_home_prom_text"
+                android:layout_marginTop="72dp"
+                style="@style/tvScreenSubTitle"
+                android:gravity="center"
+                app:layout_constraintStart_toStartOf="parent"
+                android:layout_marginStart="40dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:layout_marginEnd="40dp"
+                android:id="@+id/tv_home_subtitle"
+                android:text="@string/subtitle_end_trip"/>
+
+
+        <android.support.v7.widget.AppCompatButton
+                android:id="@+id/btnEndTrip"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toBottomOf="@id/tv_home_subtitle"
+                android:layout_marginTop="26dp"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                android:text="@string/btn_end_trip"
+                android:textColor="@color/colorToolbar"
+                app:backgroundTint="#FFF"/>
+
+    </android.support.constraint.ConstraintLayout>
+
+</LinearLayout>
