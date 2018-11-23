@@ -31,6 +31,7 @@ dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 
     // Testing
+    implementation 'com.android.support.constraint:constraint-layout:1.1.3'
     testImplementation "junit:junit:$rootProject.ext.junitVersion"
 
     //Kotlin
@@ -41,6 +42,9 @@ dependencies {
     implementation "com.android.support:design:$rootProject.ext.supportLibVersion"
     implementation "com.android.support:cardview-v7:$rootProject.ext.supportLibVersion"
     implementation "com.android.support.constraint:constraint-layout:$rootProject.ext.constraintLayoutVersion"
+
+    implementation 'org.roboguice:roboguice:3.0.1'
+
 }
 
 // applied specifically at the bottom

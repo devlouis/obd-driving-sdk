@@ -7,6 +7,7 @@ import android.support.design.widget.Snackbar
 import android.support.v4.content.ContextCompat
 import android.view.View
 import com.mdp.innovation.obd_driving_api.R
+import com.mdp.innovation.obd_driving_api.app.ui.activity.PairObdActivity
 
 
 open class BaseAppCompat: AppCompatActivity() {

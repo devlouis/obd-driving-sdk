@@ -48,7 +48,7 @@ ext {
 
     // ValidateTor Library Info
     libVersionCode = 1
-    libVersionName = '0.0.6'
+    libVersionName = '0.0.10'
     libPomUrl = 'https://github.com/devlouis/obd-driving-sdk'
     libGithubRepo = 'devlouis/obd-driving-sdk'
     libModuleName = 'obd-driving-sdk'
