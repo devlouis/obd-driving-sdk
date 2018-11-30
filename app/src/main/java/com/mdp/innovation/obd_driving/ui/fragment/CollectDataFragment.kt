@@ -8,18 +8,11 @@ import android.view.ViewGroup
 
 import com.mdp.innovation.obd_driving.R
 import android.support.v7.widget.Toolbar
-import com.mdp.innovation.obd_driving.ui.MyScoreView
-import com.mdp.innovation.obd_driving.util.Message
 import kotlinx.android.synthetic.main.fragment_collect_data.*
 import android.support.annotation.Nullable
-import com.mdp.innovation.obd_driving.interactor.MyScoreInteractor
-import com.mdp.innovation.obd_driving.presenter.MyScorePresenter
 import com.mdp.innovation.obd_driving.ui.activity.CollectTripDataActivity
-import com.mdp.innovation.obd_driving.ui.activity.HomeActivity
 import com.mdp.innovation.obd_driving.util.CustomAnimate
-import com.mdp.innovation.obd_driving.ui.navigation.Navigator
 import com.mdp.innovation.obd_driving.util.Global
-import com.mdp.innovation.obd_driving_api.app.core.ConnectOBD
 
 
 class CollectDataFragment : BaseFragment() {
@@ -33,8 +26,6 @@ class CollectDataFragment : BaseFragment() {
     var myActivity = CollectTripDataActivity()
 
     //private val presenter = MyScorePresenter(this, MyScoreInteractor())
-
-    var navigator : Navigator = Navigator()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

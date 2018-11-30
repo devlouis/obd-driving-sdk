@@ -11,13 +11,14 @@ import com.mdp.innovation.obd_driving.ui.HomeView
 import com.mdp.innovation.obd_driving.ui.fragment.CancelCollectDialogFragment
 import com.mdp.innovation.obd_driving.ui.navigation.Navigator
 import com.mdp.innovation.obd_driving.util.Global
+import org.koin.android.ext.android.inject
 
 class CollectTripDataActivity : BaseServiceActivity(), HomeView {
 
     var serviceClass = CollectTripDataService::class.java
     lateinit var myIntent : Intent
 
-    private val navigator = Navigator()
+    private val navigator by inject<Navigator>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

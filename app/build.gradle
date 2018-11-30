@@ -39,10 +39,15 @@ dependencies {
     implementation "com.android.support.constraint:constraint-layout:$rootProject.ext.constraintLayoutVersion"
 
     //SDK OBD driving
-    implementation 'com.github.devlouis:obd-driving-sdk:0.0.9'
+    //implementation 'com.github.devlouis:obd-driving-sdk:0.0.9'
 
     //SDK local
-    //implementation project(':obd_driving_api')
+    implementation project(':obd_driving_api')
     implementation 'com.android.support:support-v4:27.1.1'
     implementation 'com.airbnb.android:lottie:2.5.0'
+    implementation 'com.android.support:recyclerview-v7:27.1.1'
+    implementation 'com.android.support:recyclerview-v7:27.0.0-rc1'
+    implementation 'org.koin:koin-android:1.0.2'
+    implementation "org.koin:koin-core:1.0.2"
+    implementation "org.koin:koin-core-ext:1.0.2"
 }

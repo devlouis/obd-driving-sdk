@@ -20,6 +20,9 @@
     <string name="alert_cancel_collect">¿Estás seguro que deseas finalizar tu viaje?.</string>
     <string name="alert_end_trip">Estamos procesando los datos de tu viaje. \n Te notificaremos cuando terminemos.</string>
 
+
+    <string name="configOption1">Cambiar OBD emparejado</string>
+
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

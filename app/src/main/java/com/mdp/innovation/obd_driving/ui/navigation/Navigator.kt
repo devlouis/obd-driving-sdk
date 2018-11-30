@@ -14,6 +14,7 @@ import com.mdp.innovation.obd_driving.ui.activity.CollectTripDataActivity
 import android.content.Context
 import android.support.v7.app.AppCompatActivity
 import com.mdp.innovation.obd_driving.ui.activity.MainActivity
+import com.mdp.innovation.obd_driving.ui.fragment.ConfigurationFragment
 
 
 class Navigator {
@@ -25,6 +26,15 @@ class Navigator {
         //ft.addToBackStack(null)
         ft.commit()
         return myScoreFragment
+    }
+
+    fun navigateToConfiguration(fragmentManager: FragmentManager , @IdRes containerId: Int) : ConfigurationFragment{
+        val ft = fragmentManager.beginTransaction()
+        val configurationFragment = ConfigurationFragment.newInstance()
+        ft.replace(containerId, configurationFragment)
+        //ft.addToBackStack(null)
+        ft.commit()
+        return configurationFragment
     }
 
     fun navigateToCollectData(fragmentManager: FragmentManager? , @IdRes containerId: Int){

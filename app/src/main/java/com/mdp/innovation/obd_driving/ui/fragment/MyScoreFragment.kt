@@ -12,23 +12,16 @@ import com.mdp.innovation.obd_driving.ui.MyScoreView
 import com.mdp.innovation.obd_driving.util.Message
 import kotlinx.android.synthetic.main.fragment_my_score.*
 import android.support.annotation.Nullable
-import android.support.v4.widget.DrawerLayout
 import com.mdp.innovation.obd_driving.interactor.MyScoreInteractor
 import com.mdp.innovation.obd_driving.presenter.MyScorePresenter
 import com.mdp.innovation.obd_driving.ui.activity.HomeActivity
 import com.mdp.innovation.obd_driving.ui.navigation.Navigator
 import com.mdp.innovation.obd_driving.util.CustomAnimate
-import android.support.v7.app.AppCompatActivity
 import android.util.Log
-import android.view.MenuItem
-import android.view.MenuInflater
-import android.view.Menu
-import android.view.Gravity
+import org.koin.android.ext.android.inject
 import com.mdp.innovation.obd_driving.util.Global
 import com.mdp.innovation.obd_driving_api.app.`interface`.ObdGatewayVin
 import com.mdp.innovation.obd_driving_api.app.core.ConnectOBD
-import com.mdp.innovation.obd_driving_api.app.ui.activity.PairObdActivity
-import com.mdp.innovation.obd_driving_api.app.utils.LogUtils
 
 
 class MyScoreFragment : BaseFragment(), MyScoreView, ObdGatewayVin {
@@ -41,7 +34,7 @@ class MyScoreFragment : BaseFragment(), MyScoreView, ObdGatewayVin {
 
     var myActivity = HomeActivity()
 
-    private val navigator = Navigator()
+    private val navigator by inject<Navigator>()
 
     private val presenter = MyScorePresenter(this, MyScoreInteractor())
 
@@ -52,54 +45,25 @@ class MyScoreFragment : BaseFragment(), MyScoreView, ObdGatewayVin {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,savedInstanceState: Bundle?): View? {
         var view = inflater.inflate(R.layout.fragment_my_score, container, false)
 
-        var drawerLayout = activity?.findViewById(R.id.drawer_layout) as DrawerLayout
+        //var drawerLayout = activity?.findViewById(R.id.drawer_layout) as DrawerLayout
 
         var toolbar = view.findViewById(R.id.includeToolbar) as Toolbar
 
-
-        //(activity as AppCompatActivity).supportActionBar?.title = "111111"
-
-        var myActivity : AppCompatActivity = activity as AppCompatActivity
-        //myActivity.supportActionBar?.title = "111111"
-        //myActivity.supportActionBar?.setIcon(R.drawable.ic_bluetooth)
-
         toolbar.title = "Mi Calificación"
         toolbar.setNavigationIcon(R.drawable.ic_menu)
-        //(activity as HomeActivity).delegate.setSupportActionBar(toolbar)
 
-        toolbar.setNavigationOnClickListener {
+        myActivity = activity as HomeActivity
+        myActivity.drawerConfig(toolbar)
+
+        /*toolbar.setNavigationOnClickListener {
             System.out.println("Menuuuuuuuu")
             drawerLayout.openDrawer(Gravity.START)
-        }
-
-        //toolbar.title = "XXXXXXXXX"
-
-
-        /*toolbar.title = "XXXXXXXXX"
-        toolbar.setNavigationIcon(R.drawable.ic_bluetooth)
-
-        activity.title = "Hoooola"*/
-
-        /*var tool = (activity as AppCompatActivity).findViewById(R.id.includeToolbar) as Toolbar
-        tool.setTitle("ssssssssssssssssssss")
-        tool.setNavigationIcon(R.drawable.ic_bluetooth)
-        tool.setNavigationOnClickListener {
-            System.out.println("xxxxxxxxxxxxxxxxxxxxxx")
         }*/
 
         return view
     }
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when (item.getItemId()) {
-            android.R.id.home -> activity!!.onBackPressed()
-        }
-        return super.onOptionsItemSelected(item)
-    }
 
-    override fun onCreateOptionsMenu(menu: Menu?, inflater: MenuInflater?) {
-        inflater?.inflate(R.menu.drawer_menu, menu)
-    }
 
     override fun onActivityCreated(@Nullable savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)

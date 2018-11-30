@@ -14,17 +14,15 @@ import com.mdp.innovation.obd_driving.R
 import com.mdp.innovation.obd_driving.internal.CollectTripDataService
 import com.mdp.innovation.obd_driving.ui.HomeView
 import com.mdp.innovation.obd_driving.ui.navigation.Navigator
-import com.mdp.innovation.obd_driving.util.Constants
 import java.util.*
-import android.R.attr.data
 import android.os.Handler
-import android.util.Log
+import android.support.v4.widget.DrawerLayout
+import android.support.v7.widget.Toolbar
 import com.mdp.innovation.obd_driving.ui.fragment.EndTripDialogFragment
 import com.mdp.innovation.obd_driving.ui.fragment.MyScoreFragment
-import com.mdp.innovation.obd_driving_api.app.`interface`.ObdGatewayVin
 import com.mdp.innovation.obd_driving_api.app.core.ConnectOBD
 import com.mdp.innovation.obd_driving_api.app.ui.activity.PairObdActivity
-import com.mdp.innovation.obd_driving_api.app.ui.net.ObdService
+import org.koin.android.ext.android.inject
 
 
 class HomeActivity : BaseServiceActivity(), HomeView {
@@ -34,7 +32,8 @@ class HomeActivity : BaseServiceActivity(), HomeView {
 
     lateinit var myScoreFragment : MyScoreFragment
 
-    private val navigator = Navigator()
+    private val navigator by inject<Navigator>()
+    //private val navigator = Navigator()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -92,43 +91,18 @@ class HomeActivity : BaseServiceActivity(), HomeView {
 
     private fun setDrawerConfig(){
 
-        /*val toolbar = includeToolbar as Toolbar
-
-        setSupportActionBar(toolbar)
-        val actionBar = supportActionBar
-        actionBar!!.title = resources.getString(R.string.title_home)
-        actionBar.elevation = 4.0F
-        actionBar.setDisplayShowHomeEnabled(true)
-
-        val drawerToggle:ActionBarDrawerToggle = object : ActionBarDrawerToggle(
-            this,
-            drawer_layout,
-            toolbar,
-            R.string.drawer_open,
-            R.string.drawer_close
-        ){
-            override fun onDrawerClosed(view:View){
-                super.onDrawerClosed(view)
-            }
-
-            override fun onDrawerOpened(drawerView: View){
-                super.onDrawerOpened(drawerView)
-            }
-        }
-
-        drawerToggle.isDrawerIndicatorEnabled = true
-        drawer_layout.addDrawerListener(drawerToggle)
-        drawerToggle.syncState()*/
-
-
         navigation_view.setNavigationItemSelectedListener{
             when (it.itemId){
-                R.id.action_1 -> toast("Opcion 1 clicked")
-                R.id.action_2 -> toast("Opcion 2 clicked")
-                R.id.action_3 -> toast("Opcion 3 clicked")
+                R.id.action_1 -> {
+                    myScoreFragment = navigator.navigateToMyScore(supportFragmentManager, R.id.content)
+                }
+                R.id.action_2 -> {
+                    navigator.navigateToConfiguration(supportFragmentManager, R.id.content)
+                }
+                /*R.id.action_3 -> toast("Opcion 3 clicked")
                 R.id.action_4 ->{
                     toast("Opcion 4 clicked")
-                }
+                }*/
             }
             drawer_layout.closeDrawer(GravityCompat.START)
             true
@@ -142,6 +116,14 @@ class HomeActivity : BaseServiceActivity(), HomeView {
     override fun onBackPressed() {
         if(drawer_layout.isDrawerOpen(Gravity.START)) drawer_layout.closeDrawer(GravityCompat.START)
         else super.onBackPressed()
+    }
+
+    fun drawerConfig(toolbar : Toolbar){
+        var drawerLayout = this.findViewById(R.id.drawer_layout) as DrawerLayout
+        toolbar.setNavigationOnClickListener {
+            System.out.println("Menuuuuuuuu")
+            drawerLayout.openDrawer(Gravity.START)
+        }
     }
 
 }

@@ -15,19 +15,19 @@ class MainInteractor {
     }
 
     fun validateDevicePaired(listener: OnMainFinishedListener) {
-        /*var devicePaired = false
+        var devicePaired = true
         if (devicePaired)  listener.onDevicePaired()
         else listener.onDeviceNoPaired()
 
-        aux += 1*/
+        aux += 1
 
-        var result = ConnectOBD.verifyMacOBD()
+        /*var result = ConnectOBD.verifyMacOBD()
         Log.i("macBluetooth:", result.macBluetooth)
         Log.i("result:", result.result.toString())
         if(result.result){
             listener.onDevicePaired()
         }else{
             listener.onDeviceNoPaired()
-        }
+        }*/
     }
 }

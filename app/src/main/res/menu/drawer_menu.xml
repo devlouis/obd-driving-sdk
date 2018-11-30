@@ -5,22 +5,12 @@
 >
     <item
             android:id="@+id/action_1"
-            android:title="Opción 1"
-            android:icon="@android:drawable/ic_media_play"
+            android:title="Mi calificación"
+            android:icon="@drawable/ic_md_star"
     />
     <item
             android:id="@+id/action_2"
-            android:title="Opción 2"
-            android:icon="@android:drawable/ic_media_play"
-    />
-    <item
-            android:id="@+id/action_3"
-            android:title="Opción 3"
-            android:icon="@android:drawable/ic_media_play"
-    />
-    <item
-            android:id="@+id/action_4"
-            android:title="Opción 4"
-            android:icon="@android:drawable/ic_media_play"
+            android:title="Configuración"
+            android:icon="@drawable/ic_md_build"
     />
 </menu>

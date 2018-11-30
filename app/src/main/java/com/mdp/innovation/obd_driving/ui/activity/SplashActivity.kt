@@ -8,14 +8,12 @@ import kotlinx.android.synthetic.main.activity_splash.*
 import com.mdp.innovation.obd_driving.R
 import android.os.Looper
 import com.mdp.innovation.obd_driving.ui.navigation.Navigator
-import android.content.Intent
-
-
+import org.koin.android.ext.android.inject
 
 
 class SplashActivity : BaseAppCompat() {
 
-    var navigator = Navigator()
+    private val navigator by inject<Navigator>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

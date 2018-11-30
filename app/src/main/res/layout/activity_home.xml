@@ -19,25 +19,24 @@
             android:id="@+id/drawer_header"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:orientation="vertical"
             android:layout_gravity="start"
-            android:background="#fff">
-        <TextView
-                android:id="@+id/drawer_title"
+            android:orientation="vertical"
+            android:background="#FFF">
+        <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/title_menu"
-                android:padding="50dp"
-                android:textSize="25sp"
-                android:textStyle="bold"
-                android:background="#fff"
-        />
-        <android.support.design.widget.NavigationView
-                android:id="@+id/navigation_view"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:menu="@menu/drawer_menu"
-        />
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:background="@drawable/background2">
+                <android.support.design.widget.NavigationView
+                        android:id="@+id/navigation_view"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        app:itemIconTint="@color/colorToolbar"
+                        app:itemTextColor="@color/colorToolbar"
+                        app:headerLayout="@layout/menu_header"
+                        app:menu="@menu/drawer_menu"
+                />
+        </LinearLayout>
     </LinearLayout>
 
 
