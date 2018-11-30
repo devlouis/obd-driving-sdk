@@ -10,4 +10,5 @@ class MyApplication : Application() {
         ConnectOBD.initialize(this)
     }
 
+
 }

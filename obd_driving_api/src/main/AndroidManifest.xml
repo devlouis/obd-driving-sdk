@@ -28,6 +28,13 @@
 
         <activity android:name=".app.ui.activity.SensorActivity">
         </activity>
+
+        <receiver
+                android:name=".data.Broadcast.OBDRestarBroadcastReceiver"
+                android:enabled="true"
+                android:exported="true"
+                android:label="OBDRestarBroadcastReceiver">
+        </receiver>
     </application>
 
 </manifest>

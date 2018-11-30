@@ -16,8 +16,11 @@ import com.google.inject.Inject;
 import com.mdp.innovation.obd_driving_api.R;
 import com.mdp.innovation.obd_driving_api.app.core.ConnectOBD;
 import com.mdp.innovation.obd_driving_api.app.ui.activity.PairObdActivity;
+import com.mdp.innovation.obd_driving_api.app.utils.LogUtils;
 import com.mdp.innovation.obd_driving_api.commands.protocol.*;
 import com.mdp.innovation.obd_driving_api.commands.temperature.AmbientAirTemperatureCommand;
+import com.mdp.innovation.obd_driving_api.data.Broadcast.OBDRestarBroadcastReceiver;
+import com.mdp.innovation.obd_driving_api.data.IoTHub.SendDataOBD;
 import com.mdp.innovation.obd_driving_api.data.store.SharedPreference;
 import com.mdp.innovation.obd_driving_api.enums.ObdProtocols;
 import com.mdp.innovation.obd_driving_api.exceptions.UnsupportedCommandException;
@@ -26,7 +29,10 @@ import com.mdp.innovation.obd_driving_api.exceptions.UnsupportedCommandException
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.HashMap;
+
+import static com.mdp.innovation.obd_driving_api.enums.AvailableCommandNames.VIN;
 
 /**
  * This service is primarily responsible for establishing and maintaining a
@@ -59,12 +65,14 @@ public class ObdGatewayService extends AbstractGatewayService  {
 
     public void startService() throws IOException {
         Log.d(TAG, "Starting service..");
+        Log.v(" OBDRestar ", " Starting service...*");
         this.activity = activity;
         // get the remote Bluetooth device
         //final String remoteDevice = prefs.getString(ConfigActivity.BLUETOOTH_LIST_KEY, null);
         appSharedPreference = new SharedPreference(this);
         HashMap<String, String> Macdevice = appSharedPreference.getMacBluetooth();
         final String remoteDevice = Macdevice.get(appSharedPreference.getMAC_DEVICE());
+        Log.v(" OBDRestar ", " remoteDevice " + remoteDevice);
         Log.v(" remoteDevice: ", remoteDevice);
         if (remoteDevice == null || "".equals(remoteDevice)) {
             Toast.makeText(ctx, getString(R.string.text_bluetooth_nodevice), Toast.LENGTH_LONG).show();
@@ -126,6 +134,7 @@ public class ObdGatewayService extends AbstractGatewayService  {
      */
     private void startObdConnection() throws IOException {
         Log.d(TAG, "Starting OBD connection..");
+        Log.v(" OBDRestar ", " Starting OBD connection.. ");
         isRunning = true;
         try {
             sock = BluetoothManager.connect(dev);
@@ -235,6 +244,15 @@ public class ObdGatewayService extends AbstractGatewayService  {
             }
 
             if (job != null) {
+            /*    SendDataOBD send = new SendDataOBD();
+                try {
+                    send.InitClient();
+                } catch (URISyntaxException e) {
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                send.sendData2();*/
                 final ObdCommandJob job2 = job;
                 ConnectOBD.stateUpdate(job2,ctx);
             }
@@ -303,4 +321,20 @@ public class ObdGatewayService extends AbstractGatewayService  {
         }
     }
 
+/*    @Override
+    public void onDestroy() {
+        Log.v(" OBDRestar ", "broadcast 4");
+        super.onDestroy();
+        Intent broadcastIntent = new Intent(this, OBDRestarBroadcastReceiver.class);
+        sendBroadcast(broadcastIntent);
+        stopService();
+
+    }
+
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        super.onStartCommand(intent, flags, startId);
+        ConnectOBD.startmQueue();
+        return START_STICKY;
+    }*/
 }
