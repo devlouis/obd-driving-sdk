@@ -7,6 +7,7 @@ import com.mdp.innovation.obd_driving_api.app.`interface`.ObdGatewayVin
 import com.mdp.innovation.obd_driving_api.app.core.BaseAppCompat
 import com.mdp.innovation.obd_driving_api.app.core.ConnectOBD
 import com.mdp.innovation.obd_driving_api.app.ui.activity.PairObdActivity
+import com.mdp.innovation.obd_driving_api.app.utils.LogUtils
 import kotlinx.android.synthetic.main.activity_main_test.*
 
 class TestMainActivity : BaseAppCompat(), ObdGatewayVin {
@@ -19,7 +20,7 @@ class TestMainActivity : BaseAppCompat(), ObdGatewayVin {
         Log.v(TAG, " VIN___: $vin")
         runOnUiThread {
             tviVIN.text = vin
-            ConnectOBD.stopLiveData()
+           // ConnectOBD.stopLiveData()
         }
     }
 
@@ -31,7 +32,7 @@ class TestMainActivity : BaseAppCompat(), ObdGatewayVin {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        setContentView(R.layout.activity_main_test)
         onClickListener()
 
     }
@@ -70,6 +71,12 @@ class TestMainActivity : BaseAppCompat(), ObdGatewayVin {
         }
         var dialog = builderAlertDialog.create()
         dialog.show()
+    }
+
+    override fun onDestroy() {
+      /*  LogUtils().v("OBDRestar", "OBDRestar")
+        ConnectOBD.restarServiceOBD()*/
+        super.onDestroy()
     }
 
 

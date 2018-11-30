@@ -75,4 +75,16 @@ public final class ObdConfig {
         return cmds;
     }
 
+    public static ArrayList<ObdCommand> getCommandCustom() {
+        ArrayList<ObdCommand> cmds = new ArrayList<>();
+        // Control
+        cmds.add(new VinCommand());
+        // Engine
+        cmds.add(new RPMCommand());
+        // Misc
+        cmds.add(new SpeedCommand());
+
+
+        return cmds;
+    }
 }

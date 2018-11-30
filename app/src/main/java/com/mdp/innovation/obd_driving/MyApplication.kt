@@ -14,4 +14,5 @@ class MyApplication : Application() {
         startKoin(listOf(generalModule))
     }
 
+
 }

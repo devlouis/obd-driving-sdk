@@ -19,10 +19,12 @@ import com.mdp.innovation.obd_driving_api.app.ui.io.*
 import com.mdp.innovation.obd_driving_api.app.utils.LogUtils
 import com.mdp.innovation.obd_driving_api.commands.SpeedCommand
 import com.mdp.innovation.obd_driving_api.commands.control.VinCommand
+import com.mdp.innovation.obd_driving_api.commands.engine.RPMCommand
+import com.mdp.innovation.obd_driving_api.data.Broadcast.OBDRestarBroadcastReceiver
+import com.mdp.innovation.obd_driving_api.data.IoTHub.SendDataOBD
 import com.mdp.innovation.obd_driving_api.data.store.SharedPreference
 import com.mdp.innovation.obd_driving_api.enums.AvailableCommandNames
 import kotlinx.android.synthetic.main.activity_pair_obd.*
-import roboguice.RoboGuice
 import java.io.IOException
 
 object ConnectOBD{
@@ -32,22 +34,31 @@ object ConnectOBD{
     private var isServiceBound: Boolean = false
     private var preRequisites = true
 
-    lateinit var obdGatewayVin: ObdGatewayVin
+    var obdGatewayVin: ObdGatewayVin? = null
     lateinit var appSharedPreference: SharedPreference
     var btStatus = ""
     var context: Context? = null
     var eo = ""
 
-    private var macDevice = ""
+    var contadorTotal = 0
+    var contador = 0
+    var RPM = ""
+    var KMH = ""
 
+
+    private var macDevice = ""
+    val send = SendDataOBD()
 
     fun initialize(context: Context){
         this.context = context
         LogUtils().v(TAG, " INIT")
-        RoboGuice.setUseAnnotationDatabases(false)
+        //RoboGuice.setUseAnnotationDatabases(false)
         appSharedPreference = SharedPreference(context)
         macDevice = appSharedPreference.getMacBluetooth()[appSharedPreference.MAC_DEVICE]!!
+        send.InitClient()
         LogUtils().v(TAG, " macDevice:: $macDevice")
+        LogUtils().v(TAG, " obdGatewayVin:: $obdGatewayVin")
+
     }
 
     /**
@@ -68,12 +79,24 @@ object ConnectOBD{
             // start command execution
             Handler().post(mQueueCommands)
         }else{
-            obdGatewayVin.errorConnect(context!!.getString(R.string.mac_bluetooh_empty))
+            obdGatewayVin!!.errorConnect(context!!.getString(R.string.mac_bluetooh_empty))
         }
     }
 
     fun stopLiveData(){
         doUnbindService()
+    }
+
+    @JvmStatic
+    fun startmQueue(){
+        Log.d(TAG, "Starting live data... 2")
+        if (macDevice.isNotEmpty()) {
+            doBindService()
+            // start command execution
+            Handler().post(mQueueCommands)
+        }else{
+            //obdGatewayVin!!.errorConnect(context!!.getString(R.string.mac_bluetooh_empty))
+        }
     }
 
     val serviceConn = object : ServiceConnection {
@@ -91,7 +114,7 @@ object ConnectOBD{
                 LogUtils().v(TAG, "Failure Starting live data ${ioe.message.toString()}" )
                 btStatus = context!!.getString(R.string.status_bluetooth_error_connecting)
                 doUnbindService()
-                obdGatewayVin.errorConnect(context!!.getString(R.string.status_bluetooth_error_connecting))
+                obdGatewayVin!!.errorConnect(context!!.getString(R.string.status_bluetooth_error_connecting))
 
             }
 
@@ -111,7 +134,7 @@ object ConnectOBD{
     }
     private fun queueCommands() {
         if (isServiceBound) {
-            for (Command in ObdConfig.getCommands()) {
+            for (Command in ObdConfig.getCommandCustom()) {
                 //if (prefs.getBoolean(Command.name, true))
                 service!!.queueJob(ObdCommandJob(Command))
             }
@@ -126,11 +149,6 @@ object ConnectOBD{
             if (preRequisites) {
                 btStatus = context!!.getString(R.string.status_bluetooth_connecting)
                 val serviceIntent = Intent(context!!.applicationContext, ObdGatewayService::class.java)
-                context!!.bindService(serviceIntent, serviceConn, Context.BIND_AUTO_CREATE)
-            } else {
-                btStatus = context!!.getString(R.string.status_bluetooth_disabled)
-                val serviceIntent = Intent(context!!.applicationContext, MockObdGatewayService::class.java)
-                serviceIntent.putExtra("OB","BOLI")
                 context!!.bindService(serviceIntent, serviceConn, Context.BIND_AUTO_CREATE)
             }
         }
@@ -168,37 +186,49 @@ object ConnectOBD{
                 queueCommands()
             }
             // run again in period defined in preferences
-            Handler().postDelayed(this, 4000)
+            Handler().postDelayed(this, 2000)
         }
     }
 
     private fun updateTripStatistic(job: ObdCommandJob, cmdID: String) {
-        //Log.v(TAG, " updateTripStatistic ")
-        var VIN = ""
-        if (cmdID == AvailableCommandNames.SPEED.toString()) {
-            val command = job.command as SpeedCommand
-            Log.v(TAG, " Speed" + command.metricSpeed)
-            //Toast.makeText(this, " Speed: " + command.metricSpeed, Toast.LENGTH_LONG).show()
-            //currentTrip.setSpeedMax(command.getMetricSpeed())
-        }
-        if (cmdID == AvailableCommandNames.VIN.toString())  {
-            if (VIN.isEmpty()) {
-                Log.v(TAG, " VIN;;; $VIN")
-                val command = job.command as VinCommand
-                VIN = command.formattedResult
-
-                Log.v(TAG, " VIN $VIN")
-                obdGatewayVin.getVin(VIN)
-                //Toast.makeText(this, " VIN: $VIN", Toast.LENGTH_LONG).show()
-                //currentTrip.setSpeedMax(command.getMetricSpeed())
-            }else{
-                if (isServiceBound){
-                    doUnbindService()
+        var VIN =  appSharedPreference.getVinCar()[appSharedPreference.VIN_CAR]!!
+        Log.v(TAG, " antes del wheb")
+        when(cmdID){
+            AvailableCommandNames.SPEED.toString() -> {
+                contador++
+                val command = job.command as SpeedCommand
+                KMH = command.metricSpeed.toString()
+                Log.v(TAG, " Speed: ${command.metricSpeed}")
+            }
+            AvailableCommandNames.ENGINE_RPM.toString() -> {
+                contador++
+                val command = job.command as RPMCommand
+                RPM = command.rpm.toString()
+                Log.v(TAG, " Rpm: ${command.rpm}")
+            }
+            AvailableCommandNames.VIN.toString() -> {
+                contador++
+                if (VIN.isEmpty()) {
+                    val command = job.command as VinCommand
+                    VIN = command.formattedResult
+                    Log.v(TAG, " VIN $VIN")
+                    appSharedPreference.saveVinCar(VIN)
+                    //obdGatewayVin!!.getVin(VIN)
+                }else{
+                    Log.v(TAG, " VAR VIN: $VIN ")
                 }
-                Log.v(TAG, " VAR VIN: $VIN ")
-                //Toast.makeText(this, " VAR VIN: $VIN", Toast.LENGTH_LONG).show()
             }
         }
+        Log.v(TAG, " contador $contador")
+        if (contador == 3){
+            contadorTotal++
+            send.sendData(VIN, RPM, KMH)
+            contador = 0
+            RPM = ""
+            KMH = ""
+        }
+        Log.v(TAG, " contadorTotal:: $contadorTotal")
+
     }
 
 
@@ -228,4 +258,12 @@ object ConnectOBD{
     fun getVInDummy():String{
         return "M4N4N4T3CU3NT0"
     }
+
+    fun restarServiceOBD(){
+        Log.v(" OBDRestar ", "broadcast 2")
+        //service!!.setContext(context)
+        service!!.onDestroy()
+
+    }
+
 }

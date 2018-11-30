@@ -45,6 +45,8 @@ dependencies {
 
     implementation 'org.roboguice:roboguice:3.0.1'
 
+    // Remote binary dependency
+    implementation 'com.microsoft.azure.sdk.iot:iot-device-client:1.14.0'
 }
 
 // applied specifically at the bottom
