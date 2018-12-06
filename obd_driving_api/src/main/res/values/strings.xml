@@ -17,4 +17,6 @@
     <string name="status_bluetooth_connecting">conectando</string>
     <string name="status_bluetooth_disabled">discapacitado</string>
     <string name="status_bluetooth_ok">Listo</string>
+    <string name="location_updated">Location Updated: %1$s</string>
+    <string name="remove_location_updates">Remove location updates</string>
 </resources>

@@ -7,6 +7,7 @@ import android.content.Intent
 import android.content.ServiceConnection
 import android.os.Handler
 import android.os.IBinder
+import android.preference.PreferenceManager
 import android.support.design.widget.Snackbar
 import android.support.v4.content.ContextCompat
 import android.util.Log
@@ -14,6 +15,7 @@ import android.view.View
 import android.widget.Toast
 import com.mdp.innovation.obd_driving_api.R
 import com.mdp.innovation.obd_driving_api.app.`interface`.ObdGatewayVin
+import com.mdp.innovation.obd_driving_api.app.core.service.LocationUpdatesService
 import com.mdp.innovation.obd_driving_api.app.ui.config.ObdConfig
 import com.mdp.innovation.obd_driving_api.app.ui.io.*
 import com.mdp.innovation.obd_driving_api.app.utils.LogUtils
@@ -32,6 +34,7 @@ object ConnectOBD{
 
     private var service: AbstractGatewayService? = null
     private var isServiceBound: Boolean = false
+    var isServiceBoundLocation: Boolean = false
     private var preRequisites = true
 
     var obdGatewayVin: ObdGatewayVin? = null
@@ -48,6 +51,9 @@ object ConnectOBD{
 
     private var macDevice = ""
     val send = SendDataOBD()
+
+    //GPS Service
+    private var mLocationUpdatesService : LocationUpdatesService? = null
 
     fun initialize(context: Context){
         this.context = context
@@ -117,9 +123,7 @@ object ConnectOBD{
                 obdGatewayVin!!.errorConnect(context!!.getString(R.string.status_bluetooth_error_connecting))
 
             }
-
         }
-
 
         // This method is *only* called when the connection to the service is lost unexpectedly
         // and *not* when the client unbinds (http://developer.android.com/guide/components/bound-services.html)
@@ -145,16 +149,25 @@ object ConnectOBD{
     private fun doBindService(){
 
         if (!isServiceBound) {
-            Log.d(TAG, "Binding OBD service..")
+            LogUtils().v(TAG, "Binding OBD service..")
             if (preRequisites) {
                 btStatus = context!!.getString(R.string.status_bluetooth_connecting)
                 val serviceIntent = Intent(context!!.applicationContext, ObdGatewayService::class.java)
                 context!!.bindService(serviceIntent, serviceConn, Context.BIND_AUTO_CREATE)
             }
         }
+
+        if (!isServiceBoundLocation){
+            LogUtils().v(TAG, " Binding LOCATION Service")
+       /*     val serviceLocation = Intent(context!!.applicationContext, LocationUpdatesService::class.java)
+            context!!.bindService(serviceLocation, mServiceConnection, Context.BIND_AUTO_CREATE)
+*/
+            context!!.bindService(Intent(context!!.applicationContext, LocationUpdatesService::class.java), mServiceConnection, Context.BIND_AUTO_CREATE)
+
+        }
     }
 
-     private fun doUnbindService() {
+      fun doUnbindService() {
         if (isServiceBound) {
             if (service!!.isRunning) {
                 service!!.stopService()
@@ -163,11 +176,20 @@ object ConnectOBD{
             }
             Log.d(TAG, "Unbinding OBD service..")
             context!!.unbindService(serviceConn)
+            context!!.unbindService(mServiceConnection)
             isServiceBound = false
+            isServiceBoundLocation = false
 
             //OBD status
             //obdStatusTextView.setText(getString(R.string.status_obd_disconnected))
         }
+
+
+    }
+
+    fun doUnbindServiceLocation(){
+        context!!.unbindService(mServiceConnection)
+        isServiceBoundLocation = false
     }
 
     /**
@@ -186,7 +208,7 @@ object ConnectOBD{
                 queueCommands()
             }
             // run again in period defined in preferences
-            Handler().postDelayed(this, 2000)
+            Handler().postDelayed(this, 500)
         }
     }
 
@@ -222,7 +244,7 @@ object ConnectOBD{
         Log.v(TAG, " contador $contador")
         if (contador == 3){
             contadorTotal++
-            send.sendData(VIN, RPM, KMH)
+            send.sendData(VIN, RPM, KMH, contadorTotal)
             contador = 0
             RPM = ""
             KMH = ""
@@ -265,5 +287,27 @@ object ConnectOBD{
         service!!.onDestroy()
 
     }
+
+
+    /**
+     * GPS
+     */
+    // Monitors the state of the connection to the service.
+    private val mServiceConnection = object : ServiceConnection {
+
+        override fun onServiceConnected(name: ComponentName, binder: IBinder) {
+            //val binder = binder as LocationUpdatesService.LocalBinder
+            mLocationUpdatesService = (binder as LocationUpdatesService.LocalBinder).service
+            mLocationUpdatesService!!.requestLocationUpdates()
+            isServiceBoundLocation = true
+        }
+
+        override fun onServiceDisconnected(name: ComponentName) {
+            mLocationUpdatesService = null
+            isServiceBoundLocation = false
+        }
+    }
+
+
 
 }

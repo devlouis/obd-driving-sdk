@@ -245,8 +245,9 @@ public class SendDataOBD {
         }
     }
 
-    public void sendData(String deviceId, String rpm, String kmh){
-        String msgStr = "{\"VIN\":\"" + deviceId + "\",\"RPM\":" + rpm + ",\"KM/H\":" + kmh + "}";
+    public void sendData(String deviceId, String rpm, String kmh, Integer count){
+        String msgStr = "{\"deviceId\":\"" + deviceId + "\",\"RPM\":" + rpm + ",\"KMH\":" + kmh + ",\"COUNT\":" + count + "}";
+        //String msgStr   = "{\"VIN     \":\"" + deviceId + "\",\"COUNT\":" + count + ",\"RPM\":" + rpm + ",\"KM/H\":" + kmh + "}";
         try
         {
             Message msg = new Message(msgStr);
@@ -262,15 +263,15 @@ public class SendDataOBD {
         }
     }
 
-    public void sendData2(){
+    public void sendData2(Integer count){
         double temperature = 20.0 + Math.random() * 10;
         double humidity = 30.0 + Math.random() * 20;
 
-        String msgStr = "{\"deviceId\":\"" + deviceId + "\",\"temperature\":" + temperature + ",\"humidity\":" + humidity + "}";
+        String msgStr = "{\"deviceId\":\"" + deviceId + ",\"COUNT\":" + count + ",\"temperature\":" + temperature + ",\"humidity\":" + humidity + "}";
         try
         {
             Message msg = new Message(msgStr);
-            msg.setProperty("temperatureAlert", temperature > 28 ? "true" : "false");
+            //msg.setProperty("temperatureAlert", temperature > 28 ? "true" : "false");
             msg.setMessageId(java.util.UUID.randomUUID().toString());
             System.out.println(msgStr);
             EventCallback eventCallback = new EventCallback();
