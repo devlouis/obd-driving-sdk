@@ -37,7 +37,9 @@ class TestMainActivity : BaseAppCompat(), ObdGatewayVin {
 
     override fun errorConnect(message: String) {
         Log.v(TAG, " errorConnect: $message")
-        showDialodAlert("${message}")
+        runOnUiThread {
+            showDialodAlert("${message}")
+        }
 
     }
 
@@ -64,7 +66,10 @@ class TestMainActivity : BaseAppCompat(), ObdGatewayVin {
     fun onClickListener(){
 
         button.setOnClickListener {
-            ConnectOBD.startLiveData(this)
+            if (!ConnectOBD.CheckConecction())
+                ConnectOBD.startLiveData(this)
+            else
+                ConnectOBD.stopLiveData()
 
         }
 

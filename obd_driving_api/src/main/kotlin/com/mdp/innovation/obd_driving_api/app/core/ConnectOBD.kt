@@ -5,6 +5,7 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
+import android.location.Location
 import android.os.Handler
 import android.os.IBinder
 import android.preference.PreferenceManager
@@ -19,6 +20,7 @@ import com.mdp.innovation.obd_driving_api.app.core.service.LocationUpdatesServic
 import com.mdp.innovation.obd_driving_api.app.ui.config.ObdConfig
 import com.mdp.innovation.obd_driving_api.app.ui.io.*
 import com.mdp.innovation.obd_driving_api.app.utils.LogUtils
+import com.mdp.innovation.obd_driving_api.app.utils.UtilsLocationService
 import com.mdp.innovation.obd_driving_api.commands.SpeedCommand
 import com.mdp.innovation.obd_driving_api.commands.control.VinCommand
 import com.mdp.innovation.obd_driving_api.commands.engine.RPMCommand
@@ -28,6 +30,7 @@ import com.mdp.innovation.obd_driving_api.data.store.SharedPreference
 import com.mdp.innovation.obd_driving_api.enums.AvailableCommandNames
 import kotlinx.android.synthetic.main.activity_pair_obd.*
 import java.io.IOException
+import java.util.*
 
 object ConnectOBD{
     val TAG = javaClass.simpleName
@@ -81,6 +84,7 @@ object ConnectOBD{
         Log.d(TAG, "Starting live data...")
         this.obdGatewayVin = mObdGatewayVin
         if (macDevice.isNotEmpty()) {
+            appSharedPreference.saveIdTrip(generateIDTrip())
             doBindService()
             // start command execution
             Handler().post(mQueueCommands)
@@ -91,6 +95,16 @@ object ConnectOBD{
 
     fun stopLiveData(){
         doUnbindService()
+        mLocationUpdatesService!!.RemoveAll()
+        //doUnbindServiceLocation()
+        obdGatewayVin!!.errorConnect("Se perdio conexion al OBD")
+    }
+
+    fun generateIDTrip(): String{
+        val generadorAleatorios = Random()
+        var numeroAleatorio = 1+generadorAleatorios.nextInt(9999)
+        LogUtils().v(TAG, " generate ID: ${numeroAleatorio})")
+        return numeroAleatorio.toString()
     }
 
     @JvmStatic
@@ -159,9 +173,6 @@ object ConnectOBD{
 
         if (!isServiceBoundLocation){
             LogUtils().v(TAG, " Binding LOCATION Service")
-       /*     val serviceLocation = Intent(context!!.applicationContext, LocationUpdatesService::class.java)
-            context!!.bindService(serviceLocation, mServiceConnection, Context.BIND_AUTO_CREATE)
-*/
             context!!.bindService(Intent(context!!.applicationContext, LocationUpdatesService::class.java), mServiceConnection, Context.BIND_AUTO_CREATE)
 
         }
@@ -176,9 +187,9 @@ object ConnectOBD{
             }
             Log.d(TAG, "Unbinding OBD service..")
             context!!.unbindService(serviceConn)
-            context!!.unbindService(mServiceConnection)
+            //context!!.unbindService(mServiceConnection)
             isServiceBound = false
-            isServiceBoundLocation = false
+
 
             //OBD status
             //obdStatusTextView.setText(getString(R.string.status_obd_disconnected))
@@ -190,6 +201,12 @@ object ConnectOBD{
     fun doUnbindServiceLocation(){
         context!!.unbindService(mServiceConnection)
         isServiceBoundLocation = false
+        //mLocationUpdatesService!!.RemoveAll()
+    }
+
+    fun dounbindServiceAll(){
+
+
     }
 
     /**
@@ -244,7 +261,7 @@ object ConnectOBD{
         Log.v(TAG, " contador $contador")
         if (contador == 3){
             contadorTotal++
-            send.sendData(VIN, RPM, KMH, contadorTotal)
+            send.sendData(context, VIN, RPM, KMH, contadorTotal)
             contador = 0
             RPM = ""
             KMH = ""
@@ -259,12 +276,40 @@ object ConnectOBD{
      * Actualización del estado
      */
     @JvmStatic
-    fun stateUpdate(job2: ObdCommandJob, ctx: Context) {
+    fun stateUpdate(job: ObdCommandJob, ctx: Context) {
         this.context = ctx
-        val cmdName = job2.command.name
+        val cmdName = job.command.name
         val cmdID = LookUpCommand(cmdName)
         //context.snackBarSucceso(cmdID, claContent)
-        updateTripStatistic(job2, cmdID = cmdID)
+        var cmdResult = ""
+
+        if (job.state.equals(ObdCommandJob.ObdCommandJobState.EXECUTION_ERROR)) {
+           // cmdResult = job.command.result
+           /* if (cmdResult != null && isServiceBound) {
+               // obdStatusTextView.setText(cmdResult.toLowerCase())
+            }*/
+        } else if (job.state.equals(ObdCommandJob.ObdCommandJobState.BROKEN_PIPE)) {
+            if (isServiceBound)
+                stopLiveData()
+        } else if (job.state.equals(ObdCommandJob.ObdCommandJobState.NOT_SUPPORTED)) {
+           // cmdResult = context!!.getString(R.string.status_obd_no_support)
+        } else {
+            cmdResult = job.command.formattedResult
+            /**
+             * Esta recibiendo información...
+             */
+            //if (isServiceBound)
+                //obdStatusTextView.setText(getString(R.string.status_obd_data))
+        }
+
+        updateTripStatistic(job, cmdID = cmdID)
+    }
+
+    @JvmStatic
+    fun stateUpdateLocation(location: Location) {
+        LogUtils().v(TAG, "New location_: ${UtilsLocationService().getLocationText(location)}")
+        var VIN =  appSharedPreference.getVinCar()[appSharedPreference.VIN_CAR]!!
+        send.sendLocation(context,VIN, location.longitude.toString(), location.latitude.toString())
     }
 
     /**

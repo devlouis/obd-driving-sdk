@@ -12,6 +12,7 @@ class SharedPreference {
     var PREF_NAME = "SharedPreference"
     var MAC_DEVICE = "SharedPreference"
     var VIN_CAR = "VIN_CAR"
+    var ID_TRIP = "ID_TRIP"
 
     constructor(context: Context?) {
         this.context = context
@@ -38,4 +39,16 @@ class SharedPreference {
         vin[VIN_CAR] = pref!!.getString(VIN_CAR, "")
         return vin
     }
+
+    fun saveIdTrip(vin: String){
+        editor!!.putString(ID_TRIP, vin)
+        editor!!.commit()
+    }
+    fun getIdTrip(): HashMap<String, String>{
+        val vin = java.util.HashMap<String, String>()
+        vin[ID_TRIP] = pref!!.getString(ID_TRIP, "")
+        return vin
+    }
+
+
 }

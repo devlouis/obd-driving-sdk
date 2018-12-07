@@ -1,5 +1,9 @@
 package com.mdp.innovation.obd_driving_api.data.IoTHub;
 
+import android.app.Application;
+import android.content.Context;
+import com.mdp.innovation.obd_driving_api.app.utils.UtilsLocationService;
+import com.mdp.innovation.obd_driving_api.data.store.SharedPreference;
 import com.microsoft.azure.sdk.iot.device.*;
 import com.microsoft.azure.sdk.iot.device.DeviceTwin.DeviceMethodData;
 import com.microsoft.azure.sdk.iot.device.DeviceTwin.Pair;
@@ -245,8 +249,9 @@ public class SendDataOBD {
         }
     }
 
-    public void sendData(String deviceId, String rpm, String kmh, Integer count){
-        String msgStr = "{\"deviceId\":\"" + deviceId + "\",\"RPM\":" + rpm + ",\"KMH\":" + kmh + ",\"COUNT\":" + count + "}";
+    UtilsLocationService utilsLocationService = new UtilsLocationService();
+    public void sendData(Context context, String deviceId, String rpm, String kmh, Integer count){
+        String msgStr = "{\"deviceId\":\"" + getIDTrip(context, deviceId) + "\",\"FECHA\":\"" + utilsLocationService.getDateToDay() + "\",\"RPM\":" + rpm + ",\"KMH\":" + kmh + ",\"COUNT\":" + count + "}";
         //String msgStr   = "{\"VIN     \":\"" + deviceId + "\",\"COUNT\":" + count + ",\"RPM\":" + rpm + ",\"KM/H\":" + kmh + "}";
         try
         {
@@ -283,5 +288,28 @@ public class SendDataOBD {
         }
     }
 
+    public void sendLocation(Context context, String deviceId, String longitud, String latitud){
+        String msgStr = "{\"deviceId\":\""  + getIDTrip(context, deviceId) + "\",\"FECHA\":\"" + utilsLocationService.getDateToDay() + "\",\"LONGITUD\":" + longitud + ",\"LATITUD\":" + latitud + "}";
+        //String msgStr   = "{\"VIN     \":\"" + deviceId + "\",\"COUNT\":" + count + ",\"RPM\":" + rpm + ",\"KM/H\":" + kmh + "}";
+        try
+        {
+            Message msg = new Message(msgStr);
+            //msg.setProperty("temperatureAlert", temperature > 28 ? "true" : "false");
+            msg.setMessageId(java.util.UUID.randomUUID().toString());
+            System.out.println(msgStr);
+            EventCallback eventCallback = new EventCallback();
+            client.sendEventAsync(msg, eventCallback, 1);
+        }
+        catch (Exception e)
+        {
+            System.err.println("Exception while sending event: " + e.getMessage());
+        }
+    }
 
+
+    public String getIDTrip(Context context, String deviceId){
+        SharedPreference appSharedPreference = new SharedPreference(context);
+        HashMap<String, String> idTrip = appSharedPreference.getIdTrip();
+        return  deviceId + "-" + idTrip.get(appSharedPreference.getID_TRIP());
+    }
 }

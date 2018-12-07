@@ -53,4 +53,8 @@ class UtilsLocationService {
             DateFormat.getDateTimeInstance().format(Date())
         )
     }
+    fun getDateToDay(): String {
+        return  DateFormat.getDateTimeInstance().format(Date())
+
+    }
 }

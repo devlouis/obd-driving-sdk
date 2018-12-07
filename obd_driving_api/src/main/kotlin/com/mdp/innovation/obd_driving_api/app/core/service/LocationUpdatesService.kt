@@ -10,6 +10,7 @@ import android.support.v4.app.NotificationCompat
 import android.support.v4.content.LocalBroadcastManager
 import com.google.android.gms.location.*
 import com.mdp.innovation.obd_driving_api.R
+import com.mdp.innovation.obd_driving_api.app.core.ConnectOBD
 import com.mdp.innovation.obd_driving_api.app.ui.activity.PairObdActivity
 import com.mdp.innovation.obd_driving_api.app.utils.LogUtils
 import com.mdp.innovation.obd_driving_api.app.utils.UtilsLocationService
@@ -103,6 +104,11 @@ class LocationUpdatesService : Service() {
 
     }
 
+    fun RemoveAll(){
+        removeLocationUpdates()
+        stopSelf()
+    }
+
     override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
         super.onStartCommand(intent, flags, startId)
         LogUtils().v(TAG, " Service started")
@@ -154,7 +160,7 @@ class LocationUpdatesService : Service() {
      * no hacemos nada. De lo contrario, hacemos de este servicio un servicio de primer plano.
      */
     override fun onUnbind(intent: Intent): Boolean {
-        startForeground(NOTIFICATION_ID, getNotification())
+        //startForeground(NOTIFICATION_ID, getNotification())
         if (!mChangingConfiguration && UtilsLocationService().requestingLocationUpdates(this)) {
             LogUtils().v(TAG, " Starting foreground service")
             startForeground(NOTIFICATION_ID, getNotification())
@@ -230,7 +236,7 @@ class LocationUpdatesService : Service() {
                 servicePendingIntent
             )
             .setContentText(text)
-            .setContentTitle(UtilsLocationService().getLocationTitle(this))
+            .setContentTitle(UtilsLocationService().getDateToDay())
             .setOngoing(true)
             .setPriority(Notification.PRIORITY_HIGH)
             .setSmallIcon(R.drawable.ic_bluetooth)
@@ -266,13 +272,14 @@ class LocationUpdatesService : Service() {
 
     private fun createLocationRequest() {
         mLocationRequest = LocationRequest()
-        mLocationRequest.interval = UPDATE_INTERVAL_IN_MILLISECONDS
-        mLocationRequest.fastestInterval = FASTEST_UPDATE_INTERVAL_IN_MILLISECONDS
+        mLocationRequest.interval = 500
+        mLocationRequest.fastestInterval = 500
         mLocationRequest.priority = LocationRequest.PRIORITY_HIGH_ACCURACY
     }
 
     fun onNewLocation(location: Location) {
         LogUtils().v(TAG, "New location: ${UtilsLocationService().getLocationText(location)}")
+        ConnectOBD.stateUpdateLocation(location = location)
         mLocation = location
         // Notify anyone listening for broadcasts about the new location.
         val intent = Intent(ACTION_BROADCAST)
