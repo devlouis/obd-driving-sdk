@@ -9,8 +9,6 @@
     <uses-permission android:name="android.permission.WAKE_LOCK"/>
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
-    <uses-permission android:name="android.permission.ACCESS_LOCATION_EXTRA_COMMANDS"/>
-
     <uses-permission android:name="android.hardware.sensor.accelerometer"/>
     <uses-permission android:name="android.hardware.sensor.gyroscope"/>
 
@@ -24,7 +22,7 @@
         <service
                 android:name=".app.ui.io.ObdGatewayService"
                 android:exported="false"
-                android:launchMode="singleInstance"/>c
+                android:launchMode="singleInstance"/>
 
         <activity android:name=".app.ui.activity.SensorActivity">
         </activity>
@@ -35,6 +33,19 @@
                 android:exported="true"
                 android:label="OBDRestarBroadcastReceiver">
         </receiver>
+
+ <!--       <service
+                android:name=".app.core.service.LocationService"
+                android:enabled="true"
+                android:exported="false">
+        </service>-->
+        <service
+                android:name=".app.core.service.LocationUpdatesService"
+                android:enabled="true"
+                android:exported="true" />
+        <meta-data
+                android:name="com.google.android.geo.API_KEY"
+                android:value="AIzaSyDjh19nFL-MIOPwTXLTePrY8WNwd0YhLFY"/>
     </application>
 
 </manifest>
