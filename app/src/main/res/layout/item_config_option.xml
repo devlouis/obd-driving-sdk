@@ -24,11 +24,12 @@
                     android:tint="@color/colorToolbar"
                     android:id="@+id/iv_img"
                 />
-                <TextView
+                <com.mdp.innovation.obd_driving.util.CustomTextView
                     android:id="@+id/tv_text"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:padding="1dp"
+                    android:tag="2"
                     android:gravity="center"
                     android:text="Cambiar OBD emparejado"
                     android:textColor="@color/colorToolbar"

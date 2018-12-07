@@ -1,5 +1,9 @@
 package com.mdp.innovation.obd_driving.interactor
 
+import android.bluetooth.BluetoothAdapter
+
+
+
 class MyScoreInteractor {
 
     interface OnMyScoreFinishedListener {
