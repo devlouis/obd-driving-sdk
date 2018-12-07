@@ -64,15 +64,16 @@ class MainActivity : BaseAppCompat(),MainView {
     }
 
     private fun initUI(){
-        var result  =  ConnectOBD.verifyMacOBD()
+        /*var result  =  ConnectOBD.verifyMacOBD()
         Log.i("[INFO]", "tengo Mac Device? "+ result.result)
         Log.i("[INFO]", "Mac Device: "+ result.macBluetooth)
 
-        presenter.validateDevicePaired()
+        presenter.validateDevicePaired()*/
     }
 
     override fun onResume() {
         super.onResume()
+        presenter.validateDevicePaired()
     }
 
     private fun Context.toast(message:String){
@@ -92,7 +93,7 @@ class MainActivity : BaseAppCompat(),MainView {
 
     override fun onDeviceNoPaired(){
         //nextActivity(PairObdActivity::class.java, true)
-        toast("Aún no has vinculado ningún OBD.")
+        //toast("Aún no has vinculado ningún OBD.")
     }
 
     private fun setToolbarConfig(){

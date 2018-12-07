@@ -13,7 +13,9 @@ import android.support.annotation.Nullable
 import com.mdp.innovation.obd_driving.ui.activity.CollectTripDataActivity
 import com.mdp.innovation.obd_driving.util.CustomAnimate
 import com.mdp.innovation.obd_driving.util.Global
+import com.mdp.innovation.obd_driving.util.Preferences
 import com.mdp.innovation.obd_driving_api.app.core.ConnectOBD
+import org.koin.android.ext.android.inject
 
 
 class CollectDataFragment : BaseFragment() {
@@ -27,6 +29,8 @@ class CollectDataFragment : BaseFragment() {
     var myActivity = CollectTripDataActivity()
 
     //private val presenter = MyScorePresenter(this, MyScoreInteractor())
+
+    private val preferences by inject<Preferences>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -48,7 +52,9 @@ class CollectDataFragment : BaseFragment() {
         toolbar.title = "Procesando..."
         toolbar.setNavigationIcon(R.drawable.ic_arrow_back)
 
-        tv_vin.text = "Mi VIN es: " + Global.myVIN
+        val myVIN = preferences.getVIN(context)
+
+        tv_vin.text = "Mi VIN es: $myVIN"
 
         toolbar.setNavigationOnClickListener {
             System.out.println("backkkk")

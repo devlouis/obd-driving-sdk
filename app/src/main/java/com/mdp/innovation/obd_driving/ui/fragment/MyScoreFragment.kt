@@ -1,6 +1,7 @@
 package com.mdp.innovation.obd_driving.ui.fragment
 
 import android.app.Activity
+import android.bluetooth.BluetoothAdapter
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -185,18 +186,37 @@ class MyScoreFragment : BaseFragment(), MyScoreView, ObdGatewayVin {
     }
 
     override fun getVin(vin: String){
-        hideProgress()
         Log.i("[INFO]","ACTIVITY getVin: $vin")
-        Global.myVIN = vin
-        //ConnectOBD.stopLiveData()
-        navigator.navigateToCollectTripData(this, 1)
-        Global.cancelValidated = false
+        activity!!.runOnUiThread {
+            hideProgress()
+
+            Global.myVIN = vin
+            preferences.setVIN(context,vin)
+            //ConnectOBD.stopLiveData()
+            navigator.navigateToCollectTripData(this, 1)
+            Global.cancelValidated = false
+        }
 
     }
     override fun errorConnect(message: String){
         hideProgress()
-        Message.toastShort(message,context)
+        Message.toastLong(message,context)
+
         Log.i("[INFO]","ACTIVITY errorConnect: $message")
+        activity!!.runOnUiThread {
+            hideProgress()
+            Message.toastLong(message,context)
+        }
+    }
+
+    override fun onStop() {
+        if (ConnectOBD.isServiceBoundLocation) {
+            // Desconectarse del servicio.
+            // Esto le indica al servicio que esta actividad ya no está en primer plano
+            // y que el servicio puede responder promoviéndose a sí mismo a un servicio en primer plano.
+            ConnectOBD.doUnbindServiceLocation()
+        }
+        super.onStop()
     }
 
     private fun initUI(){
@@ -234,7 +254,22 @@ class MyScoreFragment : BaseFragment(), MyScoreView, ObdGatewayVin {
     override fun onDeviceConnected(){
         //nextActivity(HomeActivity::class.java, false)
         //Message.toastShort("Preparando para iniciar el viaje.", activity?.applicationContext)
-        goToStartTrip()
+
+        val mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter()
+        if (mBluetoothAdapter == null) {
+            // Device does not support Bluetooth
+            Message.toastLong("Lo sentimos. Su dispositivo no cuenta con Bluetooth.", activity?.applicationContext)
+        } else {
+            if (!mBluetoothAdapter.isEnabled) {
+                // Bluetooth is not enable :)
+                //Message.toastShort("Debe encender su Bluetooth.", activity?.applicationContext)
+                mBluetoothAdapter.enable()
+            }
+            goToStartTrip()
+        }
+
+
+
     }
 
     override fun onDeviceNoConnected(){
@@ -254,13 +289,13 @@ class MyScoreFragment : BaseFragment(), MyScoreView, ObdGatewayVin {
         handler.removeCallbacks(runnable)
 
         //SDK
-        //showProgress()
-        //ConnectOBD.startLiveData(this)
+        showProgress()
+        ConnectOBD.startLiveData(this)
 
         //DEMO
-        myActivity.startCollectDataService()
+        //myActivity.startCollectDataService()
         Global.cancelValidated = false
-        navigator.navigateToCollectTripData(this, 1)
+        //navigator.navigateToCollectTripData(this, 1)
     }
 
     override fun onDestroy() {

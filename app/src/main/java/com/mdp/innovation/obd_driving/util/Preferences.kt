@@ -8,6 +8,7 @@ class Preferences {
     val SCORE_PENDING = "score_pending"
     val SCORE_DATE = "score_date"
     val MY_SCORE = "my_score"
+    val MY_VIN = "my_vin"
 
     fun setScorePending(context: Context?, pending: Boolean){
         var prefs = context!!.getSharedPreferences(PREFS_FILENAME, 0)
@@ -43,6 +44,18 @@ class Preferences {
     fun getMyScore(context: Context?) : String? {
         var prefs = context!!.getSharedPreferences(PREFS_FILENAME, 0)
         return prefs.getString(MY_SCORE, "-")
+    }
+
+    fun setVIN(context: Context?, vin: String){
+        var prefs = context!!.getSharedPreferences(PREFS_FILENAME, 0)
+        val editor = prefs!!.edit()
+        editor.putString(MY_VIN, vin)
+        editor.apply()
+    }
+
+    fun getVIN(context: Context?) : String? {
+        var prefs = context!!.getSharedPreferences(PREFS_FILENAME, 0)
+        return prefs.getString(MY_VIN, "-")
     }
 
 }
