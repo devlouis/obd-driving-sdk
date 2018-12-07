@@ -5,17 +5,18 @@
               android:layout_height="wrap_content"
               android:orientation="vertical">
 
-    <TextView
+    <com.mdp.innovation.obd_driving.util.CustomTextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@color/colorToolbar"
             android:gravity="center"
+            android:tag="2"
             android:text="@string/alert"
             android:paddingBottom="8dp"
             android:paddingTop="8dp"
             style="@style/dialogTitle" />
 
-    <TextView
+    <com.mdp.innovation.obd_driving.util.CustomTextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginLeft="32dp"

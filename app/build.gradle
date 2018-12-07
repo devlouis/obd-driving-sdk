@@ -27,6 +27,7 @@ android {
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
         versionName "1.0"
+        multiDexEnabled true
     }
     buildTypes {
         release {
@@ -62,4 +63,9 @@ dependencies {
     implementation 'org.koin:koin-android:1.0.2'
     implementation "org.koin:koin-core:1.0.2"
     implementation "org.koin:koin-core-ext:1.0.2"
+
+    implementation "org.jetbrains.anko:anko-coroutines:0.10.8"
+    implementation 'com.squareup.retrofit2:retrofit:2.5.0'
+    implementation 'com.squareup.retrofit2:converter-gson:2.5.0'
+    implementation "org.jetbrains.anko:anko-commons:0.10.8"
 }

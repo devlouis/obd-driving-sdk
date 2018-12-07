@@ -8,6 +8,7 @@ import com.mdp.innovation.obd_driving_api.commands.control.ModuleVoltageCommand
 import kotlinx.android.synthetic.main.activity_main.*
 import android.view.View
 import android.content.Context
+import android.support.v4.app.ActivityCompat
 import android.widget.Toast
 import android.support.v4.view.GravityCompat
 import android.util.Log
@@ -19,6 +20,12 @@ import com.mdp.innovation.obd_driving.presenter.MainPresenter
 import com.mdp.innovation.obd_driving.util.CustomAnimate
 import com.mdp.innovation.obd_driving_api.app.core.ConnectOBD
 import com.mdp.innovation.obd_driving_api.app.ui.activity.PairObdActivity
+import android.Manifest.permission.ACCESS_FINE_LOCATION
+import android.content.pm.PackageManager
+import android.os.Build
+import android.support.v4.content.ContextCompat
+
+
 
 class MainActivity : BaseAppCompat(),MainView {
 
@@ -30,8 +37,8 @@ class MainActivity : BaseAppCompat(),MainView {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        val cmds = ArrayList<ObdCommand>()
-        cmds.add(ModuleVoltageCommand())
+        //val cmds = ArrayList<ObdCommand>()
+        //cmds.add(ModuleVoltageCommand())
 
         setToolbarConfig()
 
@@ -47,6 +54,13 @@ class MainActivity : BaseAppCompat(),MainView {
                 it.isEnabled = true
             }, 100L)
         }
+
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
+            if(!checkPermission()){
+                requestPermission()
+            }
+        }
+
     }
 
     private fun initUI(){
@@ -82,11 +96,21 @@ class MainActivity : BaseAppCompat(),MainView {
     }
 
     private fun setToolbarConfig(){
-        setSupportActionBar(toolbar);
+        setSupportActionBar(toolbar)
         val actionBar = supportActionBar
         actionBar!!.title = resources.getString(R.string.dcp)
         actionBar.elevation = 4.0F
         actionBar.setDisplayShowHomeEnabled(true)
+    }
+
+    private fun checkPermission(): Boolean {
+        val result = ContextCompat.checkSelfPermission(applicationContext, ACCESS_FINE_LOCATION)
+        return result == PackageManager.PERMISSION_GRANTED
+    }
+
+    private fun requestPermission() {
+        val permissions = arrayOf(android.Manifest.permission.ACCESS_FINE_LOCATION)
+        ActivityCompat.requestPermissions(this, permissions,0)
     }
 
 }

@@ -19,6 +19,7 @@
     <string name="notice">Atención</string>
     <string name="alert_cancel_collect">¿Estás seguro que deseas finalizar tu viaje?.</string>
     <string name="alert_end_trip">Estamos procesando los datos de tu viaje. \n Te notificaremos cuando terminemos.</string>
+    <string name="alert_score_updated">Tu score ha sido actualizado!</string>
 
 
     <string name="configOption1">Cambiar OBD emparejado</string>

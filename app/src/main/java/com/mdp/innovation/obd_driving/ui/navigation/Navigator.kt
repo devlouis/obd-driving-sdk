@@ -12,6 +12,7 @@ import android.content.Intent
 import android.support.v4.content.ContextCompat.startActivity
 import com.mdp.innovation.obd_driving.ui.activity.CollectTripDataActivity
 import android.content.Context
+import android.support.v4.app.Fragment
 import android.support.v7.app.AppCompatActivity
 import com.mdp.innovation.obd_driving.ui.activity.MainActivity
 import com.mdp.innovation.obd_driving.ui.fragment.ConfigurationFragment
@@ -48,10 +49,10 @@ class Navigator {
         fragmentManager?.popBackStack()
     }
 
-    fun navigateToCollectTripData(activity: Activity?, requestCode : Int) {
-        if (activity != null) {
-            var intent = Intent(activity, CollectTripDataActivity::class.java)
-            activity.startActivityForResult(intent, requestCode)
+    fun navigateToCollectTripData(fragment: Fragment?, requestCode : Int) {
+        if (fragment != null) {
+            var intent = Intent(fragment.context, CollectTripDataActivity::class.java)
+            fragment.startActivityForResult(intent, requestCode)
         }
     }
 

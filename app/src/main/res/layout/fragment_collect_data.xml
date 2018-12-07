@@ -27,13 +27,14 @@
                 android:id="@+id/tv_vin"
                 android:text="Mi VIN es:"/>
 
-        <TextView
+        <com.mdp.innovation.obd_driving.util.CustomTextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:layout_constraintTop_toTopOf="parent"
                 android:layout_marginTop="46dp"
                 style="@style/tvScreenTitle"
                 android:gravity="center"
+                android:tag="2"
                 app:layout_constraintStart_toStartOf="parent"
                 android:layout_marginStart="40dp"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -49,17 +50,17 @@
                 android:theme="@style/AppTheme.BlueAccent"
                 android:progressDrawable="@drawable/circular_progress_bar"
                 app:layout_constraintTop_toBottomOf="@id/tv_home_title"
-                android:layout_marginTop="24dp"
+                android:layout_marginTop="18dp"
                 app:layout_constraintStart_toStartOf="parent"
                 android:layout_marginStart="40dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 android:layout_marginEnd="40dp" />
 
-        <TextView
+        <com.mdp.innovation.obd_driving.util.CustomTextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:layout_constraintTop_toBottomOf="@id/progress_bar"
-                android:layout_marginTop="24dp"
+                android:layout_marginTop="18dp"
                 style="@style/tvScreenSubTitle"
                 android:gravity="center"
                 app:layout_constraintStart_toStartOf="parent"
@@ -69,11 +70,11 @@
                 android:id="@+id/tv_home_prom_text"
                 android:text="@string/collect_data_subtitle"/>
 
-        <TextView
+        <com.mdp.innovation.obd_driving.util.CustomTextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:layout_constraintTop_toBottomOf="@id/tv_home_prom_text"
-                android:layout_marginTop="72dp"
+                android:layout_marginTop="62dp"
                 style="@style/tvScreenSubTitle"
                 android:gravity="center"
                 app:layout_constraintStart_toStartOf="parent"

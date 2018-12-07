@@ -1,7 +1,11 @@
 package com.mdp.innovation.obd_driving.ui.fragment
 
+import android.app.Activity
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -18,10 +22,17 @@ import com.mdp.innovation.obd_driving.ui.activity.HomeActivity
 import com.mdp.innovation.obd_driving.ui.navigation.Navigator
 import com.mdp.innovation.obd_driving.util.CustomAnimate
 import android.util.Log
+import android.widget.Toast
+import com.mdp.innovation.obd_driving.model.ScoreRequest
+import com.mdp.innovation.obd_driving.service.WSService
 import org.koin.android.ext.android.inject
 import com.mdp.innovation.obd_driving.util.Global
+import com.mdp.innovation.obd_driving.util.Preferences
 import com.mdp.innovation.obd_driving_api.app.`interface`.ObdGatewayVin
 import com.mdp.innovation.obd_driving_api.app.core.ConnectOBD
+import org.jetbrains.anko.doAsync
+import org.jetbrains.anko.uiThread
+import java.util.*
 
 
 class MyScoreFragment : BaseFragment(), MyScoreView, ObdGatewayVin {
@@ -35,11 +46,20 @@ class MyScoreFragment : BaseFragment(), MyScoreView, ObdGatewayVin {
     var myActivity = HomeActivity()
 
     private val navigator by inject<Navigator>()
+    private val preferences by inject<Preferences>()
 
     private val presenter = MyScorePresenter(this, MyScoreInteractor())
 
+    var runnable = Runnable {  }
+    var handler = Handler(Looper.getMainLooper())
+
+    var showScorePending = false
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        validateConsultScore(true)
+
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,savedInstanceState: Bundle?): View? {
@@ -71,32 +91,117 @@ class MyScoreFragment : BaseFragment(), MyScoreView, ObdGatewayVin {
         initUI()
 
         if(myActivity.isActiveCollectDataService()){
-            navigator.navigateToCollectTripData(activity, 1)
+            navigator.navigateToCollectTripData(this, 1)
             Global.cancelValidated = false
         }
     }
 
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        if (resultCode == Activity.RESULT_OK){
+            val result = data?.getStringExtra("result")
+            if(result.equals("end_trip")){
+
+                val handler = Handler()
+                handler.postDelayed({
+
+                    Message.toastLong(resources.getString(R.string.alert_end_trip), context)
+
+                }, 500)
+
+                validateConsultScore(false)
+
+            }
+        }
+    }
+
+    private fun validateConsultScore(isFirstTimeInput: Boolean){
+
+        var isFirstTime = isFirstTimeInput
+
+        if(preferences.getScorePending(context)){
+            showScorePending = true
+            if(!isFirstTime){
+                isFirstTime = false
+                showScorePendingProgress()
+            }
+            //consultScore()
+
+
+            runnable = Runnable {
+
+                if(preferences.getScorePending(context)){
+                    consultScore()
+                    handler.postDelayed(runnable, 10000)
+                }else{
+                    handler.removeCallbacks(runnable)
+                    showScorePending = false
+                    if(!isFirstTime) {
+                        isFirstTime = false
+                        hideScorePendingProgress()
+                    }
+                }
+
+            }
+            handler.postDelayed(runnable, 10000)
+        }else{
+            showScorePending = false
+            if(!isFirstTime) {
+                isFirstTime = false
+                hideScorePendingProgress()
+            }
+        }
+
+    }
+
+    private fun consultScore(){
+        doAsync{
+            val service = WSService()
+            var request = ScoreRequest("peter@klaven", "cityslicka")
+            val response = service.getScore(request)
+
+            uiThread{
+
+                val scoreDate = response?.token
+                val newScore = "9.5"
+                if(scoreDate != null && scoreDate.trim() != ""){
+                    val lastScore = preferences.getLastScoreDate(context)
+                    if(scoreDate != lastScore){
+                        preferences.setLastScoreDate(context, scoreDate)
+                        preferences.setMyScore(context, newScore)
+                        preferences.setScorePending(context, false)
+                        tv_home_prom.text = newScore
+                        hideScorePendingProgress()
+
+                        var dialog = EndTripDialogFragment()
+                        dialog.show(fragmentManager,"end_trip")
+                    }
+                }
+
+                //Toast.makeText(context,"El puerto es: " + newScore,Toast.LENGTH_LONG).show()
+            }
+        }
+    }
+
     override fun getVin(vin: String){
+        hideProgress()
         Log.i("[INFO]","ACTIVITY getVin: $vin")
         Global.myVIN = vin
-        tv_vin.text = "Mi VIN es: " + vin
-        ConnectOBD.stopLiveData()
-        navigator.navigateToCollectTripData(activity, 1)
+        //ConnectOBD.stopLiveData()
+        navigator.navigateToCollectTripData(this, 1)
         Global.cancelValidated = false
 
     }
     override fun errorConnect(message: String){
+        hideProgress()
+        Message.toastShort(message,context)
         Log.i("[INFO]","ACTIVITY errorConnect: $message")
     }
 
     private fun initUI(){
-        /*val toolbar = includeToolbar as Toolbar
-        toolbar.title = "XXXXXXXXX"
-        toolbar.setNavigationIcon(R.drawable.ic_bluetooth)*/
 
-        //(activity as AppCompatActivity).setSupportActionBar(toolbar)
-
-        //(activity as AppCompatActivity).supportActionBar?.title = "Title"
+        if(showScorePending) showScorePendingProgress()
 
         CustomAnimate.setButtonAnimation(btnStartTrip)
 
@@ -110,6 +215,11 @@ class MyScoreFragment : BaseFragment(), MyScoreView, ObdGatewayVin {
                 it.isEnabled = true
             }, 100L)
         }
+
+        //showProgress()
+
+        val myScore = preferences.getMyScore(context)
+        tv_home_prom.text = myScore
 
     }
 
@@ -133,22 +243,36 @@ class MyScoreFragment : BaseFragment(), MyScoreView, ObdGatewayVin {
     }
 
     override fun showProgress(){
-
+        loading.visibility = View.VISIBLE
     }
     override fun hideProgress(){
-
+        loading.visibility = View.GONE
     }
 
     private fun goToStartTrip(){
-        //myActivity.startCollectDataService()
-        ConnectOBD.startLiveData(this)
-        /*navigator.navigateToCollectTripData(activity, 1)
-        Global.cancelValidated = false*/
 
+        handler.removeCallbacks(runnable)
 
+        //SDK
+        //showProgress()
+        //ConnectOBD.startLiveData(this)
+
+        //DEMO
+        myActivity.startCollectDataService()
+        Global.cancelValidated = false
+        navigator.navigateToCollectTripData(this, 1)
     }
 
-    fun showUpdateScoreProgressBar(){
+    override fun onDestroy() {
+        super.onDestroy()
+        handler.removeCallbacks(runnable)
+    }
+
+    fun showScorePendingProgress(){
         pb_update_score.visibility = View.VISIBLE
+    }
+
+    fun hideScorePendingProgress(){
+        pb_update_score.visibility = View.GONE
     }
 }

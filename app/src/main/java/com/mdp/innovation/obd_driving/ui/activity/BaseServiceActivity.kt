@@ -12,13 +12,17 @@ import com.mdp.innovation.obd_driving.internal.CollectTripDataService
 import com.mdp.innovation.obd_driving.ui.fragment.EndTripDialogFragment
 import com.mdp.innovation.obd_driving.util.Constants
 import android.app.Activity
+import com.mdp.innovation.obd_driving.util.Preferences
 import com.mdp.innovation.obd_driving_api.app.core.ConnectOBD
+import org.koin.android.ext.android.inject
 
 
 open class BaseServiceActivity : BaseAppCompat() {
 
     var collectDataService = CollectTripDataService::class.java
     lateinit var collectDataIntent : Intent
+
+    private val preferences by inject<Preferences>()
 
     override fun onCreate(savedInstanceState: Bundle?){
         super.onCreate(savedInstanceState)
@@ -30,10 +34,12 @@ open class BaseServiceActivity : BaseAppCompat() {
         startService(collectDataService, collectDataIntent)
     }
     fun stopCollectDataService(){
-        //collectDataIntent.action = Constants.STOPFOREGROUND_ACTION
-        //stopService(collectDataService, collectDataIntent)
+        collectDataIntent.action = Constants.STOPFOREGROUND_ACTION
+        stopService(collectDataService, collectDataIntent)
 
         ConnectOBD.stopLiveData()
+
+        preferences.setScorePending(applicationContext, true)
 
         val returnIntent = Intent()
         returnIntent.putExtra("result", "end_trip")

@@ -1,5 +1,6 @@
 package com.mdp.innovation.obd_driving.ui.activity
 
+import android.Manifest
 import android.app.Activity
 import android.os.Bundle
 import com.mdp.innovation.obd_driving_api.commands.ObdCommand
@@ -7,6 +8,8 @@ import com.mdp.innovation.obd_driving_api.commands.control.ModuleVoltageCommand
 import kotlinx.android.synthetic.main.activity_home.*
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
+import android.os.Build
 import android.widget.Toast
 import android.support.v4.view.GravityCompat
 import android.view.Gravity
@@ -16,12 +19,15 @@ import com.mdp.innovation.obd_driving.ui.HomeView
 import com.mdp.innovation.obd_driving.ui.navigation.Navigator
 import java.util.*
 import android.os.Handler
+import android.support.v4.app.ActivityCompat
+import android.support.v4.content.ContextCompat
 import android.support.v4.widget.DrawerLayout
 import android.support.v7.widget.Toolbar
 import com.mdp.innovation.obd_driving.ui.fragment.EndTripDialogFragment
 import com.mdp.innovation.obd_driving.ui.fragment.MyScoreFragment
 import com.mdp.innovation.obd_driving_api.app.core.ConnectOBD
 import com.mdp.innovation.obd_driving_api.app.ui.activity.PairObdActivity
+import com.mdp.innovation.obd_driving_api.data.IoTHub.SendDataOBD
 import org.koin.android.ext.android.inject
 
 
@@ -35,20 +41,30 @@ class HomeActivity : BaseServiceActivity(), HomeView {
     private val navigator by inject<Navigator>()
     //private val navigator = Navigator()
 
+    //var sabe = SendDataOBD()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_home)
 
         myIntent = Intent(applicationContext, serviceClass)
 
-        val cmds = ArrayList<ObdCommand>()
-        cmds.add(ModuleVoltageCommand())
+        //val cmds = ArrayList<ObdCommand>()
+        //cmds.add(ModuleVoltageCommand())
 
         setDrawerConfig()
 
         myScoreFragment = navigator.navigateToMyScore(supportFragmentManager, R.id.content)
 
-        ConnectOBD.getVInDummy()
+        //ConnectOBD.getVInDummy()
+        //sabe.InitClient()
+        //Handler().post(mQueueCommands)
+
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
+            if(!checkPermission()){
+                requestPermission()
+            }
+        }
 
 
     }
@@ -56,7 +72,7 @@ class HomeActivity : BaseServiceActivity(), HomeView {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
-        if (resultCode == Activity.RESULT_OK){
+        /*if (resultCode == Activity.RESULT_OK){
             val result = data?.getStringExtra("result")
             if(result.equals("end_trip")){
 
@@ -69,7 +85,7 @@ class HomeActivity : BaseServiceActivity(), HomeView {
 
 
             }
-        }
+        }*/
     }
 
     fun startLiveData(){
@@ -125,5 +141,23 @@ class HomeActivity : BaseServiceActivity(), HomeView {
             drawerLayout.openDrawer(Gravity.START)
         }
     }
+
+    private fun checkPermission(): Boolean {
+        val result = ContextCompat.checkSelfPermission(applicationContext, Manifest.permission.ACCESS_FINE_LOCATION)
+        return result == PackageManager.PERMISSION_GRANTED
+    }
+
+    private fun requestPermission() {
+        val permissions = arrayOf(android.Manifest.permission.ACCESS_FINE_LOCATION)
+        ActivityCompat.requestPermissions(this, permissions,0)
+    }
+
+    /*private val mQueueCommands = object : Runnable {
+        override fun run() {
+
+            //sabe.sendData2()
+            //Handler().postDelayed(this, 500)
+        }
+    }*/
 
 }

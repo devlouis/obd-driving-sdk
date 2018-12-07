@@ -13,6 +13,7 @@ import android.support.annotation.Nullable
 import com.mdp.innovation.obd_driving.ui.activity.CollectTripDataActivity
 import com.mdp.innovation.obd_driving.util.CustomAnimate
 import com.mdp.innovation.obd_driving.util.Global
+import com.mdp.innovation.obd_driving_api.app.core.ConnectOBD
 
 
 class CollectDataFragment : BaseFragment() {

@@ -12,9 +12,11 @@ class MyScorePresenter(var myScoreView: MyScoreView?, val myScoreInteractor: MyS
         myScoreView = null
     }
     override fun onDeviceConnected() {
+        myScoreView?.hideProgress()
         myScoreView?.onDeviceConnected()
     }
     override fun onDeviceNoConnected() {
+        myScoreView?.hideProgress()
         myScoreView?.onDeviceNoConnected()
     }
 }
