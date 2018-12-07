@@ -186,12 +186,16 @@ class MyScoreFragment : BaseFragment(), MyScoreView, ObdGatewayVin {
     }
 
     override fun getVin(vin: String){
-        hideProgress()
         Log.i("[INFO]","ACTIVITY getVin: $vin")
-        Global.myVIN = vin
-        //ConnectOBD.stopLiveData()
-        navigator.navigateToCollectTripData(this, 1)
-        Global.cancelValidated = false
+        activity!!.runOnUiThread {
+            hideProgress()
+
+            Global.myVIN = vin
+            preferences.setVIN(context,vin)
+            //ConnectOBD.stopLiveData()
+            navigator.navigateToCollectTripData(this, 1)
+            Global.cancelValidated = false
+        }
 
     }
     override fun errorConnect(message: String){
