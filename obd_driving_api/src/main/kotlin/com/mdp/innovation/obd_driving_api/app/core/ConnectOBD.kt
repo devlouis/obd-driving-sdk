@@ -225,7 +225,7 @@ object ConnectOBD{
                 queueCommands()
             }
             // run again in period defined in preferences
-            Handler().postDelayed(this, 500)
+            Handler().postDelayed(this, 1000)
         }
     }
 
@@ -252,7 +252,8 @@ object ConnectOBD{
                     VIN = command.formattedResult
                     Log.v(TAG, " VIN $VIN")
                     appSharedPreference.saveVinCar(VIN)
-                    //obdGatewayVin!!.getVin(VIN)
+                    if (contadorTotal == 2)
+                        obdGatewayVin!!.getVin(VIN)
                 }else{
                     Log.v(TAG, " VAR VIN: $VIN ")
                 }
