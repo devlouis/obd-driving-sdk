@@ -272,8 +272,8 @@ class LocationUpdatesService : Service() {
 
     private fun createLocationRequest() {
         mLocationRequest = LocationRequest()
-        mLocationRequest.interval = 500
-        mLocationRequest.fastestInterval = 500
+        mLocationRequest.interval = 1000
+        mLocationRequest.fastestInterval = 1000
         mLocationRequest.priority = LocationRequest.PRIORITY_HIGH_ACCURACY
     }
 

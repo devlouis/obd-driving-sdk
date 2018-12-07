@@ -252,10 +252,10 @@ object ConnectOBD{
                     VIN = command.formattedResult
                     Log.v(TAG, " VIN $VIN")
                     appSharedPreference.saveVinCar(VIN)
-                    if (contadorTotal == 2)
-                        obdGatewayVin!!.getVin(VIN)
                 }else{
                     Log.v(TAG, " VAR VIN: $VIN ")
+                    if (contadorTotal == 2)
+                        obdGatewayVin!!.getVin(VIN)
                 }
             }
         }
