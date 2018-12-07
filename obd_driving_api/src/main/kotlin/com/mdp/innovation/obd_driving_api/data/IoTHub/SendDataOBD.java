@@ -251,7 +251,7 @@ public class SendDataOBD {
 
     UtilsLocationService utilsLocationService = new UtilsLocationService();
     public void sendData(Context context, String deviceId, String rpm, String kmh, Integer count){
-        String msgStr = "{\"deviceId\":\"" + getIDTrip(context, deviceId) + "\",\"FECHA\":\"" + utilsLocationService.getDateToDay() + "\",\"RPM\":" + rpm + ",\"KMH\":" + kmh + ",\"COUNT\":" + count + "}";
+        String msgStr = "{\"ID_TRIP\":\"" + getIDTrip(context, deviceId) + "\",\"FECHA\":\"" + utilsLocationService.getDateToDay() + "\",\"RPM\":" + rpm + ",\"KMH\":" + kmh + ",\"COUNT\":" + count + "}";
         //String msgStr   = "{\"VIN     \":\"" + deviceId + "\",\"COUNT\":" + count + ",\"RPM\":" + rpm + ",\"KM/H\":" + kmh + "}";
         try
         {
@@ -289,7 +289,7 @@ public class SendDataOBD {
     }
 
     public void sendLocation(Context context, String deviceId, String longitud, String latitud){
-        String msgStr = "{\"deviceId\":\""  + getIDTrip(context, deviceId) + "\",\"FECHA\":\"" + utilsLocationService.getDateToDay() + "\",\"LONGITUD\":" + longitud + ",\"LATITUD\":" + latitud + "}";
+        String msgStr = "{\"ID_TRIP\":\""  + getIDTrip(context, deviceId) + "\",\"FECHA\":\"" + utilsLocationService.getDateToDay() + "\",\"LONGITUD\":" + longitud + ",\"LATITUD\":" + latitud + "}";
         //String msgStr   = "{\"VIN     \":\"" + deviceId + "\",\"COUNT\":" + count + ",\"RPM\":" + rpm + ",\"KM/H\":" + kmh + "}";
         try
         {
