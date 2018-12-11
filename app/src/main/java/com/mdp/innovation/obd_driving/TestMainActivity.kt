@@ -21,27 +21,12 @@ import kotlinx.android.synthetic.main.activity_main_test.*
 class TestMainActivity : BaseAppCompat(), ObdGatewayVin {
 
 
+
+
     val TAG = javaClass.simpleName
     //GPS Service
     private var mLocationUpdatesService : LocationUpdatesService? = null
     private var isServiceBoundLocation: Boolean = false
-
-
-    override fun getVin(vin: String) {
-        Log.v(TAG, " VIN___: $vin")
-        runOnUiThread {
-            tviVIN.text = vin
-           // ConnectOBD.stopLiveData()
-        }
-    }
-
-    override fun errorConnect(message: String) {
-        Log.v(TAG, " errorConnect: $message")
-        runOnUiThread {
-            showDialodAlert("${message}")
-        }
-
-    }
 
     var sendata = SendDataOBD()
 
@@ -151,4 +136,26 @@ class TestMainActivity : BaseAppCompat(), ObdGatewayVin {
         }
         super.onStop()
     }
+
+
+    override fun getVin(vin: String) {
+        Log.v(TAG, " VIN___: $vin")
+        runOnUiThread {
+            tviVIN.text = vin
+            // ConnectOBD.stopLiveData()
+        }
+    }
+
+    override fun errorConnect(message: String) {
+        Log.v(TAG, " errorConnect: $message")
+        runOnUiThread {
+            showDialodAlert("${message}")
+        }
+
+    }
+
+    override fun getSpeedKm(kmh: String) {
+        Log.v(TAG, " getSpeedKm: $kmh")
+    }
+
 }

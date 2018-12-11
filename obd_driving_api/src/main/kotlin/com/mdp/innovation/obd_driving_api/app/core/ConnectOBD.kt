@@ -47,6 +47,7 @@ object ConnectOBD{
     var eo = ""
 
     var contadorTotal = 0
+    var contadorTotalLocation = 0
     var contador = 0
     var RPM = ""
     var KMH = ""
@@ -237,6 +238,7 @@ object ConnectOBD{
                 contador++
                 val command = job.command as SpeedCommand
                 KMH = command.metricSpeed.toString()
+                obdGatewayVin!!.getSpeedKm(KMH)
                 Log.v(TAG, " Speed: ${command.metricSpeed}")
             }
             AvailableCommandNames.ENGINE_RPM.toString() -> {
@@ -310,7 +312,8 @@ object ConnectOBD{
     fun stateUpdateLocation(location: Location) {
         LogUtils().v(TAG, "New location_: ${UtilsLocationService().getLocationText(location)}")
         var VIN =  appSharedPreference.getVinCar()[appSharedPreference.VIN_CAR]!!
-        send.sendLocation(context,VIN, location.longitude.toString(), location.latitude.toString())
+        contadorTotalLocation++
+        send.sendLocation(context,VIN, location.longitude.toString(), location.latitude.toString(), contadorTotal)
     }
 
     /**

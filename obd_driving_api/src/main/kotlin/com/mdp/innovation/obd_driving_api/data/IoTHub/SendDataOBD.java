@@ -288,8 +288,8 @@ public class SendDataOBD {
         }
     }
 
-    public void sendLocation(Context context, String deviceId, String longitud, String latitud){
-        String msgStr = "{\"ID_TRIP\":\""  + getIDTrip(context, deviceId) + "\",\"FECHA\":\"" + utilsLocationService.getDateToDay() + "\",\"LONGITUD\":" + longitud + ",\"LATITUD\":" + latitud + "}";
+    public void sendLocation(Context context, String deviceId, String longitud, String latitud, Integer count){
+        String msgStr = "{\"ID_TRIP\":\""  + getIDTrip(context, deviceId) + "\",\"FECHA\":\"" + utilsLocationService.getDateToDay() + "\",\"LONGITUD\":" + longitud + ",\"LATITUD\":" + latitud + ",\"COUNT\":" + count + "}";
         //String msgStr   = "{\"VIN     \":\"" + deviceId + "\",\"COUNT\":" + count + ",\"RPM\":" + rpm + ",\"KM/H\":" + kmh + "}";
         try
         {

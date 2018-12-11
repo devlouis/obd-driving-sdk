@@ -199,6 +199,11 @@ class MyScoreFragment : BaseFragment(), MyScoreView, ObdGatewayVin {
         }
 
     }
+
+    override fun getSpeedKm(kmh: String) {
+
+    }
+
     override fun errorConnect(message: String){
         hideProgress()
         Message.toastLong(message,context)
