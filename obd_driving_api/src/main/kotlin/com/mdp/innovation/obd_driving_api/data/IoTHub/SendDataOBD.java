@@ -300,8 +300,7 @@ public class SendDataOBD {
             EventCallback eventCallback = new EventCallback();
             client.sendEventAsync(msg, eventCallback, 1);
         }
-        catch (Exception e)
-        {
+        catch (Exception e) {
             System.err.println("Exception while sending event: " + e.getMessage());
         }
     }
