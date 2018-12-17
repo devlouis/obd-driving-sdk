@@ -37,7 +37,7 @@ open class BaseServiceActivity : BaseAppCompat() {
         collectDataIntent.action = Constants.STOPFOREGROUND_ACTION
         stopService(collectDataService, collectDataIntent)
 
-        ConnectOBD.stopLiveData()
+        //ConnectOBD.stopLiveData()
 
         preferences.setScorePending(applicationContext, true)
 

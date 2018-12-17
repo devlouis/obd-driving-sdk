@@ -4,6 +4,7 @@ import android.app.Activity
 import android.bluetooth.BluetoothAdapter
 import android.content.Context
 import android.content.Intent
+import android.location.LocationManager
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -260,6 +261,15 @@ class MyScoreFragment : BaseFragment(), MyScoreView, ObdGatewayVin {
         //nextActivity(HomeActivity::class.java, false)
         //Message.toastShort("Preparando para iniciar el viaje.", activity?.applicationContext)
 
+        /*val manager = (activity?.getSystemService( Context.LOCATION_SERVICE ) as LocationManager)
+
+        if ( !manager.isProviderEnabled( LocationManager.GPS_PROVIDER ) ) {
+            Log.d("GPSx", "NOOOOOOOO")
+        }else{
+            Log.d("GPSx", "SIIIIIIIII")
+        }*/
+
+
         val mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter()
         if (mBluetoothAdapter == null) {
             // Device does not support Bluetooth
@@ -294,13 +304,13 @@ class MyScoreFragment : BaseFragment(), MyScoreView, ObdGatewayVin {
         handler.removeCallbacks(runnable)
 
         //SDK
-        showProgress()
-        ConnectOBD.startLiveData(this)
+        //showProgress()
+        //ConnectOBD.startLiveData(this)
 
         //DEMO
         //myActivity.startCollectDataService()
         Global.cancelValidated = false
-        //navigator.navigateToCollectTripData(this, 1)
+        navigator.navigateToCollectTripData(this, 1)
     }
 
     override fun onDestroy() {
