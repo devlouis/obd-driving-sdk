@@ -1,6 +1,5 @@
 package com.mdp.innovation.obd_driving_api.app.core
 
-import android.app.Activity
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
@@ -8,12 +7,7 @@ import android.content.ServiceConnection
 import android.location.Location
 import android.os.Handler
 import android.os.IBinder
-import android.preference.PreferenceManager
-import android.support.design.widget.Snackbar
-import android.support.v4.content.ContextCompat
 import android.util.Log
-import android.view.View
-import android.widget.Toast
 import com.mdp.innovation.obd_driving_api.R
 import com.mdp.innovation.obd_driving_api.app.`interface`.ObdGatewayVin
 import com.mdp.innovation.obd_driving_api.app.core.service.LocationUpdatesService
@@ -24,13 +18,17 @@ import com.mdp.innovation.obd_driving_api.app.utils.UtilsLocationService
 import com.mdp.innovation.obd_driving_api.commands.SpeedCommand
 import com.mdp.innovation.obd_driving_api.commands.control.VinCommand
 import com.mdp.innovation.obd_driving_api.commands.engine.RPMCommand
-import com.mdp.innovation.obd_driving_api.data.Broadcast.OBDRestarBroadcastReceiver
 import com.mdp.innovation.obd_driving_api.data.IoTHub.SendDataOBD
+import com.mdp.innovation.obd_driving_api.data.entity.TripDrivingEntity
+import com.mdp.innovation.obd_driving_api.data.entity.TripEntity
 import com.mdp.innovation.obd_driving_api.data.store.SharedPreference
 import com.mdp.innovation.obd_driving_api.enums.AvailableCommandNames
-import kotlinx.android.synthetic.main.activity_pair_obd.*
+import io.realm.Realm
 import java.io.IOException
 import java.util.*
+import android.provider.SyncStateContract.Helpers.update
+
+
 
 object ConnectOBD{
     val TAG = javaClass.simpleName
@@ -44,6 +42,7 @@ object ConnectOBD{
     lateinit var appSharedPreference: SharedPreference
     var btStatus = ""
     var context: Context? = null
+    lateinit var realm : Realm
     var eo = ""
 
     var contadorTotal = 0
@@ -61,6 +60,7 @@ object ConnectOBD{
 
     fun initialize(context: Context){
         this.context = context
+
         LogUtils().v(TAG, " INIT")
         //RoboGuice.setUseAnnotationDatabases(false)
         appSharedPreference = SharedPreference(context)
@@ -82,6 +82,7 @@ object ConnectOBD{
     }
 
     fun startLiveData(mObdGatewayVin: ObdGatewayVin) {
+
         Log.d(TAG, "Starting live data...")
         this.obdGatewayVin = mObdGatewayVin
         if (macDevice.isNotEmpty()) {
@@ -95,6 +96,13 @@ object ConnectOBD{
     }
 
     fun stopLiveData(){
+        doUnbindService()
+        mLocationUpdatesService!!.RemoveAll()
+        //doUnbindServiceLocation()
+       //obdGatewayVin!!.errorConnect("Se perdio conexion al OBD")
+    }
+
+    fun stopLiveDataforError(){
         doUnbindService()
         mLocationUpdatesService!!.RemoveAll()
         //doUnbindServiceLocation()
@@ -264,7 +272,10 @@ object ConnectOBD{
         Log.v(TAG, " contador $contador")
         if (contador == 3){
             contadorTotal++
-            send.sendData(context, VIN, RPM, KMH, contadorTotal)
+            // ENVIA AL IotHub
+            //send.sendData(context, VIN, RPM, KMH, contadorTotal)
+            addArticle(VIN, RPM, KMH, contadorTotal)
+
             contador = 0
             RPM = ""
             KMH = ""
@@ -274,6 +285,41 @@ object ConnectOBD{
     }
 
 
+    private fun addArticle(vin: String, rpm: String, kmh: String, count: Int) {
+        realm = Realm.getDefaultInstance()
+        realm.beginTransaction()
+
+        val trip = realm.createObject(TripDrivingEntity::class.java)
+        trip.id = count.toLong()
+        trip.id_trip = send.getIDTrip(context, vin)
+        trip.kmh = kmh
+        trip.rpm = rpm
+
+        realm.commitTransaction()
+
+        LogUtils().v(TAG, " : ${trip.toString()}")
+        findAllArticle()
+    }
+
+    private fun findAllArticle() {
+        var realmResults = realm.where(TripDrivingEntity::class.java).findAll()
+        //realmResults.sort("id", RealmResults.SORT_ORDER_DESCENDING)
+        LogUtils().v(TAG, " SIZES : ${realmResults.size}")
+    }
+
+    private fun updateArticle(id: String) {
+        realm.beginTransaction()
+
+        val article = realm.where(TripDrivingEntity::class.java).equalTo("id", id).findFirst()
+       /* article.setTitle(title)
+        article.setDescription(description)*/
+
+
+        realm.commitTransaction()
+
+        LogUtils().v(TAG, " : ${article.toString()}")
+
+    }
 
     /**
      * Actualización del estado
@@ -293,7 +339,7 @@ object ConnectOBD{
             }*/
         } else if (job.state.equals(ObdCommandJob.ObdCommandJobState.BROKEN_PIPE)) {
             if (isServiceBound)
-                stopLiveData()
+                stopLiveDataforError()
         } else if (job.state.equals(ObdCommandJob.ObdCommandJobState.NOT_SUPPORTED)) {
            // cmdResult = context!!.getString(R.string.status_obd_no_support)
         } else {
@@ -314,6 +360,8 @@ object ConnectOBD{
         var VIN =  appSharedPreference.getVinCar()[appSharedPreference.VIN_CAR]!!
         contadorTotalLocation++
         send.sendLocation(context,VIN, location.longitude.toString(), location.latitude.toString(), contadorTotal)
+
+
     }
 
     /**

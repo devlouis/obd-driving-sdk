@@ -89,7 +89,7 @@ public class ObdGatewayService extends AbstractGatewayService  {
             dev = btAdapter.getRemoteDevice(remoteDevice);
 
 
-    /*
+    /**
      * Establish Bluetooth connection
      *
      * Because discovery is a heavyweight procedure for the Bluetooth adapter,

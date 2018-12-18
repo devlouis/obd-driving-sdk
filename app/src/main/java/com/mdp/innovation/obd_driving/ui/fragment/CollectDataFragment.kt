@@ -127,38 +127,6 @@ class CollectDataFragment : BaseServiceFragment(), HomeActivity.StartLiveDataInt
             }, 100L)
         }
 
-        /*var speed = 0F
-
-        speedometer.speedTo(speed)
-
-        val fex: FloatArray = floatArrayOf(10f,20f,30f,40f,50f,60f,70f,80f,90f,100f,110f,120f,130f,140f,150f,160f,170f,180f,190f,200f)
-        var index = 0
-        var increase = true
-
-        runnable = Runnable {  }
-        handler = Handler(Looper.getMainLooper())
-        runnable = Runnable {
-
-            speed = fex[index]
-            speedometer.speedTo(speed)
-
-            increase = when(index){
-                0 -> true
-                fex.size - 1 -> false
-                else -> {
-                    var rand = (0..1).random()
-                    (rand == 1)
-                }
-            }
-
-            if(increase) index+=1
-            else index-=1
-
-            handler.postDelayed(runnable, 2000)
-
-        }
-        handler.postDelayed(runnable, 2000)*/
-
     }
 
     override fun onDestroy() {

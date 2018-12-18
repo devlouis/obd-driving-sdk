@@ -158,4 +158,24 @@ class TestMainActivity : BaseAppCompat(), ObdGatewayVin {
         Log.v(TAG, " getSpeedKm: $kmh")
     }
 
+
+    /**
+     * TEST CHECK BD
+     */
+/*
+    private fun updateArticle(id: String) {
+        realm.beginTransaction()
+
+        val article = realm.where(TripDrivingEntity::class.java).equalTo("id", id).findFirst()
+        *//* article.setTitle(title)
+         article.setDescription(description)*//*
+
+
+        realm.commitTransaction()
+
+        LogUtils().v(TAG, " : ${article.toString()}")
+
+    }*/
+
+
 }
