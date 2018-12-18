@@ -13,7 +13,7 @@ import com.mdp.innovation.obd_driving.ui.navigation.Navigator
 import com.mdp.innovation.obd_driving.util.Global
 import org.koin.android.ext.android.inject
 
-class CollectTripDataActivity : BaseServiceActivity(), HomeView {
+class CollectTripDataActivity : BaseServiceActivity(){
 
     var serviceClass = CollectTripDataService::class.java
     lateinit var myIntent : Intent
@@ -33,31 +33,18 @@ class CollectTripDataActivity : BaseServiceActivity(), HomeView {
 
     }
 
-    override fun showProgress() {
-        //progress.visibility = View.VISIBLE
-    }
-    override fun hideProgress() {
-        //progress.visibility = View.GONE
-    }
-
     override fun onBackPressed() {
-        System.out.println(Global.cancelValidated)
+        /*System.out.println(Global.cancelValidated)
         if(Global.cancelValidated) super.onBackPressed()
-        else validateCancel(supportFragmentManager)
+        else validateCancel(supportFragmentManager)*/
     }
-
-    fun stopService(){
-        super.stopService(serviceClass, myIntent)
-    }
-
-
 
     companion object {
-        fun validateCancel(fragmentManager : FragmentManager){
+        /*fun validateCancel(fragmentManager : FragmentManager){
             var dialog = CancelCollectDialogFragment()
             Global.cancelValidated
             dialog.show(fragmentManager,"cancel_collect")
-        }
+        }*/
     }
 
 }

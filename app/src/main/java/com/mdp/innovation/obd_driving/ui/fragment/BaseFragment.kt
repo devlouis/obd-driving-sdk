@@ -1,14 +1,25 @@
 package com.mdp.innovation.obd_driving.ui.fragment
 
+import android.app.Activity
+import android.app.ActivityManager
 import android.content.Context
-import android.net.Uri
+import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.support.v4.app.Fragment
-import android.view.LayoutInflater
+import android.support.v4.app.FragmentActivity
+import android.support.v4.widget.DrawerLayout
+import android.support.v7.widget.Toolbar
+import android.util.Log
+import android.view.Gravity
 import android.view.View
-import android.view.ViewGroup
-
 import com.mdp.innovation.obd_driving.R
+
+import com.mdp.innovation.obd_driving.internal.CollectTripDataService
+import com.mdp.innovation.obd_driving.util.Constants
+import com.mdp.innovation.obd_driving.util.Message
+import com.mdp.innovation.obd_driving.util.Preferences
+import org.koin.android.ext.android.inject
 
 open class BaseFragment : Fragment() {
 
@@ -16,22 +27,12 @@ open class BaseFragment : Fragment() {
         super.onCreate(savedInstanceState)
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        return inflater.inflate(R.layout.fragment_my_score, container, false)
+    fun drawerConfig(activity: FragmentActivity?, toolbar : Toolbar){
+        var drawerLayout = activity?.findViewById(R.id.drawer_layout) as DrawerLayout
+        toolbar.setNavigationOnClickListener {
+            System.out.println("Menuuuuuuuu")
+            drawerLayout.openDrawer(Gravity.START)
+        }
     }
 
-    fun onButtonPressed(uri: Uri) {
-
-    }
-
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-    }
-
-    override fun onDetach() {
-        super.onDetach()
-    }
 }

@@ -1,34 +1,42 @@
-package com.mdp.innovation.obd_driving.ui.activity
+package com.mdp.innovation.obd_driving.ui.fragment
 
 import android.app.ActivityManager
-import com.mdp.innovation.obd_driving_api.app.core.BaseAppCompat
 import android.content.Context
 import android.content.Intent
-import android.util.Log
-import com.mdp.innovation.obd_driving.util.Message
 import android.os.Build
 import android.os.Bundle
+import android.os.ResultReceiver
+import android.support.v4.app.Fragment
+import android.util.Log
+
 import com.mdp.innovation.obd_driving.internal.CollectTripDataService
 import com.mdp.innovation.obd_driving.util.Constants
-import android.app.Activity
+import com.mdp.innovation.obd_driving.util.Global
+import com.mdp.innovation.obd_driving.util.Message
 import com.mdp.innovation.obd_driving.util.Preferences
 import org.koin.android.ext.android.inject
 
-
-open class BaseServiceActivity : BaseAppCompat() {
+open class BaseServiceFragment : BaseFragment() {
 
     var collectDataService = CollectTripDataService::class.java
     lateinit var collectDataIntent : Intent
 
     private val preferences by inject<Preferences>()
 
-    override fun onCreate(savedInstanceState: Bundle?){
+    override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        collectDataIntent = Intent(applicationContext, collectDataService)
+        collectDataIntent = Intent(context, collectDataService)
     }
 
     fun startCollectDataService(){
         collectDataIntent.action = Constants.STARTFOREGROUND_ACTION
+        collectDataIntent.putExtra("onStop", object : ResultReceiver(null) {
+            override fun onReceiveResult(resultCode: Int, resultData: Bundle) {
+                Log.d("Sabee", "overideeeeeeeeeeeeeeeeee onStopService")
+                Global.tripIsEnded = true
+                fragmentManager?.popBackStack()
+            }
+        })
         startService(collectDataService, collectDataIntent)
     }
     fun stopCollectDataService(){
@@ -37,57 +45,52 @@ open class BaseServiceActivity : BaseAppCompat() {
 
         //ConnectOBD.stopLiveData()
 
-        preferences.setScorePending(applicationContext, true)
+        preferences.setScorePending(context, true)
 
-        /*val returnIntent = Intent()
-        returnIntent.putExtra("result", "end_trip")
-        setResult(Activity.RESULT_OK, returnIntent)
-
-        this.onBackPressed()*/
     }
     fun isActiveCollectDataService() : Boolean{
         return serviceIsActive(collectDataService)
     }
 
-    fun startService(serviceClass: Class<*>, intent: Intent){
+    private fun startService(serviceClass: Class<*>, intent: Intent){
         if (!isServiceRunning(serviceClass)) {
             //startService(intent)
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                startForegroundService(intent)
+                activity?.startForegroundService(intent)
             } else {
-                startService(intent)
+                activity?.startService(intent)
             }
 
         } else {
             Log.i("[INFO]", "Service already running.")
-            Message.toastShort("Service already running.", applicationContext)
+            Message.toastShort("Service already running.", context)
         }
     }
 
-    fun stopService(serviceClass: Class<*>, intent: Intent){
+    private fun stopService(serviceClass: Class<*>, intent: Intent){
         if (isServiceRunning(serviceClass)) {
-            stopService(intent)
+            activity?.stopService(intent)
         } else {
             Log.i("[INFO]", "Service already stopped.")
-            Message.toastShort("Service already stopped.", applicationContext)
+            Message.toastShort("Service already stopped.", context)
         }
     }
 
-    fun serviceIsActive(serviceClass: Class<*>): Boolean{
+    private fun serviceIsActive(serviceClass: Class<*>): Boolean{
         if (isServiceRunning(serviceClass)) {
             Log.i("[INFO]", "Service is running.")
-            Message.toastShort("Service is running.", applicationContext)
+            Message.toastShort("Service is running.", context)
             return true
         } else {
             Log.i("[INFO]", "Service is stopped.")
-            Message.toastShort("Service is stopped.", applicationContext)
+            Message.toastShort("Service is stopped.", context)
             return false
         }
     }
 
-    fun isServiceRunning(serviceClass: Class<*>): Boolean {
-        val activityManager = getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
+    private fun isServiceRunning(serviceClass: Class<*>): Boolean {
+        val activityManager = activity?.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
 
         for (service in activityManager.getRunningServices(Integer.MAX_VALUE)) {
             if (serviceClass.name == service.service.className) {
@@ -96,5 +99,4 @@ open class BaseServiceActivity : BaseAppCompat() {
         }
         return false
     }
-
 }

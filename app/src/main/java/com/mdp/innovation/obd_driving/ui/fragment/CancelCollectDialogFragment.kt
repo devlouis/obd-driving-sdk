@@ -8,6 +8,7 @@ import android.view.ViewGroup
 
 import com.mdp.innovation.obd_driving.R
 import android.support.annotation.Nullable
+import com.mdp.innovation.obd_driving.ui.InterfaceView
 import com.mdp.innovation.obd_driving.ui.activity.BaseServiceActivity
 import com.mdp.innovation.obd_driving.ui.activity.CollectTripDataActivity
 import com.mdp.innovation.obd_driving.util.CustomAnimate
@@ -18,12 +19,14 @@ import kotlinx.android.synthetic.main.fragment_dialog_cancel_collect.*
 class CancelCollectDialogFragment : BaseDialogFragment() {
 
     companion object {
-        fun newInstance(): CancelCollectDialogFragment{
-            return CancelCollectDialogFragment()
+        fun newInstance(customInterface: InterfaceView): CancelCollectDialogFragment{
+            val fragment = CancelCollectDialogFragment()
+            fragment.customInterface = customInterface
+            return fragment
         }
     }
 
-    var myActivity = BaseServiceActivity()
+    private lateinit var customInterface: InterfaceView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -35,7 +38,6 @@ class CancelCollectDialogFragment : BaseDialogFragment() {
 
     override fun onActivityCreated(@Nullable savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        myActivity = activity as BaseServiceActivity
         initUI()
     }
 
@@ -48,8 +50,8 @@ class CancelCollectDialogFragment : BaseDialogFragment() {
             it.isEnabled = false
             it.postDelayed({
                 dismiss()
-                Global.cancelValidated = true
-                myActivity.stopCollectDataService()
+                //Global.cancelValidated = true
+                customInterface.toDo()
                 it.isEnabled = true
             }, 100L)
         }
@@ -58,7 +60,7 @@ class CancelCollectDialogFragment : BaseDialogFragment() {
             it.isEnabled = false
             it.postDelayed({
                 dismiss()
-                Global.cancelValidated = false
+                //Global.cancelValidated = false
                 it.isEnabled = true
             }, 100L)
         }

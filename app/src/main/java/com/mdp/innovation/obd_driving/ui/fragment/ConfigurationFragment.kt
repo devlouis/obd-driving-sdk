@@ -29,8 +29,6 @@ class ConfigurationFragment : BaseFragment() {
     private var mRecyclerView: RecyclerView? = null
     var itemConfigOptionModelList: ArrayList<ItemConfigOptionModel> = ArrayList()
 
-    var myActivity = HomeActivity()
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
     }
@@ -43,8 +41,7 @@ class ConfigurationFragment : BaseFragment() {
         toolbar.title = "Configuración"
         toolbar.setNavigationIcon(R.drawable.ic_menu)
 
-        myActivity = activity as HomeActivity
-        myActivity.drawerConfig(toolbar)
+        drawerConfig(activity, toolbar)
 
         setOptions(view)
 
@@ -55,7 +52,6 @@ class ConfigurationFragment : BaseFragment() {
 
     override fun onActivityCreated(@Nullable savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        myActivity = activity as HomeActivity
         initUI()
     }
 
@@ -71,7 +67,7 @@ class ConfigurationFragment : BaseFragment() {
         super.onDetach()
     }
 
-    fun setOptions(view: View){
+    private fun setOptions(view: View){
 
         val option1 = ItemConfigOptionModel()
         option1.img = R.drawable.ic_bluetooth

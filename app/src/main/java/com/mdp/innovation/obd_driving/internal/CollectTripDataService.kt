@@ -3,8 +3,6 @@ package com.mdp.innovation.obd_driving.internal
 import android.app.Notification
 import android.app.Service
 import android.content.Intent
-import android.os.IBinder
-import android.os.Handler
 import android.util.Log
 import android.widget.Toast
 import com.mdp.innovation.obd_driving.util.Message
@@ -20,36 +18,33 @@ import android.R.string.cancel
 import android.app.Activity
 import android.app.NotificationManager
 import android.support.v4.app.NotificationManagerCompat
-import android.os.Build
 import android.app.NotificationChannel
 import android.annotation.TargetApi
 import android.content.Context
 import android.graphics.Color
-import android.os.Bundle
+import android.os.*
 import android.support.v4.app.TaskStackBuilder
 import android.support.v4.content.ContextCompat
 import android.widget.RemoteViews
+import com.mdp.innovation.obd_driving.ui.InterfaceView
 import com.mdp.innovation.obd_driving.util.Constants
+import com.mdp.innovation.obd_driving.util.Global
 
 
-class CollectTripDataService : BaseService() {
+class CollectTripDataService : BaseService(){
 
     private lateinit var mHandler: Handler
     private lateinit var mRunnable: Runnable
 
     private var number = 0
 
+    lateinit var resultReceiver : ResultReceiver
+
     override fun onBind(intent: Intent): IBinder {
         throw UnsupportedOperationException("Not yet implemented")
     }
 
     override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
-
-        if (intent.getAction().equals(Constants.STARTFOREGROUND_ACTION)) {
-
-        }else if (intent.getAction().equals(Constants.STOPFOREGROUND_ACTION)) {
-
-        }
 
         when(intent.action){
             Constants.STARTFOREGROUND_ACTION -> {
@@ -61,10 +56,21 @@ class CollectTripDataService : BaseService() {
                 mHandler.postDelayed(mRunnable, 5000)
 
                 addNotification()
+
+                resultReceiver = intent.getParcelableExtra("onStop")
+
             }
-            Constants.STOPFOREGROUND_ACTION ->{
+            Constants.STOPFOREGROUND_ACTION -> {
                 stopForeground(true)
                 stopSelf()
+
+                if(Global.appIsOpen){
+                    if(resultReceiver != null) resultReceiver.send(0, Bundle())
+                }else{
+                    Global.isPendingToBack = true
+                }
+
+
             }
         }
 
@@ -106,7 +112,7 @@ class CollectTripDataService : BaseService() {
         return Service.START_STICKY
     }
 
-    fun addNotification() {
+    private fun addNotification() {
 
         val CHANNEL_ID = "my_channel_01"
         val name = "my_channel"
