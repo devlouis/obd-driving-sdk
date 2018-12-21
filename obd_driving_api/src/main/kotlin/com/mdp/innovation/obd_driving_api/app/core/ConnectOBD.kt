@@ -316,30 +316,15 @@ object ConnectOBD{
         val currentDateandTimeMili = sdf8.format(Date())
         LogUtils().v("TAG_BD_SEG", " fulltime : ${currentDateandTimeFull} milisegundos: $currentDateandTimeMili")
 
-        ObdRepository(Application()).getWhereDate(currentDateandTime, object : ObdRepository.GetWhenDateCallback {
-            override fun onSuccess(obdEntity: ObdEntity) {
-                LogUtils().v(TAG, " id viaje : ${obdEntity.toString()}")
-                obdEntity.id_trip = send.getIDTrip(context, vin)
-                obdEntity.kmh = kmh
-                obdEntity.rpm = rpm
-                obdEntity.dataUdate = currentDateandTime
-                obdEntity.status = statusTrip
-                ObdRepository(Application()).update(obdEntity)
-                LogUtils().v(TAG_BD, " OBD BD update : ${obdEntity.toString()}")
-            }
-
-            override fun onFailure() {
-                LogUtils().v(TAG, " id viaje : error - no se encuentra - se registra")
-                val obdEntity = ObdEntity()
-                obdEntity.id_trip = send.getIDTrip(context, vin)
-                obdEntity.kmh = kmh
-                obdEntity.rpm = rpm
-                obdEntity.dataNew = currentDateandTime
-                obdEntity.status = statusTrip
-                ObdRepository(Application()).addObd(obdEntity)
-                LogUtils().v(TAG_BD, " OBD NEW : ${currentDateandTimeFull}")
-            }
-        })
+        LogUtils().v(TAG, " id viaje : error - no se encuentra - se registra")
+        val obdEntity = ObdEntity()
+        obdEntity.id_trip = send.getIDTrip(context, vin)
+        obdEntity.kmh = kmh
+        obdEntity.rpm = rpm
+        obdEntity.dataNew = currentDateandTime
+        obdEntity.status = statusTrip
+        ObdRepository(Application()).addObd(obdEntity)
+        LogUtils().v(TAG_BD, " OBD NEW : ${currentDateandTimeFull}")
 
         findAllArticle()
     }
@@ -358,7 +343,16 @@ object ConnectOBD{
         val currentDateandTimeFull = sdf7.format(Date())
         LogUtils().v(TAG_GET, " GET LOCATION: ${currentDateandTimeFull} :: ${location.longitude},${location.latitude} ")
 
-        LocationRepository(Application()).getWhereDate(currentDateandTime, object : LocationRepository.GetWhenDateCallback {
+        val locationEntity = LocationEntity()
+        locationEntity.id_trip = send.getIDTrip(context, VIN)
+        locationEntity.longitud = location.longitude.toString()
+        locationEntity.latitudd = location.latitude.toString()
+        locationEntity.dataNew = currentDateandTime
+        locationEntity.status = statusTrip
+        LocationRepository(Application()).addLocation(locationEntity)
+        LogUtils().v(TAG_BD, " LOCATION NEW time: ${currentDateandTimeFull}")
+
+      /*  LocationRepository(Application()).getWhereDate(currentDateandTime, object : LocationRepository.GetWhenDateCallback {
             override fun onSuccess(locationEntity: LocationEntity) {
                 LogUtils().v(TAG, " id viaje : ${locationEntity.toString()}")
                 locationEntity.longitud = location.longitude.toString()
@@ -370,7 +364,6 @@ object ConnectOBD{
             }
 
             override fun onFailure() {
-                //showErrorMessage(e.toString())
                 LogUtils().v(TAG, " id viaje : error - no se encuentra - se registra")
                 val locationEntity = LocationEntity()
                 locationEntity.id_trip = send.getIDTrip(context, VIN)
@@ -381,7 +374,7 @@ object ConnectOBD{
                 LocationRepository(Application()).addLocation(locationEntity)
                 LogUtils().v(TAG_BD, " LOCATION NEW time: ${currentDateandTimeFull}")
             }
-        })
+        })*/
 
     }
 
