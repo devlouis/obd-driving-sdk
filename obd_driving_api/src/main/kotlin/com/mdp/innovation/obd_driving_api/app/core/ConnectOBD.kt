@@ -1,5 +1,6 @@
 package com.mdp.innovation.obd_driving_api.app.core
 
+import android.app.Application
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
@@ -23,15 +24,21 @@ import com.mdp.innovation.obd_driving_api.data.entity.TripDrivingEntity
 import com.mdp.innovation.obd_driving_api.data.entity.TripEntity
 import com.mdp.innovation.obd_driving_api.data.store.SharedPreference
 import com.mdp.innovation.obd_driving_api.enums.AvailableCommandNames
-import io.realm.Realm
 import java.io.IOException
 import java.util.*
 import android.provider.SyncStateContract.Helpers.update
-
+import com.mdp.innovation.obd_driving_api.data.entity.LocationEntity
+import com.mdp.innovation.obd_driving_api.data.entity.ObdEntity
+import com.mdp.innovation.obd_driving_api.data.store.TripRepository
+import com.mdp.innovation.obd_driving_api.data.store.repository.LocationRepository
+import com.mdp.innovation.obd_driving_api.data.store.repository.ObdRepository
+import java.text.SimpleDateFormat
 
 
 object ConnectOBD{
     val TAG = javaClass.simpleName
+    val TAG_BD = " BD_LOCAL"
+    val TAG_GET = " TAG_GET"
 
     private var service: AbstractGatewayService? = null
     private var isServiceBound: Boolean = false
@@ -42,7 +49,7 @@ object ConnectOBD{
     lateinit var appSharedPreference: SharedPreference
     var btStatus = ""
     var context: Context? = null
-    lateinit var realm : Realm
+
     var eo = ""
 
     var contadorTotal = 0
@@ -51,20 +58,24 @@ object ConnectOBD{
     var RPM = ""
     var KMH = ""
 
+    var statusTrip = "0"
+
 
     private var macDevice = ""
+    var VIN = ""
     val send = SendDataOBD()
 
     //GPS Service
     private var mLocationUpdatesService : LocationUpdatesService? = null
 
-    fun initialize(context: Context){
+    fun initialize(context: Context) {
         this.context = context
 
         LogUtils().v(TAG, " INIT")
         //RoboGuice.setUseAnnotationDatabases(false)
         appSharedPreference = SharedPreference(context)
         macDevice = appSharedPreference.getMacBluetooth()[appSharedPreference.MAC_DEVICE]!!
+        VIN =  appSharedPreference.getVinCar()[appSharedPreference.VIN_CAR]!!
         send.InitClient()
         LogUtils().v(TAG, " macDevice:: $macDevice")
         LogUtils().v(TAG, " obdGatewayVin:: $obdGatewayVin")
@@ -83,6 +94,8 @@ object ConnectOBD{
 
     fun startLiveData(mObdGatewayVin: ObdGatewayVin) {
 
+
+        appSharedPreference.saveIdRawBD("0")
         Log.d(TAG, "Starting live data...")
         this.obdGatewayVin = mObdGatewayVin
         if (macDevice.isNotEmpty()) {
@@ -96,8 +109,13 @@ object ConnectOBD{
     }
 
     fun stopLiveData(){
-        doUnbindService()
-        mLocationUpdatesService!!.RemoveAll()
+        statusTrip = "2"
+        Handler().postDelayed({
+            doUnbindService()
+            mLocationUpdatesService!!.RemoveAll()
+        }, 1000)
+
+
         //doUnbindServiceLocation()
        //obdGatewayVin!!.errorConnect("Se perdio conexion al OBD")
     }
@@ -238,9 +256,8 @@ object ConnectOBD{
         }
     }
 
+
     private fun updateTripStatistic(job: ObdCommandJob, cmdID: String) {
-        var VIN =  appSharedPreference.getVinCar()[appSharedPreference.VIN_CAR]!!
-        Log.v(TAG, " antes del wheb")
         when(cmdID){
             AvailableCommandNames.SPEED.toString() -> {
                 contador++
@@ -274,50 +291,97 @@ object ConnectOBD{
             contadorTotal++
             // ENVIA AL IotHub
             //send.sendData(context, VIN, RPM, KMH, contadorTotal)
-            addArticle(VIN, RPM, KMH, contadorTotal)
+            val sdf7 = SimpleDateFormat("H:mm:ss:SSS")
+            val currentDateandTimeFull = sdf7.format(Date())
+            LogUtils().v(TAG_GET, " GET OBD: ${currentDateandTimeFull} :: ${RPM},${KMH} ")
+
+            //Log.v(TAG_BD, " contador OBD :: $contadorTotal")
+            addToBdObd(VIN, RPM, KMH, contadorTotal)
 
             contador = 0
             RPM = ""
             KMH = ""
         }
-        Log.v(TAG, " contadorTotal:: $contadorTotal")
+
 
     }
 
 
-    private fun addArticle(vin: String, rpm: String, kmh: String, count: Int) {
-        realm = Realm.getDefaultInstance()
-        realm.beginTransaction()
+    private fun addToBdObd(vin: String, rpm: String, kmh: String, count: Int) {
+        val sdf6 = SimpleDateFormat("H:mm:ss")
+        val sdf7 = SimpleDateFormat("H:mm:ss.SSS")
+        val sdf8 = SimpleDateFormat("SSS")
+        val currentDateandTime = sdf6.format(Date())
+        val currentDateandTimeFull = sdf7.format(Date())
+        val currentDateandTimeMili = sdf8.format(Date())
+        LogUtils().v("TAG_BD_SEG", " fulltime : ${currentDateandTimeFull} milisegundos: $currentDateandTimeMili")
 
-        val trip = realm.createObject(TripDrivingEntity::class.java)
-        trip.id = count.toLong()
-        trip.id_trip = send.getIDTrip(context, vin)
-        trip.kmh = kmh
-        trip.rpm = rpm
+        ObdRepository(Application()).getWhereDate(currentDateandTime, object : ObdRepository.GetWhenDateCallback {
+            override fun onSuccess(obdEntity: ObdEntity) {
+                LogUtils().v(TAG, " id viaje : ${obdEntity.toString()}")
+                obdEntity.id_trip = send.getIDTrip(context, vin)
+                obdEntity.kmh = kmh
+                obdEntity.rpm = rpm
+                obdEntity.dataUdate = currentDateandTime
+                obdEntity.status = statusTrip
+                ObdRepository(Application()).update(obdEntity)
+                LogUtils().v(TAG_BD, " OBD BD update : ${obdEntity.toString()}")
+            }
 
-        realm.commitTransaction()
+            override fun onFailure() {
+                LogUtils().v(TAG, " id viaje : error - no se encuentra - se registra")
+                val obdEntity = ObdEntity()
+                obdEntity.id_trip = send.getIDTrip(context, vin)
+                obdEntity.kmh = kmh
+                obdEntity.rpm = rpm
+                obdEntity.dataNew = currentDateandTime
+                obdEntity.status = statusTrip
+                ObdRepository(Application()).addObd(obdEntity)
+                LogUtils().v(TAG_BD, " OBD NEW : ${currentDateandTimeFull}")
+            }
+        })
 
-        LogUtils().v(TAG, " : ${trip.toString()}")
         findAllArticle()
     }
 
     private fun findAllArticle() {
-        var realmResults = realm.where(TripDrivingEntity::class.java).findAll()
-        //realmResults.sort("id", RealmResults.SORT_ORDER_DESCENDING)
-        LogUtils().v(TAG, " SIZES : ${realmResults.size}")
+
+       /* var realmResults = realm.where(TripDrivingEntity::class.java).findAll()
+        LogUtils().v(TAG, " SIZES : ${realmResults.size}")*/
     }
 
-    private fun updateArticle(id: String) {
-        realm.beginTransaction()
+    private fun addToBdLocation(id: String, location: Location) {
 
-        val article = realm.where(TripDrivingEntity::class.java).equalTo("id", id).findFirst()
-       /* article.setTitle(title)
-        article.setDescription(description)*/
+        val sdf6 = SimpleDateFormat("H:mm:ss")
+        val sdf7 = ("H:mm:ss.SSS")
+        val currentDateandTime = sdf6.format(Date())
+        val currentDateandTimeFull = sdf7.format(Date())
+        LogUtils().v(TAG_GET, " GET LOCATION: ${currentDateandTimeFull} :: ${location.longitude},${location.latitude} ")
 
+        LocationRepository(Application()).getWhereDate(currentDateandTime, object : LocationRepository.GetWhenDateCallback {
+            override fun onSuccess(locationEntity: LocationEntity) {
+                LogUtils().v(TAG, " id viaje : ${locationEntity.toString()}")
+                locationEntity.longitud = location.longitude.toString()
+                locationEntity.latitudd = location.latitude.toString()
+                locationEntity.dataUdate = currentDateandTime
+                locationEntity.status = statusTrip
+                LocationRepository(Application()).update(locationEntity)
+                LogUtils().v(TAG_BD, " LOCATION BD update : ${locationEntity.toString()}")
+            }
 
-        realm.commitTransaction()
-
-        LogUtils().v(TAG, " : ${article.toString()}")
+            override fun onFailure() {
+                //showErrorMessage(e.toString())
+                LogUtils().v(TAG, " id viaje : error - no se encuentra - se registra")
+                val locationEntity = LocationEntity()
+                locationEntity.id_trip = send.getIDTrip(context, VIN)
+                locationEntity.longitud = location.longitude.toString()
+                locationEntity.latitudd = location.latitude.toString()
+                locationEntity.dataNew = currentDateandTime
+                locationEntity.status = statusTrip
+                LocationRepository(Application()).addLocation(locationEntity)
+                LogUtils().v(TAG_BD, " LOCATION NEW time: ${currentDateandTimeFull}")
+            }
+        })
 
     }
 
@@ -356,10 +420,11 @@ object ConnectOBD{
 
     @JvmStatic
     fun stateUpdateLocation(location: Location) {
-        LogUtils().v(TAG, "New location_: ${UtilsLocationService().getLocationText(location)}")
-        var VIN =  appSharedPreference.getVinCar()[appSharedPreference.VIN_CAR]!!
+        LogUtils().v(TAG_BD, "New location_: ${UtilsLocationService().getLocationText(location)}")
         contadorTotalLocation++
-        send.sendLocation(context,VIN, location.longitude.toString(), location.latitude.toString(), contadorTotal)
+        val id = appSharedPreference.getIdRawBD()
+        addToBdLocation(id[appSharedPreference.ID_RAW_BD]!!, location)
+
 
 
     }

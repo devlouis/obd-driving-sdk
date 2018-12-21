@@ -1,7 +1,7 @@
 package com.mdp.innovation.obd_driving_api.app.core
 
 import android.app.Application
-
+import com.mdp.innovation.obd_driving_api.data.store.TripRepository
 
 
 /**
@@ -11,8 +11,12 @@ import android.app.Application
  */
 class MyApplicationSDK : Application() {
 
+
+    lateinit var tripRepository: TripRepository
     override fun onCreate() {
         super.onCreate()
 
+        tripRepository =  TripRepository(this)
     }
+
 }

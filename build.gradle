@@ -20,8 +20,6 @@ buildscript {
         classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.7.3'
         classpath 'com.github.dcendents:android-maven-gradle-plugin:2.0'
 
-        //BD realm
-        classpath "io.realm:realm-gradle-plugin:5.8.0"
     }
 }
 
@@ -60,4 +58,6 @@ ext {
     libModuleDesc = 'Android library for fast and simple string validation.'
     libBintrayName = 'obd-driving-sdk'
 
+    roomVersion= '1.0.0'
+    runtime= '1.1.0'
 }

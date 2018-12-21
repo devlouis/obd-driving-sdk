@@ -1,6 +1,5 @@
 package com.mdp.innovation.obd_driving_api.data.entity;
 
-
 import android.arch.persistence.room.ColumnInfo;
 import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.PrimaryKey;
@@ -8,37 +7,27 @@ import android.support.annotation.NonNull;
 
 import java.io.Serializable;
 
-/**
- * Created by louislopez on 13,December,2018
- * MDP Consulting,
- * Peru, Lima.
- */
+@Entity(tableName = "tb_location")
+public class LocationEntity implements Serializable {
 
-@Entity(tableName = "tb_trip")
-public class TripEntity implements Serializable {
     @PrimaryKey(autoGenerate = true)
     @NonNull
     @ColumnInfo(name = "id")
     private Long id;
 
     private String id_trip = "";
-    private String live_date = "";
     private String latitudd = "";
     private String longitud = "";
-    private String rpm = "";
-    private String kmh = "";
     private String status = "";
     private String dataNew = "";
     private String dataUdate = "";
-    private long dataNewMili = 0;
-    private long dataUdateMili = 0;
 
-
+    @NonNull
     public Long getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(@NonNull Long id) {
         this.id = id;
     }
 
@@ -48,14 +37,6 @@ public class TripEntity implements Serializable {
 
     public void setId_trip(String id_trip) {
         this.id_trip = id_trip;
-    }
-
-    public String getLive_date() {
-        return live_date;
-    }
-
-    public void setLive_date(String live_date) {
-        this.live_date = live_date;
     }
 
     public String getLatitudd() {
@@ -72,22 +53,6 @@ public class TripEntity implements Serializable {
 
     public void setLongitud(String longitud) {
         this.longitud = longitud;
-    }
-
-    public String getRpm() {
-        return rpm;
-    }
-
-    public void setRpm(String rpm) {
-        this.rpm = rpm;
-    }
-
-    public String getKmh() {
-        return kmh;
-    }
-
-    public void setKmh(String kmh) {
-        this.kmh = kmh;
     }
 
     public String getStatus() {
@@ -114,53 +79,16 @@ public class TripEntity implements Serializable {
         this.dataUdate = dataUdate;
     }
 
-    public long getDataNewMili() {
-        return dataNewMili;
-    }
-
-    public void setDataNewMili(long dataNewMili) {
-        this.dataNewMili = dataNewMili;
-    }
-
-    public long getDataUdateMili() {
-        return dataUdateMili;
-    }
-
-    public void setDataUdateMili(long dataUdateMili) {
-        this.dataUdateMili = dataUdateMili;
-    }
-
     @Override
     public String toString() {
-        return "TripEntity{" +
+        return "LocationEntity{" +
                 "id=" + id +
                 ", id_trip='" + id_trip + '\'' +
-                ", live_date='" + live_date + '\'' +
                 ", latitudd='" + latitudd + '\'' +
                 ", longitud='" + longitud + '\'' +
-                ", rpm='" + rpm + '\'' +
-                ", kmh='" + kmh + '\'' +
                 ", status='" + status + '\'' +
                 ", dataNew='" + dataNew + '\'' +
                 ", dataUdate='" + dataUdate + '\'' +
-                ", dataNewMili=" + dataNewMili +
-                ", dataUdateMili=" + dataUdateMili +
                 '}';
     }
-
-    /*@Override
-    public String toString() {
-        return "{" +
-                "'id':'" + id + "',"+
-                "'id_trip':'" + id_trip + "'," +
-                "'live_date':'" + live_date + "'," +
-                "'latitudd':'" + latitudd + "'," +
-                "'longitud':'" + longitud + "'," +
-                "'rpm':'" + rpm + "'," +
-                "'kmh':'" + kmh + "'," +
-                "'status':'" + status + "'," +
-                "'dataNew':'" + dataNew + "'," +
-                "'dataUdate':'" + dataUdate + "'," +
-                '}';
-    }*/
 }
