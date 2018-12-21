@@ -12,24 +12,26 @@ import com.mdp.innovation.obd_driving.R
 import android.support.v7.widget.Toolbar
 import kotlinx.android.synthetic.main.fragment_collect_data.*
 import android.support.annotation.Nullable
+import android.util.Log
 import com.github.anastr.speedviewlib.PointerSpeedometer
+import com.mdp.innovation.obd_driving.ui.InterfaceView
 import com.mdp.innovation.obd_driving.ui.activity.CollectTripDataActivity
+import com.mdp.innovation.obd_driving.ui.activity.HomeActivity
 import com.mdp.innovation.obd_driving.util.CustomAnimate
 import com.mdp.innovation.obd_driving.util.Global
+import com.mdp.innovation.obd_driving.util.Message
 import com.mdp.innovation.obd_driving.util.Preferences
 import com.mdp.innovation.obd_driving_api.app.core.ConnectOBD
 import org.koin.android.ext.android.inject
 
 
-class CollectDataFragment : BaseFragment() {
+class CollectDataFragment : BaseServiceFragment(), HomeActivity.StartLiveDataInterface {
 
     companion object {
         fun newInstance(): CollectDataFragment{
             return CollectDataFragment()
         }
     }
-
-    var myActivity = CollectTripDataActivity()
 
     //private val presenter = MyScorePresenter(this, MyScoreInteractor())
 
@@ -40,6 +42,7 @@ class CollectDataFragment : BaseFragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,savedInstanceState: Bundle?): View? {
@@ -49,8 +52,35 @@ class CollectDataFragment : BaseFragment() {
 
     override fun onActivityCreated(@Nullable savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        myActivity = activity as CollectTripDataActivity
         initUI()
+        (activity as HomeActivity).setOnStartLiveDataListener(this)
+    }
+
+    override fun onPause() {
+        super.onPause()
+        Global.appIsOpen = false
+        (activity as HomeActivity).setOnStartLiveDataListener(null)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        Global.appIsOpen = true
+
+        if(Global.isPendingToBack){
+            fragmentManager?.popBackStack()
+            Global.isPendingToBack = false
+        }
+
+        (activity as HomeActivity).setOnStartLiveDataListener(this)
+    }
+
+    private val customInterface = object : InterfaceView {
+        override fun toDo() {
+            Global.tripIsEnded = true
+            stopCollectDataService()
+            ConnectOBD.stopLiveData()
+            fragmentManager?.popBackStack()
+        }
     }
 
     private fun initUI(){
@@ -70,7 +100,12 @@ class CollectDataFragment : BaseFragment() {
             //activity?.onBackPressed()
 
             //validateCancel()
-            CollectTripDataActivity.validateCancel(fragmentManager!!)
+
+            //CollectTripDataActivity.validateCancel(fragmentManager!!)
+
+            var dialog = CancelCollectDialogFragment.newInstance(customInterface)
+            Global.cancelValidated = false
+            dialog.show(fragmentManager,"cancel_collect")
 
         }
 
@@ -82,52 +117,15 @@ class CollectDataFragment : BaseFragment() {
             it.postDelayed({
 
                 Global.cancelValidated = true
-                myActivity.stopCollectDataService()
-                //ConnectOBD.stopLiveData()
+                Global.tripIsEnded = true
+                stopCollectDataService()
+                fragmentManager?.popBackStack()
+                ConnectOBD.stopLiveData()
 
 
                 it.isEnabled = true
             }, 100L)
         }
-
-        var speed = 0F
-
-        speedometer.speedTo(speed)
-
-        val fex: FloatArray = floatArrayOf(10f,20f,30f,40f,50f,60f,70f,80f,90f,100f,110f,120f,130f,140f,150f,160f,170f,180f,190f,200f)
-        var index = 0
-        var increase = true
-
-        runnable = Runnable {  }
-        handler = Handler(Looper.getMainLooper())
-        runnable = Runnable {
-
-            speed = fex[index]
-            speedometer.speedTo(speed)
-
-            /*if(index == 0) increase = true
-            else if(index == fex.size - 1) increase = false
-            else{
-                var rand = (0..1).random()
-                increase = (rand == 1)
-            }*/
-
-          /*  increase = when(index){
-                0 -> true
-                fex.size - 1 -> false
-                else -> {
-                    var rand = (0..1).random()
-                    (rand == 1)
-                }
-            }*/
-
-            if(increase) index+=1
-            else index-=1
-
-            handler.postDelayed(runnable, 2000)
-
-        }
-        handler.postDelayed(runnable, 2000)
 
     }
 
@@ -140,14 +138,6 @@ class CollectDataFragment : BaseFragment() {
         var dialog : CancelCollectDialogFragment = CancelCollectDialogFragment()
         dialog.show(fragmentManager,"cancel_collect_dialog_fragment")
     }*/
-
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-    }
-
-    override fun onDetach() {
-        super.onDetach()
-    }
 
     /*override fun onDeviceConnected(){
         //nextActivity(HomeActivity::class.java, false)
@@ -167,7 +157,39 @@ class CollectDataFragment : BaseFragment() {
 
     }*/
 
-    private fun goToStartTrip(){
+    override fun getVin(vin: String){
+        /*Log.i("[INFO]","ACTIVITY getVin: $vin")
+        activity!!.runOnUiThread {
+            //hideProgress()
 
+            Global.myVIN = vin
+            preferences.setVIN(context,vin)
+            //ConnectOBD.stopLiveData()
+            //navigator.navigateToCollectData(fragmentManager, R.id.content)
+            Global.cancelValidated = false
+        }*/
+
+    }
+
+    override fun getSpeedKm(kmh: String) {
+        Log.d("Sabee", kmh)
+        val speed = kmh.toFloat()
+        activity!!.runOnUiThread {
+            speedometer.speedTo(speed)
+        }
+
+    }
+
+    override fun errorConnect(message: String){
+        //hideProgress()
+        //Message.toastLong(message,context)
+
+        Log.i("[INFO]","ACTIVITY errorConnect: $message")
+        if(activity != null){
+            activity!!.runOnUiThread {
+                //hideProgress()
+                Message.toastLong(message,context)
+            }
+        }
     }
 }

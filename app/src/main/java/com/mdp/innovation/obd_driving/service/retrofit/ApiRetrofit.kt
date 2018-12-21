@@ -9,7 +9,7 @@ import retrofit2.http.POST
 
 interface ApiRetrofit {
 
-    @POST("api/login")
+    @POST("api")
     open fun getScore(@Body request: ScoreRequest): Call<ScoreResponse>
 
 }

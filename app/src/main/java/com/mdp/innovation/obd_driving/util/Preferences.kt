@@ -6,7 +6,7 @@ class Preferences {
 
     val PREFS_FILENAME = "com.mdp.innovation.obd_driving"
     val SCORE_PENDING = "score_pending"
-    val SCORE_DATE = "score_date"
+    val LAST_TRIP_CALCULED = "last_trip_calculed"
     val MY_SCORE = "my_score"
     val MY_VIN = "my_vin"
 
@@ -22,16 +22,16 @@ class Preferences {
         return prefs.getBoolean(SCORE_PENDING, false)
     }
 
-    fun setLastScoreDate(context: Context?, scoreDate: String){
+    fun setLastTripCalculed(context: Context?, scoreDate: String){
         var prefs = context!!.getSharedPreferences(PREFS_FILENAME, 0)
         val editor = prefs!!.edit()
-        editor.putString(SCORE_DATE, scoreDate)
+        editor.putString(LAST_TRIP_CALCULED, scoreDate)
         editor.apply()
     }
 
-    fun getLastScoreDate(context: Context?) : String? {
+    fun getLastTripCalculed(context: Context?) : String? {
         var prefs = context!!.getSharedPreferences(PREFS_FILENAME, 0)
-        return prefs.getString(SCORE_DATE, "-")
+        return prefs.getString(LAST_TRIP_CALCULED, "-")
     }
 
     fun setMyScore(context: Context?, score: String){
