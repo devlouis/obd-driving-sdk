@@ -1,4 +1,4 @@
-package com.mdp.innovation.obd_driving.model
+package com.mdp.innovation.obd_driving.service.model
 
 data class ScoreResponse(val VIN: Vin, val tripid: TripId) {
 

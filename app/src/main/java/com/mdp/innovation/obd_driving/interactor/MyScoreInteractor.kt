@@ -1,19 +1,13 @@
 package com.mdp.innovation.obd_driving.interactor
 
 import android.util.Log
-import com.mdp.innovation.obd_driving.model.ScoreRequest
-import com.mdp.innovation.obd_driving.model.ScoreResponse
+import com.mdp.innovation.obd_driving.service.model.ScoreResponse
 import com.mdp.innovation.obd_driving.service.WSService
-import com.mdp.innovation.obd_driving.service.retrofit.ApiRetrofit
-import com.mdp.innovation.obd_driving.util.ConstantsWS
-import com.mdp.innovation.obd_driving_api.app.core.ConnectOBD
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.uiThread
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
 
 
 class MyScoreInteractor {
@@ -28,18 +22,18 @@ class MyScoreInteractor {
     }
 
     fun isConnected(listener: OnMyScoreFinishedListener) {
-        /*var isConnected = true
+        var isConnected = true
         if (isConnected)  listener.onDeviceConnected()
-        else listener.onDeviceNoConnected()*/
+        else listener.onDeviceNoConnected()
 
-        var result = ConnectOBD.verifyMacOBD()
+        /*var result = ConnectOBD.verifyMacOBD()
         Log.i("macBluetooth:", result.macBluetooth)
         Log.i("result:", result.result.toString())
         if(result.result){
             listener.onDeviceConnected()
         }else{
             listener.onDeviceNoConnected()
-        }
+        }*/
     }
 
     fun getScore(listener: OnMyScoreFinishedListener, VIN: String, tripId: String) {

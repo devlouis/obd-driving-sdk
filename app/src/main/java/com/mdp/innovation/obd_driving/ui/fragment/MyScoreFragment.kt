@@ -1,10 +1,6 @@
 package com.mdp.innovation.obd_driving.ui.fragment
 
-import android.app.Activity
 import android.bluetooth.BluetoothAdapter
-import android.content.Context
-import android.content.Intent
-import android.location.LocationManager
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -24,19 +20,11 @@ import com.mdp.innovation.obd_driving.ui.activity.HomeActivity
 import com.mdp.innovation.obd_driving.ui.navigation.Navigator
 import com.mdp.innovation.obd_driving.util.CustomAnimate
 import android.util.Log
-import android.widget.Toast
-import com.mdp.innovation.obd_driving.model.ScoreRequest
-import com.mdp.innovation.obd_driving.model.ScoreResponse
-import com.mdp.innovation.obd_driving.service.WSService
-import com.mdp.innovation.obd_driving.ui.InterfaceView
+import com.mdp.innovation.obd_driving.service.model.ScoreResponse
 import org.koin.android.ext.android.inject
 import com.mdp.innovation.obd_driving.util.Global
 import com.mdp.innovation.obd_driving.util.Preferences
-import com.mdp.innovation.obd_driving_api.app.`interface`.ObdGatewayVin
 import com.mdp.innovation.obd_driving_api.app.core.ConnectOBD
-import org.jetbrains.anko.doAsync
-import org.jetbrains.anko.uiThread
-import java.util.*
 
 
 class MyScoreFragment : BaseServiceFragment(), MyScoreView, HomeActivity.StartLiveDataInterface {
@@ -78,7 +66,7 @@ class MyScoreFragment : BaseServiceFragment(), MyScoreView, HomeActivity.StartLi
 
         drawerConfig(activity, toolbar)
 
-        validateConsultScore(true)
+        //validateConsultScore(true)
 
         if(Global.tripIsEnded){
             Message.toastLong(resources.getString(R.string.alert_end_trip), context)
@@ -326,16 +314,16 @@ class MyScoreFragment : BaseServiceFragment(), MyScoreView, HomeActivity.StartLi
         handler.removeCallbacks(runnable)
 
         //SDK
-        showProgress()
-        (activity as HomeActivity).startLiveData()
+        //showProgress()
+        //(activity as HomeActivity).startLiveData()
         //(activity as HomeActivity).simulateSpeed()
         //navigator.navigateToCollectData(fragmentManager, R.id.content)
 
 
         //DEMO
-        //startCollectDataService()
-        //Global.cancelValidated = false
-        //navigator.navigateToCollectData(fragmentManager, R.id.content)
+        startCollectDataService()
+        Global.cancelValidated = false
+        navigator.navigateToCollectData(fragmentManager, R.id.content)
     }
 
     override fun onDestroy() {
