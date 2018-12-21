@@ -2,7 +2,6 @@ apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
-apply plugin: 'realm-android'
 
 
 //apply plugin: 'realm-android'
@@ -34,19 +33,6 @@ android {
 
 }
 
-// This is added automatically if Kotlin is registered in the project, but Kotlin extension functions
-// for Realm can be excluded if needed.
-realm {
-    kotlinExtensionsEnabled = true
-}
-
-// enable @ParametersAreNonnullByDefault annotation. See https://blog.jetbrains.com/kotlin/2017/09/kotlin-1-1-50-is-out/
-tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).all {
-    kotlinOptions {
-        freeCompilerArgs = ["-Xjsr305=strict"]
-    }
-}
-
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 
@@ -72,7 +58,13 @@ dependencies {
     implementation 'com.google.android.gms:play-services-location:11.0.0'
     implementation 'com.google.android.gms:play-services-maps:11.0.0'
 
+    // Room components
+    implementation "android.arch.persistence.room:runtime:$rootProject.roomVersion"
+    kapt "android.arch.persistence.room:compiler:$rootProject.roomVersion"
+    androidTestImplementation "android.arch.persistence.room:testing:$rootProject.roomVersion"
 
+    //Google gson
+    implementation 'com.google.code.gson:gson:2.7'
 
 
 }

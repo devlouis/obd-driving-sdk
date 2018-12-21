@@ -305,6 +305,21 @@ public class SendDataOBD {
         }
     }
 
+    public void sendDataJsonString(String msgStr){
+        try
+        {
+            Message msg = new Message(msgStr);
+            msg.setMessageId(java.util.UUID.randomUUID().toString());
+            System.out.println(msgStr);
+            EventCallback eventCallback = new EventCallback();
+            client.sendEventAsync(msg, eventCallback, 1);
+        }
+        catch (Exception e)
+        {
+            System.err.println("Exception while sending event: " + e.getMessage());
+        }
+    }
+
 
     public String getIDTrip(Context context, String deviceId){
         SharedPreference appSharedPreference = new SharedPreference(context);

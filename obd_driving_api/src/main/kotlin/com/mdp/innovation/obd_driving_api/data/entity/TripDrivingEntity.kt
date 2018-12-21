@@ -1,7 +1,12 @@
 package com.mdp.innovation.obd_driving_api.data.entity
 
-import io.realm.RealmObject
-import io.realm.annotations.PrimaryKey
+import android.arch.persistence.room.ColumnInfo
+import android.arch.persistence.room.Entity
+import android.arch.persistence.room.Ignore
+import android.arch.persistence.room.PrimaryKey
+import android.support.annotation.NonNull
+
+import java.io.Serializable
 
 
 /**
@@ -9,9 +14,12 @@ import io.realm.annotations.PrimaryKey
  * MDP Consulting,
  * Peru, Lima.
  */
-open class TripDrivingEntity: RealmObject() {
+
+class TripDrivingEntity: Serializable {
+
 
     var id: Long = 0
+
     var id_trip: String = ""
     var live_date: String = ""
     var latitudd: String = ""
@@ -19,8 +27,12 @@ open class TripDrivingEntity: RealmObject() {
     var rpm: String = ""
     var kmh: String = ""
     var status: String = ""
+
+    var dataNew: String = ""
+    var dataUdate: String = ""
+
     override fun toString(): String {
-        return "TripDrivingEntity(id=$id, id_trip='$id_trip', live_date='$live_date', latitudd='$latitudd', longitud='$longitud', rpm='$rpm', kmh='$kmh', status='$status')"
+        return "TripDrivingEntity(id=$id, id_trip='$id_trip', live_date='$live_date', latitudd='$latitudd', longitud='$longitud', rpm='$rpm', kmh='$kmh', status='$status', dataNew='$dataNew', dataUdate='$dataUdate')"
     }
 
 
