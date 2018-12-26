@@ -78,25 +78,6 @@ class HomeActivity : BaseServiceActivity(), HomeView, ObdGatewayVin {
 
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-
-        /*if (resultCode == Activity.RESULT_OK){
-            val result = data?.getStringExtra("result")
-            if(result.equals("end_trip")){
-
-                val handler = Handler()
-                handler.postDelayed({
-                    var dialog = EndTripDialogFragment()
-                    dialog.show(supportFragmentManager,"end_trip")
-                    myScoreFragment.showUpdateScoreProgressBar()
-                }, 500)
-
-
-            }
-        }*/
-    }
-
     fun startLiveData(){
         ConnectOBD.startLiveData(this)
     }
@@ -184,6 +165,9 @@ class HomeActivity : BaseServiceActivity(), HomeView, ObdGatewayVin {
                     myScoreFragment = navigator.navigateToMyScore(supportFragmentManager, R.id.content)
                 }
                 R.id.action_2 -> {
+                    navigator.navigateToMyTrips(supportFragmentManager, R.id.content)
+                }
+                R.id.action_3 -> {
                     navigator.navigateToConfiguration(supportFragmentManager, R.id.content)
                 }
                 /*R.id.action_3 -> toast("Opcion 3 clicked")

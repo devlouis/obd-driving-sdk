@@ -1,14 +1,13 @@
 package com.mdp.innovation.obd_driving.service
 
 import android.util.Log
-import com.mdp.innovation.obd_driving.model.ScoreRequest
-import com.mdp.innovation.obd_driving.model.ScoreResponse
+import com.mdp.innovation.obd_driving.service.model.MyTripsRequest
+import com.mdp.innovation.obd_driving.service.model.MyTripsResponse
+import com.mdp.innovation.obd_driving.service.model.ScoreRequest
+import com.mdp.innovation.obd_driving.service.model.ScoreResponse
 import com.mdp.innovation.obd_driving.service.retrofit.ApiRetrofit
 import com.mdp.innovation.obd_driving.util.ConstantsWS
-import org.json.JSONObject
 import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
@@ -49,6 +48,17 @@ class WSService {
 
         val service: ApiRetrofit? = retrofit?.create(ApiRetrofit::class.java)
         return service!!.getScore(request)
+    }
+
+    fun getMyTrips(VIN: String) : Call<MyTripsResponse>{
+        var request = MyTripsRequest(VIN, 1,10)
+        val retrofit: Retrofit? = Retrofit.Builder()
+            .baseUrl(ConstantsWS.WS_URL_SCORE)
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+
+        val service: ApiRetrofit? = retrofit?.create(ApiRetrofit::class.java)
+        return service!!.getMyTrips(request)
     }
 
 }

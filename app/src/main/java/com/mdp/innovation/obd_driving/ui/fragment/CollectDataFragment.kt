@@ -78,7 +78,7 @@ class CollectDataFragment : BaseServiceFragment(), HomeActivity.StartLiveDataInt
         override fun toDo() {
             Global.tripIsEnded = true
             stopCollectDataService()
-            ConnectOBD.stopLiveData()
+            //ConnectOBD.stopLiveData()
             fragmentManager?.popBackStack()
         }
     }
@@ -120,7 +120,7 @@ class CollectDataFragment : BaseServiceFragment(), HomeActivity.StartLiveDataInt
                 Global.tripIsEnded = true
                 stopCollectDataService()
                 fragmentManager?.popBackStack()
-                ConnectOBD.stopLiveData()
+                //ConnectOBD.stopLiveData()
 
 
                 it.isEnabled = true

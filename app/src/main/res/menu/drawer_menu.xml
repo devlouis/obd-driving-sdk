@@ -10,6 +10,11 @@
     />
     <item
             android:id="@+id/action_2"
+            android:title="Mis viajes"
+            android:icon="@drawable/ic_md_direction_car"
+    />
+    <item
+            android:id="@+id/action_3"
             android:title="Configuración"
             android:icon="@drawable/ic_md_build"
     />

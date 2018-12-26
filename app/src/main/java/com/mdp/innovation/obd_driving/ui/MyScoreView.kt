@@ -1,6 +1,6 @@
 package com.mdp.innovation.obd_driving.ui
 
-import com.mdp.innovation.obd_driving.model.ScoreResponse
+import com.mdp.innovation.obd_driving.service.model.ScoreResponse
 
 interface MyScoreView : LoadingView{
     fun onDeviceConnected()

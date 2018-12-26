@@ -2,7 +2,7 @@ package com.mdp.innovation.obd_driving.presenter
 
 import com.mdp.innovation.obd_driving.ui.MyScoreView
 import com.mdp.innovation.obd_driving.interactor.MyScoreInteractor
-import com.mdp.innovation.obd_driving.model.ScoreResponse
+import com.mdp.innovation.obd_driving.service.model.ScoreResponse
 
 class MyScorePresenter(var myScoreView: MyScoreView?, val myScoreInteractor: MyScoreInteractor) : MyScoreInteractor.OnMyScoreFinishedListener {
     fun isConnected() {
