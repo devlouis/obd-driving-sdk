@@ -95,6 +95,11 @@ class TestMainActivity : BaseAppCompat(), ObdGatewayVin {
         idSendDataIoT.setOnClickListener {
             getFirstTrip(10)
         }
+        btnClearDB.setOnClickListener {
+            tripRepository!!.deleteAll()
+            obdRepository!!.deleteAll()
+            locationRepository!!.deleteAll()
+        }
 
 
     }

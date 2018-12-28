@@ -64,9 +64,15 @@
             app:layout_constraintTop_toTopOf="@+id/btnVerifyMac"
             app:layout_constraintBottom_toBottomOf="@+id/btnVerifyMac"/>
     <Button
-            android:text="Envio Data IotHub Test"
+            android:text="Exportar Data"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/idSendDataIoT" app:layout_constraintStart_toStartOf="parent" android:layout_marginStart="20dp"
             android:layout_marginTop="8dp" app:layout_constraintTop_toBottomOf="@+id/btnVerifyMac"/>
+    <Button
+            android:text="Limpiar Data Base"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/btnClearDB" app:layout_constraintStart_toStartOf="parent" android:layout_marginStart="20dp"
+            android:layout_marginTop="8dp" app:layout_constraintTop_toBottomOf="@+id/idSendDataIoT"/>
 </android.support.constraint.ConstraintLayout>

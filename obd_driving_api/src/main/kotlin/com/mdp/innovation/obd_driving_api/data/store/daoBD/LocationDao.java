@@ -49,5 +49,10 @@ public interface LocationDao {
             "        LIMIT 0, :limit\n" +
             "    ) tmp\n" +
             ")")
-    void deleteWithDate(Integer limit);
+    void deleteLocationWithDate(Integer limit);
+
+
+/*    @Query("SELECT COUNT(dataNew)\n" +
+            "  FROM tb_trip")
+    Integer countLocation();*/
 }

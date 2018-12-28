@@ -39,6 +39,11 @@ public class ObdRepository {
         new UpdateAsyncTask(obdDao).execute(obdEntity);
     }
 
+    public void deleteAll() {
+        //noteDao.delete(noteEntity);
+        new DeleteAllAsyncTask(obdDao).execute();
+    }
+
     /**
      * Validar dato existente por segundo
      * @param date
@@ -56,6 +61,10 @@ public class ObdRepository {
      */
     public void getFirtsTrips(Integer limit, PopulateCallback populateCallback){
         new GetFirstTripsAsyncTask(obdDao, populateCallback).execute(limit);
+    }
+
+    public void deleteFirstObd(Integer limit){
+        new DeleteFirstAllAsyncTask(obdDao).execute(limit);
     }
 
 
@@ -183,6 +192,37 @@ public class ObdRepository {
             }else{
                 populateCallback.onFailure(new Exception());
             }
+        }
+    }
+
+
+    private static class DeleteAllAsyncTask extends AsyncTask<ObdEntity, Void, Void> {
+
+        private final ObdDao mAsyncTaskDao;
+
+        DeleteAllAsyncTask(ObdDao dao) {
+            mAsyncTaskDao = dao;
+        }
+
+        @Override
+        protected Void doInBackground(final ObdEntity... params) {
+            mAsyncTaskDao.deleteAllObd();
+            return null;
+        }
+    }
+
+    private static class DeleteFirstAllAsyncTask extends AsyncTask<Integer, Void, Void>{
+
+        private final ObdDao mAsyncTaskDao;
+
+        public DeleteFirstAllAsyncTask(ObdDao dao) {
+            this.mAsyncTaskDao = dao;
+        }
+
+        @Override
+        protected Void doInBackground(Integer... integers) {
+            mAsyncTaskDao.deleteObdWithDate(integers[0]);
+            return null;
         }
     }
 
