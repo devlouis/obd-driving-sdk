@@ -59,8 +59,8 @@ public interface TripDao {
     @Query("SELECT *\n" +
             "FROM tb_trip\n" +
             "ORDER BY id ASC\n" +
-            "LIMIT :limit")
-    List<TripEntity> selectFirstTrip(Integer limit);
+            "LIMIT :limit, :limit2")
+    List<TripEntity> selectFirstTrip(Integer limit, Integer limit2);
 
     @Query("DELETE FROM tb_trip\n" +
             "WHERE id IN (\n" +

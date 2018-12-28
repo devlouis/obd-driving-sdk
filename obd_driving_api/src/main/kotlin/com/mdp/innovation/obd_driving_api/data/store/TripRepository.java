@@ -65,8 +65,8 @@ public class TripRepository {
         new getWhenDateAsyncTask(tripDao, getWhenDateCallback).execute(date);
     }
 
-    public void getFirtsTrips(Integer limit, PopulateCallback populateCallback){
-        new GetFirstTripsAsyncTask(tripDao, populateCallback).execute(limit);
+    public void getFirtsTrips(Integer limit, Integer limit2,PopulateCallback populateCallback){
+        new GetFirstTripsAsyncTask(tripDao, populateCallback).execute(limit, limit2);
     }
 
 
@@ -223,7 +223,7 @@ public class TripRepository {
         }
         @Override
         protected List<TripEntity> doInBackground(Integer... integers) {
-            return mAsyncTaskDao.selectFirstTrip(integers[0]);
+            return mAsyncTaskDao.selectFirstTrip(integers[0], integers[1]);
         }
 
         @Override

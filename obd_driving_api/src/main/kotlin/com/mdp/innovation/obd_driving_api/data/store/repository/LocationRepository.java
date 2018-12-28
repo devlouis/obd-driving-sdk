@@ -39,6 +39,11 @@ public class LocationRepository {
         new UpdateAsyncTask(locationDao).execute(locationEntity);
     }
 
+    public void deleteAll() {
+        //noteDao.delete(noteEntity);
+        new DeleteAllAsyncTask(locationDao).execute();
+    }
+
     /**
      * Validar dato existente por segundo
      * @param date
@@ -58,9 +63,13 @@ public class LocationRepository {
         new GetFirstTripsAsyncTask(locationDao, populateCallback).execute(limit);
     }
 
+    public void deleteFirstLocation(Integer limit){
+        new DeleteFirstAllAsyncTask(locationDao).execute(limit);
+    }
+
     //Asynctask ------
     public interface PopulateCallback {
-        void onSuccess(List<LocationEntity> obdEntityList);
+        void onSuccess(List<LocationEntity> locationEntityList);
         void onFailure(Exception e);
     }
 
@@ -182,6 +191,36 @@ public class LocationRepository {
             }else{
                 populateCallback.onFailure(new Exception());
             }
+        }
+    }
+
+    private static class DeleteAllAsyncTask extends AsyncTask<LocationEntity, Void, Void> {
+
+        private final LocationDao mAsyncTaskDao;
+
+        DeleteAllAsyncTask(LocationDao dao) {
+            mAsyncTaskDao = dao;
+        }
+
+        @Override
+        protected Void doInBackground(final LocationEntity... params) {
+            mAsyncTaskDao.deleteAll();
+            return null;
+        }
+    }
+
+    private class DeleteFirstAllAsyncTask extends AsyncTask<Integer, Void, Void>{
+
+        private final LocationDao mAsyncTaskDao;
+
+        public DeleteFirstAllAsyncTask(LocationDao dao) {
+            this.mAsyncTaskDao = dao;
+        }
+
+        @Override
+        protected Void doInBackground(Integer... integers) {
+            mAsyncTaskDao.deleteLocationWithDate(integers[0]);
+            return null;
         }
     }
 }

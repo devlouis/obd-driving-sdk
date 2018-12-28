@@ -27,11 +27,13 @@ import com.mdp.innovation.obd_driving_api.enums.AvailableCommandNames
 import java.io.IOException
 import java.util.*
 import android.provider.SyncStateContract.Helpers.update
+import com.mdp.innovation.obd_driving_api.app.utils.JSONUtils
 import com.mdp.innovation.obd_driving_api.data.entity.LocationEntity
 import com.mdp.innovation.obd_driving_api.data.entity.ObdEntity
 import com.mdp.innovation.obd_driving_api.data.store.TripRepository
 import com.mdp.innovation.obd_driving_api.data.store.repository.LocationRepository
 import com.mdp.innovation.obd_driving_api.data.store.repository.ObdRepository
+import java.lang.Exception
 import java.text.SimpleDateFormat
 
 
@@ -39,6 +41,8 @@ object ConnectOBD{
     val TAG = javaClass.simpleName
     val TAG_BD = " BD_LOCAL"
     val TAG_GET = " TAG_GET"
+
+    val LIMIT = 20
 
     private var service: AbstractGatewayService? = null
     private var isServiceBound: Boolean = false
@@ -93,7 +97,7 @@ object ConnectOBD{
     }
 
     fun startLiveData(mObdGatewayVin: ObdGatewayVin) {
-
+        statusTrip = "0"
 
         appSharedPreference.saveIdRawBD("0")
         Log.d(TAG, "Starting live data...")
@@ -103,6 +107,7 @@ object ConnectOBD{
             doBindService()
             // start command execution
             Handler().post(mQueueCommands)
+            Handler().post(mSyncronizarBDtoIothub)
         }else{
             obdGatewayVin!!.errorConnect(context!!.getString(R.string.mac_bluetooh_empty))
         }
@@ -256,7 +261,6 @@ object ConnectOBD{
         }
     }
 
-
     private fun updateTripStatistic(job: ObdCommandJob, cmdID: String) {
         when(cmdID){
             AvailableCommandNames.SPEED.toString() -> {
@@ -312,9 +316,6 @@ object ConnectOBD{
         val sdf7 = SimpleDateFormat("H:mm:ss.SSS")
         val sdf8 = SimpleDateFormat("SSS")
         val currentDateandTime = sdf6.format(Date())
-        val currentDateandTimeFull = sdf7.format(Date())
-        val currentDateandTimeMili = sdf8.format(Date())
-        LogUtils().v("TAG_BD_SEG", " fulltime : ${currentDateandTimeFull} milisegundos: $currentDateandTimeMili")
 
         LogUtils().v(TAG, " id viaje : error - no se encuentra - se registra")
         val obdEntity = ObdEntity()
@@ -324,16 +325,9 @@ object ConnectOBD{
         obdEntity.dataNew = currentDateandTime
         obdEntity.status = statusTrip
         ObdRepository(Application()).addObd(obdEntity)
-        LogUtils().v(TAG_BD, " OBD NEW : ${currentDateandTimeFull}")
-
-        findAllArticle()
+        LogUtils().v(TAG_BD, " OBD NEW : ${currentDateandTime} = ${obdEntity.toString()}")
     }
 
-    private fun findAllArticle() {
-
-       /* var realmResults = realm.where(TripDrivingEntity::class.java).findAll()
-        LogUtils().v(TAG, " SIZES : ${realmResults.size}")*/
-    }
 
     private fun addToBdLocation(id: String, location: Location) {
 
@@ -341,7 +335,7 @@ object ConnectOBD{
         val sdf7 = ("H:mm:ss.SSS")
         val currentDateandTime = sdf6.format(Date())
         val currentDateandTimeFull = sdf7.format(Date())
-        LogUtils().v(TAG_GET, " GET LOCATION: ${currentDateandTimeFull} :: ${location.longitude},${location.latitude} ")
+        //LogUtils().v(TAG_GET, " GET LOCATION: ${currentDateandTimeFull} :: ${location.longitude},${location.latitude} ")
 
         val locationEntity = LocationEntity()
         locationEntity.id_trip = send.getIDTrip(context, VIN)
@@ -350,31 +344,7 @@ object ConnectOBD{
         locationEntity.dataNew = currentDateandTime
         locationEntity.status = statusTrip
         LocationRepository(Application()).addLocation(locationEntity)
-        LogUtils().v(TAG_BD, " LOCATION NEW time: ${currentDateandTimeFull}")
-
-      /*  LocationRepository(Application()).getWhereDate(currentDateandTime, object : LocationRepository.GetWhenDateCallback {
-            override fun onSuccess(locationEntity: LocationEntity) {
-                LogUtils().v(TAG, " id viaje : ${locationEntity.toString()}")
-                locationEntity.longitud = location.longitude.toString()
-                locationEntity.latitudd = location.latitude.toString()
-                locationEntity.dataUdate = currentDateandTime
-                locationEntity.status = statusTrip
-                LocationRepository(Application()).update(locationEntity)
-                LogUtils().v(TAG_BD, " LOCATION BD update : ${locationEntity.toString()}")
-            }
-
-            override fun onFailure() {
-                LogUtils().v(TAG, " id viaje : error - no se encuentra - se registra")
-                val locationEntity = LocationEntity()
-                locationEntity.id_trip = send.getIDTrip(context, VIN)
-                locationEntity.longitud = location.longitude.toString()
-                locationEntity.latitudd = location.latitude.toString()
-                locationEntity.dataNew = currentDateandTime
-                locationEntity.status = statusTrip
-                LocationRepository(Application()).addLocation(locationEntity)
-                LogUtils().v(TAG_BD, " LOCATION NEW time: ${currentDateandTimeFull}")
-            }
-        })*/
+        LogUtils().v(TAG_BD, " LOCATION NEW time: ${currentDateandTime} = ${locationEntity.toString()}")
 
     }
 
@@ -464,5 +434,194 @@ object ConnectOBD{
     }
 
 
+    //TODO ###########################################################################################
+    //TODO ###########################################################################################
+    //TODO ###########################################################################################
+    /**
+     * Sincronizacion BD to IoTHub
+     */
+    /**
+     * Enviar a IoTHub cada 1 min
+     */
+    val handler = Handler()
+    private var mSyncronizarBDtoIothub = object : Runnable {
+        override fun run() {
+            var countBD = 0
+            if (start){
+                LogUtils().v(TAG_BD, "########################### I N I C I O ####################################")
+                getFirst20OBD()
+            }
+            start = true
+
+            LocationRepository(Application()).getAll(object : LocationRepository.PopulateCallback{
+                override fun onSuccess(locationEntityList: MutableList<LocationEntity>) {
+                    countBD = locationEntityList.size
+                    LogUtils().v(TAG_BD, " Count Location: ${countBD}")
+
+                }
+                override fun onFailure(e: Exception?) {
+
+                }
+            })
+
+            /**
+             * Validar si todavia existe data que sincronizar
+             */
+            if (countBD > 0){
+                handler.postDelayed(this, 30000)
+            }
+            else{
+                handler.removeCallbacks(this)
+                LogUtils().v(TAG_BD, " Termina la sincronizacion a la BD")
+            }
+
+        }
+    }
+
+    /**
+     * Obtener los 20 primeros
+     */
+    var firstOBD = 0
+    var firstLocation = 0
+    var start = false
+    private fun getFirst20OBD(){
+
+        ObdRepository(Application()).getFirtsTrips(LIMIT, object : ObdRepository.PopulateCallback{
+            override fun onSuccess(obdEntityList: MutableList<ObdEntity>) {
+                for (obd in obdEntityList){
+                    firstOBD++
+                    validateToSend(obd.dataNew, obd, "OBD")
+                    LogUtils().v(TAG_BD, " firstOBD : ${firstOBD}")
+                }
+                firstOBD = 0
+                ObdRepository(Application()).deleteFirstObd(LIMIT)
+                LogUtils().v(TAG_BD, "SE BORRO LOS 20 PRIMERO OBD...")
+                getFirst20Location()
+            }
+
+            override fun onFailure(e: Exception?) {
+                LogUtils().v(TAG_BD, "No se encuentras mas datos...")
+            }
+        })
+    }
+
+    private fun getFirst20Location(){
+        LocationRepository(Application()).getFirtsTrips(LIMIT, object : LocationRepository.PopulateCallback {
+            override fun onSuccess(locationEntityList: MutableList<LocationEntity>) {
+                for (location in locationEntityList){
+                    firstLocation++
+                    validateToSend(location.dataNew, location, "LOCATION")
+                    LogUtils().v(TAG_BD, " firstLocation : ${firstLocation}")
+                }
+                firstLocation = 0
+                LocationRepository(Application()).deleteFirstLocation(LIMIT)
+                LogUtils().v(TAG_BD, "SE BORRO LOS 20 PRIMERO LOCATION...")
+                LogUtils().v(TAG_BD, "######################### F I N ######################################")
+
+                /**
+                 * Enviar a IoTHub
+                 */
+                //
+
+            }
+
+            override fun onFailure(e: Exception?) {
+                LogUtils().v(TAG_BD, "No se encuentras mas datos...")
+            }
+        })
+    }
+
+
+    private fun validateToSend(date: String, any: Any, table: String){
+        TripRepository(Application()).getWhereDate(date, object : TripRepository.GetWhenDateCallback {
+          override fun onSuccess(trip: TripEntity) {
+              LogUtils().v(TAG_BD, " id viaje : ${trip.toString()}")
+              when(table){
+                  "OBD" ->  {
+                      var value = any as ObdEntity
+                      trip.id_trip = value.id_trip
+                      trip.kmh = value.kmh
+                      trip.rpm = value.rpm
+                      trip.dataUdate = value.dataNew
+                      trip.status = value.status
+                      TripRepository(Application()).update(trip)
+                  }
+                  "LOCATION" ->{
+                      var value = any as LocationEntity
+                      LogUtils().v(TAG_BD, " LOCATION - value : ${value.toString()}")
+                      trip.id_trip = value.id_trip
+                      trip.latitudd = value.latitudd
+                      trip.longitud = value.longitud
+                      trip.dataUdate = value.dataNew
+                      trip.status = value.status
+                      TripRepository(Application()).update(trip)
+                  }
+              }
+              LogUtils().v(TAG_BD, " LOCATION BD update : ${trip.toString()}")
+
+          }
+          override fun onFailure() {
+              LogUtils().v(TAG, " id viaje : error - no se encuentra - se registra")
+              when(table){
+                  "OBD" ->  {
+                      var value = any as ObdEntity
+                      val trip = TripEntity()
+                      trip.id_trip = value.id_trip
+                      trip.kmh = value.kmh
+                      trip.rpm = value.rpm
+                      trip.dataNew = value.dataNew
+                      trip.status = value.status
+                      TripRepository(Application()).add(trip)
+                      LogUtils().v(TAG_BD, " OBD NEW INSERT: ${trip.toString()}")
+                  }
+                  "LOCATION" ->{
+                      var value = any as LocationEntity
+                      val trip = TripEntity()
+                      trip.id_trip = value.id_trip
+                      trip.latitudd = value.latitudd
+                      trip.longitud = value.longitud
+                      trip.dataNew = value.dataNew
+                      trip.status = value.status
+                      TripRepository(Application()).add(trip)
+                      LogUtils().v(TAG_BD, " LOCATION NEW INSERT: ${trip.toString()}")
+                  }
+              }
+          }
+        })
+    }
+
+
+    var limit = 0
+    var limit2 = 20
+
+    private fun getFirstTripSend(){
+        var countTrip = getAllTrip()
+        TripRepository(Application()).getFirtsTrips(limit , limit2, object : TripRepository.PopulateCallback {
+            override fun onSuccess(tripEntityList: MutableList<TripEntity>?) {
+                SendDataOBD().sendDataJsonString(JSONUtils.generateJSONArray(tripEntityList).toString())
+                limit+20
+                limit2+20
+                if (countTrip < limit2){
+
+                }
+            }
+            override fun onFailure(e: Exception?) {
+
+            }
+        })
+    }
+
+    private fun getAllTrip():Int {
+        var count = 0
+        TripRepository(Application()).getAllNotes(object : TripRepository.PopulateCallback {
+            override fun onSuccess(tripEntityList: MutableList<TripEntity>) {
+                count = tripEntityList.size
+            }
+            override fun onFailure(e: Exception?) {
+
+            }
+        })
+        return count
+    }
 
 }
