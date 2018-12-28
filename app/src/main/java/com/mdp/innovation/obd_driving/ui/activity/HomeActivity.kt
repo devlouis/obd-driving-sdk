@@ -202,9 +202,17 @@ class HomeActivity : BaseServiceActivity(), HomeView, ObdGatewayVin {
             //System.out.println(Global.cancelValidated)
             //if(Global.cancelValidated) supportFragmentManager.popBackStack()
             //else CollectTripDataActivity.validateCancel(supportFragmentManager)
-            var dialog = CancelCollectDialogFragment.newInstance(customInterface)
-            Global.cancelValidated = false
-            dialog.show(supportFragmentManager,"cancel_collect")
+
+            val fragmentName = supportFragmentManager.getBackStackEntryAt(0).name
+            if(fragmentName == "collect_data"){
+                var dialog = CancelCollectDialogFragment.newInstance(customInterface)
+                Global.cancelValidated = false
+                dialog.show(supportFragmentManager,"cancel_collect")
+            }else{
+                super.onBackPressed()
+            }
+
+
         }
 
     }

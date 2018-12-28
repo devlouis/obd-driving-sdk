@@ -2,13 +2,11 @@ package com.mdp.innovation.obd_driving.ui.navigation
 
 import android.support.v4.app.FragmentManager
 import android.support.annotation.IdRes
-import com.mdp.innovation.obd_driving.ui.fragment.MyScoreFragment
-import com.mdp.innovation.obd_driving.ui.fragment.CollectDataFragment
 import android.app.Activity
 import android.content.Intent
+import com.mdp.innovation.obd_driving.model.ItemMyTripsModel
 import com.mdp.innovation.obd_driving.ui.activity.MainActivity
-import com.mdp.innovation.obd_driving.ui.fragment.ConfigurationFragment
-import com.mdp.innovation.obd_driving.ui.fragment.MyTripsFragment
+import com.mdp.innovation.obd_driving.ui.fragment.*
 
 
 class Navigator {
@@ -31,6 +29,15 @@ class Navigator {
         return myTripsFragment
     }
 
+    fun navigateToTripDetail(fragmentManager: FragmentManager , @IdRes containerId: Int, item: ItemMyTripsModel) : TripDetailFragment{
+        val ft = fragmentManager.beginTransaction()
+        val myTripsFragment = TripDetailFragment.newInstance(item)
+        ft.replace(containerId, myTripsFragment)
+        ft.addToBackStack(null)
+        ft.commit()
+        return myTripsFragment
+    }
+
     fun navigateToConfiguration(fragmentManager: FragmentManager , @IdRes containerId: Int) : ConfigurationFragment{
         val ft = fragmentManager.beginTransaction()
         val configurationFragment = ConfigurationFragment.newInstance()
@@ -42,7 +49,7 @@ class Navigator {
 
     fun navigateToCollectData(fragmentManager: FragmentManager? , @IdRes containerId: Int){
         val ft = fragmentManager?.beginTransaction()
-        ft?.replace(containerId, CollectDataFragment.newInstance())
+        ft?.replace(containerId, CollectDataFragment.newInstance(), "collect_data")
         ft?.addToBackStack("collect_data")
         ft?.commit()
     }

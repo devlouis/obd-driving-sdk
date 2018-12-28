@@ -9,18 +9,18 @@ class TripPresenter(var tripView: TripView?, val tripInteractor: TripInteractor)
     fun onDestroy() {
         tripView = null
     }
-    fun getMyTrips(vin: String) {
-        //myScoreView?.showProgress()
-        tripInteractor.getMyTrips( this, vin)
+    fun getMyTrips(vin: String, page: Int, elements: Int, showLoading: Boolean) {
+        if(showLoading) tripView?.showLoading()
+        tripInteractor.getMyTrips( this, vin, page, elements)
     }
 
     override fun onGetMyTripsSuccess(response: MyTripsResponse) {
-        //myScoreView?.hideProgress()
+        tripView?.hideLoading()
         tripView?.onGetMyTripsSuccess(response)
     }
 
     override fun onGetMyTripsError(message: String) {
-        //myScoreView?.hideProgress()
+        tripView?.hideLoading()
         tripView?.onGetMyTripsError(message)
     }
 }

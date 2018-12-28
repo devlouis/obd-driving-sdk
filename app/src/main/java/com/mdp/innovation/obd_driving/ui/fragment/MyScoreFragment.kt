@@ -195,7 +195,7 @@ class MyScoreFragment : BaseServiceFragment(), MyScoreView, HomeActivity.StartLi
     override fun getVin(vin: String){
         Log.i("[INFO]","ACTIVITY getVin: $vin")
         activity!!.runOnUiThread {
-            hideProgress()
+            hideLoading()
 
             Global.myVIN = vin
             preferences.setVIN(context,vin)
@@ -216,7 +216,7 @@ class MyScoreFragment : BaseServiceFragment(), MyScoreView, HomeActivity.StartLi
 
         Log.i("[INFO]","ACTIVITY errorConnect: $message")
         activity!!.runOnUiThread {
-            hideProgress()
+            hideLoading()
             Message.toastLong(message,activity!!.applicationContext)
             navigator.navigateToCollectData(fragmentManager, R.id.content)
 
@@ -302,10 +302,10 @@ class MyScoreFragment : BaseServiceFragment(), MyScoreView, HomeActivity.StartLi
         Message.toastShort("Su OBD ha perdido la conexión. Por favor vuélvalo a conectar.", activity?.applicationContext)
     }
 
-    override fun showProgress(){
+    override fun showLoading(){
         loading.visibility = View.VISIBLE
     }
-    override fun hideProgress(){
+    override fun hideLoading(){
         loading.visibility = View.GONE
     }
 
