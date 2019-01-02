@@ -27,6 +27,7 @@ import com.mdp.innovation.obd_driving_api.enums.AvailableCommandNames
 import java.io.IOException
 import java.util.*
 import android.provider.SyncStateContract.Helpers.update
+import com.crashlytics.android.Crashlytics
 import com.mdp.innovation.obd_driving_api.app.utils.JSONUtils
 import com.mdp.innovation.obd_driving_api.data.entity.LocationEntity
 import com.mdp.innovation.obd_driving_api.data.entity.ObdEntity
@@ -74,7 +75,7 @@ object ConnectOBD{
 
     fun initialize(context: Context) {
         this.context = context
-
+        //todo Crashlytics.getInstance().crash() // Force a crash
         LogUtils().v(TAG, " INIT")
         //RoboGuice.setUseAnnotationDatabases(false)
         appSharedPreference = SharedPreference(context)
@@ -522,6 +523,7 @@ object ConnectOBD{
                  * Enviar a IoTHub
                  */
                 //
+                countTotalTripPost = getAllTrip()
 
             }
 
@@ -593,16 +595,17 @@ object ConnectOBD{
 
     var limit = 0
     var limit2 = 20
+    var countTotalTrip = 0
+    var countTotalTripPost = 0
 
     private fun getFirstTripSend(){
-        var countTrip = getAllTrip()
         TripRepository(Application()).getFirtsTrips(limit , limit2, object : TripRepository.PopulateCallback {
             override fun onSuccess(tripEntityList: MutableList<TripEntity>?) {
-                SendDataOBD().sendDataJsonString(JSONUtils.generateJSONArray(tripEntityList).toString())
                 limit+20
                 limit2+20
-                if (countTrip < limit2){
-
+                countTotalTripPost = countTotalTrip - limit2
+                if (countTotalTrip < 0){
+                    SendDataOBD().sendDataJsonString(JSONUtils.generateJSONArray(tripEntityList).toString())
                 }
             }
             override fun onFailure(e: Exception?) {

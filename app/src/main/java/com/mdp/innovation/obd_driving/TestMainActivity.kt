@@ -58,6 +58,8 @@ class TestMainActivity : BaseAppCompat(), ObdGatewayVin {
 
         updateArticle("6")
 
+
+
     }
 
     var count = 0
