@@ -41,7 +41,7 @@ class MyScoreInteractor {
         doAsync{
 
             val service = WSService()
-            val call = service.getScore2(VIN, tripId)
+            val call = service.getScore(VIN, tripId)
             uiThread{
                 call.enqueue(object : Callback<ScoreResponse> {
                     override fun onResponse(call: Call<ScoreResponse>, response: Response<ScoreResponse>) {

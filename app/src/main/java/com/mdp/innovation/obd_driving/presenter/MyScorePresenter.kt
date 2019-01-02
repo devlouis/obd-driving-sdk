@@ -6,18 +6,18 @@ import com.mdp.innovation.obd_driving.service.model.ScoreResponse
 
 class MyScorePresenter(var myScoreView: MyScoreView?, val myScoreInteractor: MyScoreInteractor) : MyScoreInteractor.OnMyScoreFinishedListener {
     fun isConnected() {
-        myScoreView?.showProgress()
+        myScoreView?.showLoading()
         myScoreInteractor.isConnected( this)
     }
     fun onDestroy() {
         myScoreView = null
     }
     override fun onDeviceConnected() {
-        myScoreView?.hideProgress()
+        myScoreView?.hideLoading()
         myScoreView?.onDeviceConnected()
     }
     override fun onDeviceNoConnected() {
-        myScoreView?.hideProgress()
+        myScoreView?.hideLoading()
         myScoreView?.onDeviceNoConnected()
     }
 

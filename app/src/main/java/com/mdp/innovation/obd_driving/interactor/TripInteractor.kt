@@ -20,12 +20,12 @@ class TripInteractor {
         fun onGetMyTripsError(message: String)
     }
 
-    fun getMyTrips(listener: OnTripFinishedListener, VIN: String) {
+    fun getMyTrips(listener: OnTripFinishedListener, VIN: String, page: Int, elements: Int) {
 
         doAsync{
 
             val service = WSService()
-            val call = service.getMyTrips(VIN)
+            val call = service.getMyTrips(VIN, page, elements)
             uiThread{
                 call.enqueue(object : Callback<MyTripsResponse> {
                     override fun onResponse(call: Call<MyTripsResponse>, response: Response<MyTripsResponse>) {

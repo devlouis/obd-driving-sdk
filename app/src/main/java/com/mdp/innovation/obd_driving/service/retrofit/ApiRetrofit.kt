@@ -13,7 +13,7 @@ interface ApiRetrofit {
 
     @POST("api")
     open fun getScore(@Body request: ScoreRequest): Call<ScoreResponse>
-    @POST("trip/list")
+    @POST("mytrips")
     open fun getMyTrips(@Body request: MyTripsRequest): Call<MyTripsResponse>
 
 }
