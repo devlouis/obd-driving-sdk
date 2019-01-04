@@ -18,6 +18,7 @@ public class LocationEntity implements Serializable {
     private String id_trip = "";
     private String latitudd = "";
     private String longitud = "";
+    private String bearing = "";
     private String status = "";
     private String dataNew = "";
     private String dataUdate = "";
@@ -55,6 +56,14 @@ public class LocationEntity implements Serializable {
         this.longitud = longitud;
     }
 
+    public String getBearing() {
+        return bearing;
+    }
+
+    public void setBearing(String bearing) {
+        this.bearing = bearing;
+    }
+
     public String getStatus() {
         return status;
     }
@@ -86,6 +95,7 @@ public class LocationEntity implements Serializable {
                 ", id_trip='" + id_trip + '\'' +
                 ", latitudd='" + latitudd + '\'' +
                 ", longitud='" + longitud + '\'' +
+                ", bearing='" + bearing + '\'' +
                 ", status='" + status + '\'' +
                 ", dataNew='" + dataNew + '\'' +
                 ", dataUdate='" + dataUdate + '\'' +

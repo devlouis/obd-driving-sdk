@@ -67,8 +67,8 @@ dependencies {
     implementation 'com.google.code.gson:gson:2.7'
 
     //Firebase
-    implementation 'com.google.firebase:firebase-core:16.0.4'
-    implementation 'com.crashlytics.sdk.android:crashlytics:2.9.6'
+    //implementation 'com.google.firebase:firebase-core:16.0.4'
+    //implementation 'com.crashlytics.sdk.android:crashlytics:2.9.6'
 
 
 }
