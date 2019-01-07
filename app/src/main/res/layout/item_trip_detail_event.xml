@@ -56,7 +56,8 @@
 
         <com.mdp.innovation.obd_driving.util.CustomTextView
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
+                android:id="@+id/tv_value"
                 android:layout_weight="0.28"
                 android:textSize="14sp"
                 android:gravity="center"
@@ -65,7 +66,8 @@
                 android:text="6.65"/>
         <com.mdp.innovation.obd_driving.util.CustomTextView
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
+                android:id="@+id/tv_duration"
                 android:layout_weight="0.28"
                 android:textSize="14sp"
                 android:gravity="center"
@@ -74,9 +76,10 @@
                 android:text="00:00:02"/>
         <com.mdp.innovation.obd_driving.util.CustomTextView
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
+                android:id="@+id/tv_time"
                 android:layout_weight="0.28"
-                android:textSize="14sp"
+                android:textSize="13sp"
                 android:gravity="center"
                 android:textColor="@color/colorToolbar"
                 android:tag="1"

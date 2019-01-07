@@ -1,10 +1,7 @@
 package com.mdp.innovation.obd_driving.service
 
 import android.util.Log
-import com.mdp.innovation.obd_driving.service.model.MyTripsRequest
-import com.mdp.innovation.obd_driving.service.model.MyTripsResponse
-import com.mdp.innovation.obd_driving.service.model.ScoreRequest
-import com.mdp.innovation.obd_driving.service.model.ScoreResponse
+import com.mdp.innovation.obd_driving.service.model.*
 import com.mdp.innovation.obd_driving.service.retrofit.ApiRetrofit
 import com.mdp.innovation.obd_driving.util.ConstantsWS
 import retrofit2.Call
@@ -61,6 +58,14 @@ class WSService {
 
         val service: ApiRetrofit? = retrofit.create(ApiRetrofit::class.java)
         return service!!.getMyTrips(request)
+    }
+
+    fun getTripDetail(tripId: String) : Call<TripDetailResponse>{
+        var request = TripDetailRequest(tripId)
+        val retrofit = getRetrofit(WS_URL_LOCAL)
+
+        val service: ApiRetrofit? = retrofit.create(ApiRetrofit::class.java)
+        return service!!.getTripDetail(request)
     }
 
 }

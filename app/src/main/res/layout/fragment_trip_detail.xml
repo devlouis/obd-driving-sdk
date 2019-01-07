@@ -14,6 +14,7 @@
     <ScrollView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:id="@+id/sv_trip_detail"
             android:layout_marginTop="?attr/actionBarSize">
 
         <android.support.constraint.ConstraintLayout
@@ -27,8 +28,8 @@
                     android:background="@drawable/bg_trip_detail_top"
                     app:layout_constraintTop_toTopOf="parent"
                     android:layout_marginTop="5dp"
-                    android:layout_marginLeft="5dp"
-                    android:layout_marginRight="5dp"
+                    android:layout_marginLeft="@dimen/paddingTripDetail"
+                    android:layout_marginRight="@dimen/paddingTripDetail"
                     android:orientation="horizontal">
 
                 <LinearLayout
@@ -48,6 +49,7 @@
                     <com.mdp.innovation.obd_driving.util.CustomTextView
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
+                            android:id="@+id/tv_duration_value"
                             android:textSize="16sp"
                             android:textColor="@color/colorToolbar"
                             android:tag="1"
@@ -71,6 +73,7 @@
                     <com.mdp.innovation.obd_driving.util.CustomTextView
                             android:layout_width="match_parent"
                             android:layout_height="40dp"
+                            android:id="@+id/tv_score_value"
                             android:textSize="20sp"
                             android:textColor="@color/colorToolbar"
                             android:tag="2"
@@ -94,6 +97,7 @@
                     <com.mdp.innovation.obd_driving.util.CustomTextView
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
+                            android:id="@+id/tv_distance_value"
                             android:textSize="16sp"
                             android:textColor="@color/colorToolbar"
                             android:tag="1"
@@ -103,27 +107,33 @@
 
             </LinearLayout>
 
-            <LinearLayout
-                android:id="@+id/ll_map"
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:background="#000"
-                android:orientation="vertical"
-                app:layout_constraintTop_toBottomOf="@id/ll_trip_detail_top"
-                app:layout_constraintHeight_percent=".5"
-                android:layout_marginTop="5dp"
-                android:layout_marginLeft="5dp"
-                android:layout_marginRight="5dp"
-                app:layout_constraintLeft_toLeftOf="parent"
-                app:layout_constraintRight_toRightOf="parent"
-                app:layout_constraintWidth_percent="1">
+            <RelativeLayout
+                    android:id="@+id/ll_map"
+                    android:layout_width="match_parent"
+                    android:layout_height="270dp"
+                    android:background="#000"
+                    android:orientation="vertical"
+                    app:layout_constraintTop_toBottomOf="@id/ll_trip_detail_top"
+                    android:layout_marginTop="5dp"
+                    android:layout_marginLeft="@dimen/paddingTripDetail"
+                    android:layout_marginRight="@dimen/paddingTripDetail"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    app:layout_constraintRight_toRightOf="parent">
+
+                <com.google.android.gms.maps.MapView
+                        xmlns:android="http://schemas.android.com/apk/res/android"
+                        android:id="@+id/map_dashBoard"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                />
 
                 <ImageView
-                    android:layout_width="fill_parent"
-                    android:layout_height="fill_parent"
-                    android:src="@drawable/map_test"/>
+                        android:id="@+id/transparent_image"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:src="@android:color/transparent" />
 
-            </LinearLayout>
+            </RelativeLayout>
 
             <LinearLayout
                 android:id="@+id/ll_trip_detail_middle"
@@ -175,6 +185,7 @@
                         <com.mdp.innovation.obd_driving.util.CustomTextView
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
+                                android:id="@+id/tv_start_value"
                                 android:textSize="14sp"
                                 android:layout_weight="1"
                                 android:paddingLeft="20dp"
@@ -186,6 +197,7 @@
                         <com.mdp.innovation.obd_driving.util.CustomTextView
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
+                                android:id="@+id/tv_end_value"
                                 android:textSize="14sp"
                                 android:layout_weight="1"
                                 android:paddingLeft="20dp"
@@ -207,14 +219,15 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="10dp"
-                    android:layout_marginRight="5dp"
-                    android:layout_marginLeft="5dp"
+                    android:layout_marginRight="@dimen/paddingTripDetailEvents"
+                    android:layout_marginLeft="@dimen/paddingTripDetailEvents"
                     app:layout_constraintTop_toBottomOf="@id/ll_trip_detail_middle"
                     android:orientation="vertical">
 
                 <com.mdp.innovation.obd_driving.util.CustomTextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:id="@+id/tv_events_title"
                     android:textSize="18sp"
                     android:layout_weight="1"
                     android:textColor="#FFF"
@@ -222,10 +235,12 @@
                     android:paddingRight="20dp"
                     android:background="@color/colorToolbar"
                     android:tag="2"
-                    android:gravity="left"
+                    android:gravity="center_vertical|left"
+                    android:paddingBottom="8dp"
+                    android:paddingTop="5dp"
                     android:text="@string/events"/>
 
-                <include layout="@layout/item_trip_detail_event_type"/>
+                <!--include layout="@layout/item_trip_detail_event_type"/-->
 
             </LinearLayout>
 

@@ -32,6 +32,9 @@
     <string name="value">Valor</string>
     <string name="hour">Hora</string>
 
+    <dimen name="paddingTripDetail">5dp</dimen>
+    <dimen name="paddingTripDetailEvents">0dp</dimen>
+
 
     <string name="configOption1">Cambiar OBD emparejado</string>
 

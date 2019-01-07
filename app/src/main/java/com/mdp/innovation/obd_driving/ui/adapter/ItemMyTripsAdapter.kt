@@ -207,11 +207,8 @@ class ItemMyTripsAdapter(private var mDataList: java.util.ArrayList<ItemMyTripsM
         }
 
         override fun onClick(v: View) {
-
             var item = mDataList[adapterPosition]
             onClickItemListener!!.onClick(item!!)
-
-            Message.toastShort("Aloja!", v.context)
         }
 
     }

@@ -7,5 +7,8 @@ class ItemMyTripsModel {
     var timeStart: Date? = null
     var duration: String? = null
     var score: Float? = null
+    var distance: String? = null
+    var timeEnd: Date? = null
+    var tripId: String? = null
 
 }

@@ -4,12 +4,13 @@
               xmlns:app="http://schemas.android.com/apk/res-auto"
              android:layout_width="match_parent"
              android:layout_height="match_parent"
+              android:animateLayoutChanges="true"
               android:orientation="vertical">
 
     <LinearLayout
-            android:id="@+id/cl_header"
+            android:id="@+id/ll_header"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="45dp"
             android:orientation="horizontal">
 
         <LinearLayout
@@ -21,7 +22,7 @@
 
             <TextView
                     android:layout_width="2dp"
-                    android:layout_height="10dp"
+                    android:layout_height="14dp"
                     android:id="@+id/tv_line_1"
                     android:visibility="invisible"
                     android:background="@drawable/bg_trip_detail_top"
@@ -44,7 +45,7 @@
 
             <TextView
                     android:layout_width="2dp"
-                    android:layout_height="10dp"
+                    android:layout_height="14dp"
                     android:id="@+id/tv_line_2"
                     android:background="@drawable/bg_trip_detail_top"
                     android:gravity="center"
@@ -57,9 +58,9 @@
 
         <LinearLayout
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:layout_weight="0.84"
-                android:gravity="center_horizontal"
+                android:gravity="center"
                 android:layout_gravity="center_horizontal"
                 android:orientation="horizontal">
 
@@ -83,6 +84,7 @@
                 <com.mdp.innovation.obd_driving.util.CustomTextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:id="@+id/tv_event_score"
                         app:layout_constraintEnd_toStartOf="@id/img_arrow"
                         android:textSize="18sp"
                         android:textColor="@color/colorToolbar"
@@ -113,61 +115,71 @@
     <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="#CCC"
-            android:orientation="horizontal">
+            android:id="@+id/ll_events_container"
+            android:orientation="vertical">
 
         <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="0.16"
-                android:gravity="center"
+                android:layout_width="match_parent"
+                android:layout_height="30dp"
+                android:background="#CCC"
                 android:orientation="horizontal">
 
-            <TextView
-                    android:layout_width="2dp"
+            <LinearLayout
+                    android:layout_width="0dp"
                     android:layout_height="match_parent"
-                    android:id="@+id/tv_line_3"
-                    android:background="@drawable/bg_trip_detail_top"
+                    android:layout_weight="0.16"
                     android:gravity="center"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    android:layout_marginLeft="0dp"/>
+                    android:orientation="horizontal">
+
+                <TextView
+                        android:layout_width="2dp"
+                        android:layout_height="match_parent"
+                        android:id="@+id/tv_line_3"
+                        android:background="@drawable/bg_trip_detail_top"
+                        android:gravity="center"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        android:layout_marginLeft="0dp"/>
+
+            </LinearLayout>
+
+            <com.mdp.innovation.obd_driving.util.CustomTextView
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="0.28"
+                    android:textSize="14sp"
+                    android:gravity="center"
+                    android:textColor="#000"
+                    android:tag="1"
+                    android:text="@string/value"/>
+            <com.mdp.innovation.obd_driving.util.CustomTextView
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="0.28"
+                    android:textSize="14sp"
+                    android:gravity="center"
+                    android:textColor="#000"
+                    android:tag="1"
+                    android:text="@string/duration"/>
+            <com.mdp.innovation.obd_driving.util.CustomTextView
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="0.28"
+                    android:textSize="14sp"
+                    android:gravity="center"
+                    android:textColor="#000"
+                    android:tag="1"
+                    android:text="@string/hour"/>
+
 
         </LinearLayout>
 
-        <com.mdp.innovation.obd_driving.util.CustomTextView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="0.28"
-                android:textSize="14sp"
-                android:gravity="center"
-                android:textColor="#000"
-                android:tag="1"
-                android:text="@string/value"/>
-        <com.mdp.innovation.obd_driving.util.CustomTextView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="0.28"
-                android:textSize="14sp"
-                android:gravity="center"
-                android:textColor="#000"
-                android:tag="1"
-                android:text="@string/duration"/>
-        <com.mdp.innovation.obd_driving.util.CustomTextView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="0.28"
-                android:textSize="14sp"
-                android:gravity="center"
-                android:textColor="#000"
-                android:tag="1"
-                android:text="@string/hour"/>
-
+        <!--include layout="@layout/item_trip_detail_event"/>
+        <include layout="@layout/item_trip_detail_event"/-->
 
     </LinearLayout>
 
-    <include layout="@layout/item_trip_detail_event"/>
-    <include layout="@layout/item_trip_detail_event"/>
+
 
 </LinearLayout>

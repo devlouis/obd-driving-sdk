@@ -1,6 +1,5 @@
 package com.mdp.innovation.obd_driving.ui.fragment
 
-import android.content.Context
 import android.os.Bundle
 import android.os.Handler
 import android.view.LayoutInflater
@@ -11,27 +10,22 @@ import com.mdp.innovation.obd_driving.R
 import android.support.v7.widget.Toolbar
 import kotlinx.android.synthetic.main.fragment_my_trips.*
 import android.support.annotation.Nullable
-import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.util.Log
-import com.mdp.innovation.obd_driving.interactor.TripInteractor
-import com.mdp.innovation.obd_driving.model.ItemConfigOptionModel
+import com.mdp.innovation.obd_driving.interactor.MyTripsInteractor
 import com.mdp.innovation.obd_driving.model.ItemMyTripsModel
-import com.mdp.innovation.obd_driving.presenter.TripPresenter
+import com.mdp.innovation.obd_driving.presenter.MyTripsPresenter
 import com.mdp.innovation.obd_driving.service.model.MyTripsResponse
-import com.mdp.innovation.obd_driving.service.model.ScoreResponse
-import com.mdp.innovation.obd_driving.ui.TripView
-import com.mdp.innovation.obd_driving.ui.adapter.ItemConfigOptionAdapter
+import com.mdp.innovation.obd_driving.ui.MyTripsView
 import com.mdp.innovation.obd_driving.ui.adapter.ItemMyTripsAdapter
 import com.mdp.innovation.obd_driving.ui.navigation.Navigator
 import com.mdp.innovation.obd_driving.util.Message
-import com.mdp.innovation.obd_driving_api.app.ui.activity.PairObdActivity
 import org.koin.android.ext.android.inject
 import java.util.*
 
 
-class MyTripsFragment : BaseFragment(), TripView {
+class MyTripsFragment : BaseFragment(), MyTripsView {
     val TAG =  javaClass.simpleName
     companion object {
         fun newInstance(): MyTripsFragment{
@@ -41,7 +35,7 @@ class MyTripsFragment : BaseFragment(), TripView {
 
     private val navigator by inject<Navigator>()
 
-    private val presenter = TripPresenter(this, TripInteractor())
+    private val presenter = MyTripsPresenter(this, MyTripsInteractor())
 
     private val elementsByPage = 15
     private var currentPage = 1
@@ -184,6 +178,9 @@ class MyTripsFragment : BaseFragment(), TripView {
             model.timeStart = item.timeStart
             model.duration = item.duration
             model.score = item.score
+            model.distance =  item.distance
+            model.timeEnd =  item.timeEnd
+            model.tripId = item.tripId
 
             itemMyTripsModelList.add(model)
             adapter.notifyItemInserted(itemMyTripsModelList.size)
