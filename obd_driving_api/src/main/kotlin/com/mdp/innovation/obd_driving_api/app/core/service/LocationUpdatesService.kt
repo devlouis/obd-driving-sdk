@@ -259,7 +259,7 @@ class LocationUpdatesService : Service() {
             mFusedLocationClient.lastLocation
                 .addOnCompleteListener { task ->
                     if (task.isSuccessful && task.result != null) {
-                        mLocation = task.result
+                        mLocation = task.result!!
                     } else {
                         LogUtils().v(TAG, "Failed to get location.")
                     }

@@ -42,7 +42,7 @@ class TestMainActivity : BaseAppCompat(), ObdGatewayVin {
     private var mLocationUpdatesService : LocationUpdatesService? = null
     private var isServiceBoundLocation: Boolean = false
 
-    var sendata = SendDataOBD()
+    //var sendata = SendDataOBD()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -53,10 +53,17 @@ class TestMainActivity : BaseAppCompat(), ObdGatewayVin {
         locationRepository = (application as MyApplication).locationRepository
 
         onClickListener()
-        sendata.InitClient()
+        //sendata.InitClient()
         //Handler().post(mQueueCommands2)
 
         updateArticle("6")
+
+        if (ConnectOBD.isServiceBoundLocation){
+            button.text = "Detener viaje"
+        }else{
+            button.text = "Iniciar Viaje"
+        }
+
 
     }
 
@@ -64,7 +71,7 @@ class TestMainActivity : BaseAppCompat(), ObdGatewayVin {
     val mQueueCommands2 = object : Runnable {
         override fun run() {
             count++
-            sendata.sendData2(count)
+            //sendata.sendData2(count)
             Handler().postDelayed(this, 500)
         }
     }
@@ -171,6 +178,7 @@ class TestMainActivity : BaseAppCompat(), ObdGatewayVin {
     override fun getVin(vin: String) {
         Log.v(TAG, " VIN___: $vin")
         runOnUiThread {
+            button.text = "Detener viaje"
             tviVIN.text = vin
             // ConnectOBD.stopLiveData()
         }
@@ -178,8 +186,10 @@ class TestMainActivity : BaseAppCompat(), ObdGatewayVin {
 
     override fun errorConnect(message: String) {
         Log.v(TAG, " errorConnect: $message")
+        //ConnectOBD.doUnbindService()
         runOnUiThread {
             showDialodAlert("${message}")
+
         }
 
     }

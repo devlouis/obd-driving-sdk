@@ -91,7 +91,7 @@ public class MockObdGatewayService extends AbstractGatewayService {
                 ((PairObdActivity) ctx).runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        ((PairObdActivity) ctx).stateUpdate(job2);
+                       // ((PairObdActivity) ctx).stateUpdate(job2);
                     }
                 });
 

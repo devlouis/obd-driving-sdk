@@ -306,6 +306,13 @@ public class SendDataOBD {
     }
 
     public void sendDataJsonString(String msgStr){
+        String msgStrsss = "[{" +
+                "\"tripId\":\""  + deviceId + "\",\"FECHA\":\"" + utilsLocationService.getDateToDay() + "\",\"LONGITUD\":" + "999999969" + ",\"LATITUD\":" + "5858858" + ",\"COUNT\":" + "58" +
+                "}," +
+                "{\"tripId\":\""  + deviceId + "\",\"FECHA\":\"" + utilsLocationService.getDateToDay() + "\",\"LONGITUD\":" + "999999969" + ",\"LATITUD\":" + "5858858" + ",\"COUNT\":" + "58" +
+                "}" +
+                "]";
+
         try
         {
             Message msg = new Message(msgStr);

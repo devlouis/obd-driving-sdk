@@ -53,7 +53,7 @@ public interface TripDao {
     public List<User> findUserWithName(String search)
      */
 
-    @Query("SELECT * FROM tb_trip WHERE dataNew = :fecha")
+    @Query("SELECT * FROM tb_trip WHERE time = :fecha")
     TripEntity findTripWithDate(String fecha);
 
     @Query("SELECT *\n" +

@@ -21,14 +21,15 @@ public class TripEntity implements Serializable {
     @ColumnInfo(name = "id")
     private Long id;
 
-    private String id_trip = "";
+    private String tripId = "";
     private String live_date = "";
-    private String latitudd = "";
-    private String longitud = "";
+    private String lat = "";
+    private String lon = "";
+    private String bearing = "";
     private String rpm = "";
-    private String kmh = "";
+    private String speed = "";
     private String status = "";
-    private String dataNew = "";
+    private String time = "";
     private String dataUdate = "";
     private long dataNewMili = 0;
     private long dataUdateMili = 0;
@@ -42,12 +43,12 @@ public class TripEntity implements Serializable {
         this.id = id;
     }
 
-    public String getId_trip() {
-        return id_trip;
+    public String getTripId() {
+        return tripId;
     }
 
-    public void setId_trip(String id_trip) {
-        this.id_trip = id_trip;
+    public void setTripId(String tripId) {
+        this.tripId = tripId;
     }
 
     public String getLive_date() {
@@ -58,20 +59,28 @@ public class TripEntity implements Serializable {
         this.live_date = live_date;
     }
 
-    public String getLatitudd() {
-        return latitudd;
+    public String getLat() {
+        return lat;
     }
 
-    public void setLatitudd(String latitudd) {
-        this.latitudd = latitudd;
+    public void setLat(String lat) {
+        this.lat = lat;
     }
 
-    public String getLongitud() {
-        return longitud;
+    public String getLon() {
+        return lon;
     }
 
-    public void setLongitud(String longitud) {
-        this.longitud = longitud;
+    public void setLon(String lon) {
+        this.lon = lon;
+    }
+
+    public String getBearing() {
+        return bearing;
+    }
+
+    public void setBearing(String bearing) {
+        this.bearing = bearing;
     }
 
     public String getRpm() {
@@ -82,12 +91,12 @@ public class TripEntity implements Serializable {
         this.rpm = rpm;
     }
 
-    public String getKmh() {
-        return kmh;
+    public String getSpeed() {
+        return speed;
     }
 
-    public void setKmh(String kmh) {
-        this.kmh = kmh;
+    public void setSpeed(String speed) {
+        this.speed = speed;
     }
 
     public String getStatus() {
@@ -98,12 +107,12 @@ public class TripEntity implements Serializable {
         this.status = status;
     }
 
-    public String getDataNew() {
-        return dataNew;
+    public String getTime() {
+        return time;
     }
 
-    public void setDataNew(String dataNew) {
-        this.dataNew = dataNew;
+    public void setTime(String time) {
+        this.time = time;
     }
 
     public String getDataUdate() {
@@ -134,14 +143,15 @@ public class TripEntity implements Serializable {
     public String toString() {
         return "TripEntity{" +
                 "id=" + id +
-                ", id_trip='" + id_trip + '\'' +
+                ", tripId='" + tripId + '\'' +
                 ", live_date='" + live_date + '\'' +
-                ", latitudd='" + latitudd + '\'' +
-                ", longitud='" + longitud + '\'' +
+                ", lat='" + lat + '\'' +
+                ", lon='" + lon + '\'' +
+                ", bearing='" + bearing + '\'' +
                 ", rpm='" + rpm + '\'' +
-                ", kmh='" + kmh + '\'' +
+                ", speed='" + speed + '\'' +
                 ", status='" + status + '\'' +
-                ", dataNew='" + dataNew + '\'' +
+                ", time='" + time + '\'' +
                 ", dataUdate='" + dataUdate + '\'' +
                 ", dataNewMili=" + dataNewMili +
                 ", dataUdateMili=" + dataUdateMili +
@@ -152,14 +162,14 @@ public class TripEntity implements Serializable {
     public String toString() {
         return "{" +
                 "'id':'" + id + "',"+
-                "'id_trip':'" + id_trip + "'," +
+                "'tripId':'" + tripId + "'," +
                 "'live_date':'" + live_date + "'," +
-                "'latitudd':'" + latitudd + "'," +
-                "'longitud':'" + longitud + "'," +
+                "'lat':'" + lat + "'," +
+                "'lon':'" + lon + "'," +
                 "'rpm':'" + rpm + "'," +
-                "'kmh':'" + kmh + "'," +
+                "'speed':'" + speed + "'," +
                 "'status':'" + status + "'," +
-                "'dataNew':'" + dataNew + "'," +
+                "'time':'" + time + "'," +
                 "'dataUdate':'" + dataUdate + "'," +
                 '}';
     }*/

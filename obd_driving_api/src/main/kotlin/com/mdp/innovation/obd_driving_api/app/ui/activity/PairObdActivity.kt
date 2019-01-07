@@ -26,81 +26,11 @@ import com.mdp.innovation.obd_driving_api.commands.control.VinCommand
 import com.mdp.innovation.obd_driving_api.data.store.SharedPreference
 import com.mdp.innovation.obd_driving_api.enums.AvailableCommandNames
 import kotlinx.android.synthetic.main.activity_pair_obd.*
-import roboguice.RoboGuice
-import java.io.FileNotFoundException
-import java.io.IOException
-import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.concurrent.schedule
 
 
-class PairObdActivity : BaseAppCompat(), ObdProgressListener {
-    /**
-     * Actualización del estado
-     */
-    override fun stateUpdate(job: ObdCommandJob) {
-        val cmdName = job.command.name
-        val cmdID = LookUpCommand(cmdName)
-        snackBarSucceso(cmdID, claContent)
-
-        updateTripStatistic(job, cmdID = cmdID)
-    }
-
-    /**
-     * Comando de búsqueda
-     */
-    fun LookUpCommand(txt: String): String {
-        for (item in AvailableCommandNames.values()) {
-            if (item.value == txt) return item.name
-        }
-        return txt
-    }
-
-    private fun queueCommands() {
-        if (isServiceBound) {
-            for (Command in ObdConfig.getCommands()) {
-                //if (prefs.getBoolean(Command.name, true))
-                    service!!.queueJob(ObdCommandJob(Command))
-            }
-        }
-    }
-
-    private val mQueueCommands = object : Runnable {
-        override fun run() {
-            if (service != null && service!!.isRunning && service!!.queueEmpty()) {
-                queueCommands()
-
-            }
-            // run again in period defined in preferences
-            Handler().postDelayed(this, 4000)
-        }
-    }
-
-    private fun updateTripStatistic(job: ObdCommandJob, cmdID: String) {
-        //Log.v(TAG, " updateTripStatistic ")
-        //Toast.makeText(this, "updateTripStatistic", Toast.LENGTH_LONG).show()
-        if (cmdID == AvailableCommandNames.SPEED.toString()) run {
-            val command = job.command as SpeedCommand
-            Log.v(TAG, " Speed" + command.metricSpeed)
-            //Toast.makeText(this, " Speed: " + command.metricSpeed, Toast.LENGTH_LONG).show()
-            //currentTrip.setSpeedMax(command.getMetricSpeed())
-        }
-        if (cmdID == AvailableCommandNames.VIN.toString()) run {
-            if (VIN.isEmpty()) {
-                val command = job.command as VinCommand
-                Log.v(TAG, " VIN " + command.formattedResult)
-                VIN = command.formattedResult
-                Toast.makeText(this, " VIN: $VIN", Toast.LENGTH_LONG).show()
-                //currentTrip.setSpeedMax(command.getMetricSpeed())
-            }else{
-                if (isServiceBound){
-                    doUnbindService()
-                }
-                Toast.makeText(this, " VAR VIN: $VIN", Toast.LENGTH_LONG).show()
-            }
-        }
-    }
-
+class PairObdActivity : BaseAppCompat() {
 
     val TAG = javaClass.simpleName
     val BLUETOOTH_LIST_KEY = "bluetooth_list_preference"
@@ -111,18 +41,13 @@ class PairObdActivity : BaseAppCompat(), ObdProgressListener {
     var NewsDeviceStrings = ArrayList<BluetoothDevice>()
 
     lateinit var mBtAdapter: BluetoothAdapter
-    var mProgressDlg: ProgressDialog? = null
 
     lateinit var appSharedPreference: SharedPreference
-
-    private var service: AbstractGatewayService? = null
     private var bluetoothDefaultIsEnable = false
 
-    var obdGatewayVin: ObdGatewayVin? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_pair_obd)
-        RoboGuice.setUseAnnotationDatabases(false)
         LogUtils().v(TAG, " Hola")
         initUI()
         onClickListener()
@@ -181,6 +106,7 @@ class PairObdActivity : BaseAppCompat(), ObdProgressListener {
             bluetoothDefaultIsEnable = btAdapter.isEnabled
 
         mBtAdapter = BluetoothAdapter.getDefaultAdapter()
+
         if (mBtAdapter.isEnabled){
             BluetoohEnable()
         }else{
@@ -305,13 +231,9 @@ class PairObdActivity : BaseAppCompat(), ObdProgressListener {
         super.onDestroy()
         unregisterReceiver(mReceiver)
 
-        if (isServiceBound){
-            doUnbindService()
-        }
-
         val btAdapter = BluetoothAdapter.getDefaultAdapter()
-        if (btAdapter != null && btAdapter.isEnabled && !bluetoothDefaultIsEnable)
-            btAdapter.disable()
+        /*if (btAdapter != null && btAdapter.isEnabled && !bluetoothDefaultIsEnable)
+            btAdapter.disable()*/
     }
 
     override fun onPause() {
@@ -327,89 +249,11 @@ class PairObdActivity : BaseAppCompat(), ObdProgressListener {
 
     override fun onResume() {
         super.onResume()
-        // get Bluetooth device
-        val btAdapter = BluetoothAdapter
-            .getDefaultAdapter()
 
-        //preRequisites = btAdapter != null && btAdapter.isEnabled
-        //preRequisites = btAdapter != null && btAdapter.enable()
-        /*  if (!preRequisites && prefs.getBoolean(ConfigActivity.ENABLE_BT_KEY, false)) {
-              preRequisites = btAdapter != null && btAdapter.enable()
-          }*/
     }
 
 
-    private var isServiceBound: Boolean = false
-    private var preRequisites = true
-    private val serviceConn = object : ServiceConnection {
-        override fun onServiceConnected(className: ComponentName, binder: IBinder) {
-            Log.d(TAG, className.toString() + " service is bound")
-            isServiceBound = true
-            service = (binder as AbstractGatewayService.AbstractGatewayServiceBinder).service
-            service!!.setContext(this@PairObdActivity)
-            Log.d(TAG, "Starting live data")
-            try {
-                service!!.startService()
-                if (preRequisites)
-                    btStatusTextView.text = getString(R.string.status_bluetooth_connected)
-            } catch (ioe: IOException) {
-                Log.e(TAG, "Failure Starting live data")
-                btStatusTextView.text = getString(R.string.status_bluetooth_error_connecting)
-                doUnbindService()
-            }
 
-        }
-
-
-        // This method is *only* called when the connection to the service is lost unexpectedly
-        // and *not* when the client unbinds (http://developer.android.com/guide/components/bound-services.html)
-        // So the isServiceBound attribute should also be set to false when we unbind from the service.
-        override fun onServiceDisconnected(className: ComponentName) {
-            Log.d(TAG, className.toString() + " service is unbound")
-            isServiceBound = false
-        }
-    }
-
-    fun startLiveData() {
-        Log.d(TAG, "Starting live data..")
-
-
-        doBindService()
-
-        // start command execution
-        Handler().post(mQueueCommands)
-    }
-
-    private fun doBindService() {
-        if (!isServiceBound) {
-            Log.d(TAG, "Binding OBD service..")
-            if (preRequisites) {
-                btStatusTextView.text = getString(R.string.status_bluetooth_connecting)
-                val serviceIntent = Intent(applicationContext, ObdGatewayService::class.java)
-                bindService(serviceIntent, serviceConn, Context.BIND_AUTO_CREATE)
-            } else {
-                btStatusTextView.text = getString(R.string.status_bluetooth_disabled)
-                val serviceIntent = Intent(applicationContext, MockObdGatewayService::class.java)
-                bindService(serviceIntent, serviceConn, Context.BIND_AUTO_CREATE)
-            }
-        }
-    }
-
-    private fun doUnbindService() {
-        if (isServiceBound) {
-            if (service!!.isRunning) {
-                service!!.stopService()
-                if (preRequisites)
-                    btStatusTextView.text = getString(R.string.status_bluetooth_ok)
-            }
-            Log.d(TAG, "Unbinding OBD service..")
-            unbindService(serviceConn)
-            isServiceBound = false
-
-            //OBD status
-            //obdStatusTextView.setText(getString(R.string.status_obd_disconnected))
-        }
-    }
 
     override fun onBackPressed() {
         if (viewDialogDevicesNew.visibility == View.VISIBLE){
