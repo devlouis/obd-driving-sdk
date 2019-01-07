@@ -186,8 +186,10 @@ class TestMainActivity : BaseAppCompat(), ObdGatewayVin {
 
     override fun errorConnect(message: String) {
         Log.v(TAG, " errorConnect: $message")
+        //ConnectOBD.doUnbindService()
         runOnUiThread {
             showDialodAlert("${message}")
+
         }
 
     }

@@ -121,8 +121,15 @@ object ConnectOBD{
         }, 1000)
 
 
-        //doUnbindServiceLocation()
-       //obdGatewayVin!!.errorConnect("Se perdio conexion al OBD")
+        /**
+         * Enviar Data restante
+         * @param mSyncronizarBDtoIothub remuevo el handler
+         */
+        handler.removeCallbacks(mSyncronizarBDtoIothub)
+        countTotalTripPost = getAllTrip()
+        LogUtils().v(TAG_BD, " Datos restantes : ${countTotalTripPost}")
+        
+
     }
 
     fun stopLiveDataforError(){
@@ -160,6 +167,13 @@ object ConnectOBD{
             Log.d(TAG, "onServiceConnected")
             try {
                 service!!.startService()
+
+                if (!isServiceBoundLocation){
+                    LogUtils().v(TAG, " Binding LOCATION Service")
+                    context!!.bindService(Intent(context!!.applicationContext, LocationUpdatesService::class.java), mServiceConnection, Context.BIND_AUTO_CREATE)
+
+                }
+
                 if (preRequisites)
                     btStatus = context!!.getString(R.string.status_bluetooth_connected)
             } catch (ioe: IOException) {
@@ -203,11 +217,11 @@ object ConnectOBD{
             }
         }
 
-        if (!isServiceBoundLocation){
+     /*   if (!isServiceBoundLocation){
             LogUtils().v(TAG, " Binding LOCATION Service")
             context!!.bindService(Intent(context!!.applicationContext, LocationUpdatesService::class.java), mServiceConnection, Context.BIND_AUTO_CREATE)
 
-        }
+        }*/
     }
 
       fun doUnbindService() {
@@ -516,7 +530,6 @@ object ConnectOBD{
                  * Enviar a IoTHub
                  */
                 //
-                countTotalTripPost = getAllTrip()
                 getFirstTripSend()
 
             }
