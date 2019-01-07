@@ -17,7 +17,7 @@
             android:supportsRtl="true"
             android:name=".MyApplication">
         <activity
-                android:name=".ui.activity.SplashActivity">
+                android:name=".TestMainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -53,9 +53,9 @@
                 android:exported="true">
         </service>
 
-        <meta-data
+        <!--<meta-data
                 android:name="com.google.android.geo.API_KEY"
-                android:value="AIzaSyB4CB95ArajxFfCgrfVHR4OgRs5b5P0Ubw" />
+                android:value="AIzaSyB4CB95ArajxFfCgrfVHR4OgRs5b5P0Ubw" />-->
 
         <meta-data
                 android:name="com.google.android.gms.version"
