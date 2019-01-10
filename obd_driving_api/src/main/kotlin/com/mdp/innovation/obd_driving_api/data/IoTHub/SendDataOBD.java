@@ -114,7 +114,7 @@ public class SendDataOBD {
         try
         {
             client.open();
-            if (protocol == IotHubClientProtocol.MQTT)
+ /*           if (protocol == IotHubClientProtocol.MQTT)
             {
                 MessageCallbackMqtt callback = new MessageCallbackMqtt();
                 Counter counter = new Counter(0);
@@ -124,12 +124,12 @@ public class SendDataOBD {
                 MessageCallback callback = new MessageCallback();
                 Counter counter = new Counter(0);
                 client.setMessageCallback(callback, counter);
-            }
-            client.subscribeToDeviceMethod(new SampleDeviceMethodCallback(), null, new DeviceMethodStatusCallBack(), null);
-            Succeed.set(false);
-            client.startDeviceTwin(new DeviceTwinStatusCallBack(), null, new onProperty(), null);
+            }*/
+            //client.subscribeToDeviceMethod(new SampleDeviceMethodCallback(), null, new DeviceMethodStatusCallBack(), null);
+            //Succeed.set(false);
+            //client.startDeviceTwin(new DeviceTwinStatusCallBack(), null, new onProperty(), null);
 
-            do
+  /*          do
             {
                 Thread.sleep(1000);
             }
@@ -147,7 +147,7 @@ public class SendDataOBD {
 
             client.subscribeToTwinDesiredProperties(desiredProperties);
 
-            System.out.println("Subscribe to Desired properties on device Twin...");
+            System.out.println("Subscribe to Desired properties on device Twin...");*/
         }
         catch (Exception e2)
         {

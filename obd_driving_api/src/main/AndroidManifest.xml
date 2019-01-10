@@ -43,9 +43,9 @@
                 android:name=".app.core.service.LocationUpdatesService"
                 android:enabled="true"
                 android:exported="true" />
-        <meta-data
+  <!--      <meta-data
                 android:name="com.google.android.geo.API_KEY"
-                android:value="AIzaSyDjh19nFL-MIOPwTXLTePrY8WNwd0YhLFY"/>
+                android:value="AIzaSyDjh19nFL-MIOPwTXLTePrY8WNwd0YhLFY"/>-->
     </application>
 
 </manifest>

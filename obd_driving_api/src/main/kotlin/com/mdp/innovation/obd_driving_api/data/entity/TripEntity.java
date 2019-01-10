@@ -23,16 +23,14 @@ public class TripEntity implements Serializable {
 
     private String tripId = "";
     private String live_date = "";
-    private String lat = "";
-    private String lon = "";
-    private String bearing = "";
-    private String rpm = "";
-    private String speed = "";
+    private Float lat = 0.0f;
+    private Float lon = 0.0f;
+    private Float bearing = 0.0f;
+    private Integer rpm = 0;
+    private Integer speed = 0;
     private String status = "";
     private String time = "";
     private String dataUdate = "";
-    private long dataNewMili = 0;
-    private long dataUdateMili = 0;
 
 
     public Long getId() {
@@ -59,43 +57,43 @@ public class TripEntity implements Serializable {
         this.live_date = live_date;
     }
 
-    public String getLat() {
+    public Float getLat() {
         return lat;
     }
 
-    public void setLat(String lat) {
+    public void setLat(Float lat) {
         this.lat = lat;
     }
 
-    public String getLon() {
+    public Float getLon() {
         return lon;
     }
 
-    public void setLon(String lon) {
+    public void setLon(Float lon) {
         this.lon = lon;
     }
 
-    public String getBearing() {
+    public Float getBearing() {
         return bearing;
     }
 
-    public void setBearing(String bearing) {
+    public void setBearing(Float bearing) {
         this.bearing = bearing;
     }
 
-    public String getRpm() {
+    public Integer getRpm() {
         return rpm;
     }
 
-    public void setRpm(String rpm) {
+    public void setRpm(Integer rpm) {
         this.rpm = rpm;
     }
 
-    public String getSpeed() {
+    public Integer getSpeed() {
         return speed;
     }
 
-    public void setSpeed(String speed) {
+    public void setSpeed(Integer speed) {
         this.speed = speed;
     }
 
@@ -123,21 +121,6 @@ public class TripEntity implements Serializable {
         this.dataUdate = dataUdate;
     }
 
-    public long getDataNewMili() {
-        return dataNewMili;
-    }
-
-    public void setDataNewMili(long dataNewMili) {
-        this.dataNewMili = dataNewMili;
-    }
-
-    public long getDataUdateMili() {
-        return dataUdateMili;
-    }
-
-    public void setDataUdateMili(long dataUdateMili) {
-        this.dataUdateMili = dataUdateMili;
-    }
 
     @Override
     public String toString() {
@@ -153,8 +136,6 @@ public class TripEntity implements Serializable {
                 ", status='" + status + '\'' +
                 ", time='" + time + '\'' +
                 ", dataUdate='" + dataUdate + '\'' +
-                ", dataNewMili=" + dataNewMili +
-                ", dataUdateMili=" + dataUdateMili +
                 '}';
     }
 

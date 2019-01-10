@@ -137,7 +137,7 @@ class HomeActivity : BaseServiceActivity(), HomeView, ObdGatewayVin {
         startLiveDataInterface?.getSpeedKm(kmh)
     }
 
-    override fun errorConnect(message: String){
+    override fun errorConnect(message: String, type: Int){
         /*hideProgress()
         Message.toastLong(message,applicationContext)
 

@@ -65,6 +65,8 @@ class TestMainActivity : BaseAppCompat(), ObdGatewayVin {
         }
 
 
+        //ConnectOBD.getAllTrip()
+
     }
 
     var count = 0
@@ -184,11 +186,32 @@ class TestMainActivity : BaseAppCompat(), ObdGatewayVin {
         }
     }
 
-    override fun errorConnect(message: String) {
-        Log.v(TAG, " errorConnect: $message")
+    val OBD_LOST = 404
+    val OBD_ERROR = 401
+    val OBD_NO_PAIRED = 301
+    override fun errorConnect(message: String, type: Int) {
+
         //ConnectOBD.doUnbindService()
         runOnUiThread {
-            showDialodAlert("${message}")
+
+            when(type){
+                /**
+                 * Se dejo de recibir informacion de OBD
+                 */
+                OBD_LOST -> {
+                    showDialodAlert("${message} - 5 seg espera")
+                    Log.v(TAG, " errorConnect: ${message} - 5 seg espera")
+                }
+                OBD_ERROR -> {
+                    Log.v(TAG, " errorConnect: $message")
+                }
+                OBD_NO_PAIRED -> {
+                    Log.v(TAG, " errorConnect: $message")
+                }
+                else -> {
+                    showDialodAlert("${message}")
+                }
+            }
 
         }
 

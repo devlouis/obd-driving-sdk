@@ -106,7 +106,7 @@ class LocationUpdatesService : Service() {
 
     fun RemoveAll(){
         removeLocationUpdates()
-        stopSelf()
+        //stopSelf()
     }
 
     override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {

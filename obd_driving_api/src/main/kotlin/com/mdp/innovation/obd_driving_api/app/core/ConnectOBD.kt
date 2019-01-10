@@ -6,6 +6,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
 import android.location.Location
+import android.os.CountDownTimer
 import android.os.Handler
 import android.os.IBinder
 import android.util.Log
@@ -43,6 +44,10 @@ object ConnectOBD{
 
     val LIMIT = 30
 
+    val OBD_LOST = 404
+    val OBD_ERROR = 401
+    val OBD_NO_PAIRED = 301
+
     private var service: AbstractGatewayService? = null
     private var isServiceBound: Boolean = false
     var isServiceBoundLocation: Boolean = false
@@ -61,12 +66,14 @@ object ConnectOBD{
     var RPM = ""
     var KMH = ""
 
-    var statusTrip = "0"
+    var statusTrip = "1"
 
     var handler = Handler()
     private var macDevice = ""
     var VIN = ""
     val send = SendDataOBD()
+
+    var statusContinueTrip = false
 
     //GPS Service
     private var mLocationUpdatesService : LocationUpdatesService? = null
@@ -79,11 +86,19 @@ object ConnectOBD{
         appSharedPreference = SharedPreference(context)
         macDevice = appSharedPreference.getMacBluetooth()[appSharedPreference.MAC_DEVICE]!!
         VIN =  appSharedPreference.getVinCar()[appSharedPreference.VIN_CAR]!!
-        send.InitClient()
+        Handler().postDelayed(initClientIotHub, 2000)
         //send.sendDataJsonString("")
         LogUtils().v(TAG, " macDevice:: $macDevice")
         LogUtils().v(TAG, " obdGatewayVin:: $obdGatewayVin")
 
+
+
+    }
+
+    private val initClientIotHub = object : Runnable {
+        override fun run() {
+            send.InitClient()
+        }
     }
 
     /**
@@ -97,7 +112,7 @@ object ConnectOBD{
     }
 
     fun startLiveData(mObdGatewayVin: ObdGatewayVin) {
-        statusTrip = "0"
+        statusTrip = "1"
 
         appSharedPreference.saveIdRawBD("0")
         Log.d(TAG, "Starting live data...")
@@ -109,7 +124,7 @@ object ConnectOBD{
             Handler().post(mQueueCommands)
             handler.post(mSyncronizarBDtoIothub)
         }else{
-            obdGatewayVin!!.errorConnect(context!!.getString(R.string.mac_bluetooh_empty))
+            obdGatewayVin!!.errorConnect(context!!.getString(R.string.mac_bluetooh_empty), OBD_NO_PAIRED)
         }
     }
 
@@ -117,27 +132,62 @@ object ConnectOBD{
         statusTrip = "2"
         Handler().postDelayed({
             doUnbindService()
-            mLocationUpdatesService!!.RemoveAll()
+
+            //context!!.bindService(Intent(context!!.applicationContext, LocationUpdatesService::class.java), mServiceConnection, Context.BIND_AUTO_CREATE)
+            //context!!.stopService(Intent(context!!.applicationContext, LocationUpdatesService::class.java))
+            //isServiceBoundLocation = true
+            mLocationUpdatesService!!.removeLocationUpdates()
+            /**
+             * Enviar Data restante
+             * @param mSyncronizarBDtoIothub remuevo el handler
+             */
+            handler.removeCallbacks(mSyncronizarBDtoIothub)
+            getAllTrip()
         }, 1000)
-
-
-        /**
-         * Enviar Data restante
-         * @param mSyncronizarBDtoIothub remuevo el handler
-         */
-        handler.removeCallbacks(mSyncronizarBDtoIothub)
-        countTotalTripPost = getAllTrip()
-        LogUtils().v(TAG_BD, " Datos restantes : ${countTotalTripPost}")
-        
-
     }
 
     fun stopLiveDataforError(){
         doUnbindService()
         mLocationUpdatesService!!.RemoveAll()
         //doUnbindServiceLocation()
-        obdGatewayVin!!.errorConnect("Se perdio conexion al OBD")
+
+        /**
+         * Inicia el tiempo de espera para reconexion
+         */
+        startTimerContinue()
+
+        obdGatewayVin!!.errorConnect("Se perdio conexion al OBD", OBD_LOST)
+
+
+
+
+
     }
+
+
+    var secondsRemaining: Long = 5
+    var timerContinue = object : CountDownTimer(secondsRemaining * 1000, 1000) {
+        override fun onFinish() {
+            statusContinueTrip = false
+            LogUtils().v(TAG_BD, " COULDDOWN: ${secondsRemaining} - TERMINO TIEMPO DE ESPERA")
+        }
+
+        override fun onTick(millisUntilFinished: Long) {
+            statusContinueTrip = true
+            LogUtils().v(TAG_BD, " COULDDOWN: ${millisUntilFinished / 1000}")
+
+        }
+    }
+
+    private fun startTimerContinue(){
+        LogUtils().v(TAG_BD, " startTimerContinue ...")
+
+        timerContinue.start()
+
+    }
+
+
+
 
     fun generateIDTrip(): String{
         val generadorAleatorios = Random()
@@ -146,17 +196,6 @@ object ConnectOBD{
         return numeroAleatorio.toString()
     }
 
-    @JvmStatic
-    fun startmQueue(){
-        Log.d(TAG, "Starting live data... 2")
-        if (macDevice.isNotEmpty()) {
-            doBindService()
-            // start command execution
-            Handler().post(mQueueCommands)
-        }else{
-            //obdGatewayVin!!.errorConnect(context!!.getString(R.string.mac_bluetooh_empty))
-        }
-    }
 
     val serviceConn = object : ServiceConnection {
         override fun onServiceConnected(className: ComponentName, binder: IBinder) {
@@ -167,11 +206,14 @@ object ConnectOBD{
             Log.d(TAG, "onServiceConnected")
             try {
                 service!!.startService()
-
+                Log.d(TAG_BD, " isServiceBoundLocation: ${isServiceBoundLocation}")
                 if (!isServiceBoundLocation){
                     LogUtils().v(TAG, " Binding LOCATION Service")
                     context!!.bindService(Intent(context!!.applicationContext, LocationUpdatesService::class.java), mServiceConnection, Context.BIND_AUTO_CREATE)
+                    //else
 
+                }else{
+                    mLocationUpdatesService!!.requestLocationUpdates()
                 }
 
                 if (preRequisites)
@@ -179,8 +221,9 @@ object ConnectOBD{
             } catch (ioe: IOException) {
                 LogUtils().v(TAG, "Failure Starting live data ${ioe.message.toString()}" )
                 btStatus = context!!.getString(R.string.status_bluetooth_error_connecting)
+
                 doUnbindService()
-                obdGatewayVin!!.errorConnect(context!!.getString(R.string.status_bluetooth_error_connecting))
+                obdGatewayVin!!.errorConnect(context!!.getString(R.string.status_bluetooth_error_connecting), OBD_ERROR)
 
             }
         }
@@ -466,32 +509,6 @@ object ConnectOBD{
     var start = false
 
 
-    private fun validateMoreData(){
-        var countBD = 0
-        LocationRepository(Application()).getAll(object : LocationRepository.PopulateCallback{
-            override fun onSuccess(locationEntityList: MutableList<LocationEntity>) {
-                countBD = locationEntityList.size
-                LogUtils().v(TAG_BD, " Count Location: ${countBD}")
-                /**
-                 * Validar si todavia existe data que sincronizar
-                 */
-                if (countBD > 0){
-                    getFirst20OBD()
-                    handler.postDelayed(mSyncronizarBDtoIothub, 30000)
-                }
-                else{
-                    handler.removeCallbacks(mSyncronizarBDtoIothub)
-                    LogUtils().v(TAG_BD, " Termina la sincronizacion a la BD")
-                }
-
-            }
-            override fun onFailure(e: Exception?) {
-
-            }
-        })
-
-    }
-
     private fun getFirst20OBD(){
 
         ObdRepository(Application()).getFirtsTrips(LIMIT, object : ObdRepository.PopulateCallback{
@@ -530,7 +547,9 @@ object ConnectOBD{
                  * Enviar a IoTHub
                  */
                 //
-                getFirstTripSend()
+
+                Handler().postDelayed(sendTripIotHub,2000)
+
 
             }
 
@@ -540,6 +559,13 @@ object ConnectOBD{
         })
     }
 
+    private val sendTripIotHub = object : Runnable {
+        override fun run() {
+            getFirstTripSend()
+
+            //Handler().postDelayed(this, 2000)
+        }
+    }
 
     private fun validateToSend(date: String, any: Any, table: String){
         TripRepository(Application()).getWhereDate(date, object : TripRepository.GetWhenDateCallback {
@@ -548,26 +574,30 @@ object ConnectOBD{
               when(table){
                   "OBD" ->  {
                       var value = any as ObdEntity
+                      LogUtils().v(TAG_BD, " OBD - value : ${value.toString()}")
                       trip.tripId = value.id_trip
-                      trip.speed = value.kmh
-                      trip.rpm = value.rpm
+                      trip.speed = value.kmh.toInt()
+                      trip.rpm = value.rpm.toInt()
                       trip.dataUdate = value.dataNew
                       trip.status = value.status
                       TripRepository(Application()).update(trip)
+                      LogUtils().v(TAG_BD, " OBD BD update : ${trip.toString()}")
+
                   }
                   "LOCATION" ->{
                       var value = any as LocationEntity
                       LogUtils().v(TAG_BD, " LOCATION - value : ${value.toString()}")
                       trip.tripId = value.id_trip
-                      trip.lat = value.latitudd
-                      trip.lon = value.longitud
-                      trip.bearing = value.bearing
+                      trip.lat = value.latitudd.toFloat()
+                      trip.lon = value.longitud.toFloat()
+                      trip.bearing = value.bearing.toFloat()
                       trip.dataUdate = value.dataNew
                       trip.status = value.status
                       TripRepository(Application()).update(trip)
+                      LogUtils().v(TAG_BD, " LOCATION BD update : ${trip.toString()}")
                   }
               }
-              LogUtils().v(TAG_BD, " LOCATION BD update : ${trip.toString()}")
+
 
           }
           override fun onFailure() {
@@ -577,8 +607,8 @@ object ConnectOBD{
                       var value = any as ObdEntity
                       val trip = TripEntity()
                       trip.tripId = value.id_trip
-                      trip.speed = value.kmh
-                      trip.rpm = value.rpm
+                      trip.speed = value.kmh.toInt()
+                      trip.rpm = value.rpm.toInt()
                       trip.time = value.dataNew
                       trip.status = value.status
                       TripRepository(Application()).add(trip)
@@ -588,9 +618,9 @@ object ConnectOBD{
                       var value = any as LocationEntity
                       val trip = TripEntity()
                       trip.tripId = value.id_trip
-                      trip.lat = value.latitudd
-                      trip.lon = value.longitud
-                      trip.bearing = value.bearing
+                      trip.lat = value.latitudd.toFloat()
+                      trip.lon = value.longitud.toFloat()
+                      trip.bearing = value.bearing.toFloat()
                       trip.time = value.dataNew
                       trip.status = value.status
                       TripRepository(Application()).add(trip)
@@ -612,6 +642,7 @@ object ConnectOBD{
             override fun onSuccess(tripEntityList: MutableList<TripEntity>) {
                 LogUtils().v(TAG_BD," limit: $limit  - limit2: $limit2")
                 LogUtils().v(TAG_BD," TRIP SIZE: ${tripEntityList.size}")
+                LogUtils().v(TAG_BD," tripEntityList: ${tripEntityList.toString()}")
                 if (tripEntityList.size == 0){
                     handler.removeCallbacks(mSyncronizarBDtoIothub)
                     LogUtils().v(TAG_BD, "##### Termina la sincronizacion a la BD #####")
@@ -627,17 +658,73 @@ object ConnectOBD{
         })
     }
 
-    private fun getAllTrip():Int {
+    fun getAllTrip(){
         var count = 0
         TripRepository(Application()).getAllNotes(object : TripRepository.PopulateCallback {
             override fun onSuccess(tripEntityList: MutableList<TripEntity>) {
                 count = tripEntityList.size
+                LogUtils().v(TAG_BD, " Datos restantes : ${count}")
+                LogUtils().v(TAG_BD, " Datos tripEntityList : ${tripEntityList.toString()}")
+                getAllOBD()
             }
             override fun onFailure(e: Exception?) {
 
             }
         })
-        return count
     }
 
+    private fun getAllOBD(){
+        LogUtils().v(TAG_BD, "######################### I N I C I O   U L T I M A ######################################")
+        ObdRepository(Application()).getAll(object : ObdRepository.PopulateCallback{
+            override fun onSuccess(obdEntityList: MutableList<ObdEntity>) {
+                for (obd in obdEntityList){
+                    firstOBD++
+                    validateToSend(obd.dataNew, obd, "OBD")
+                    LogUtils().v(TAG_BD, " firstOBD : ${firstOBD}")
+                    LogUtils().v(TAG_BD, " obdEntityList : ${obdEntityList.size}")
+                }
+                firstOBD = 0
+                ObdRepository(Application()).deleteFirstObd(obdEntityList.size)
+                LogUtils().v(TAG_BD, "SE BORRO LOS ${obdEntityList.size} DEL OBD...")
+                getAllLocation()
+            }
+
+            override fun onFailure(e: Exception?) {
+
+            }
+        })
+    }
+
+    private fun getAllLocation(){
+
+        LocationRepository(Application()).getAll(object : LocationRepository.PopulateCallback{
+            override fun onSuccess(locationEntityList: MutableList<LocationEntity>) {
+                for (location in locationEntityList){
+                    firstLocation++
+                    validateToSend(location.dataNew, location, "LOCATION")
+                    LogUtils().v(TAG_BD, " firstLocation : ${firstLocation}")
+                    LogUtils().v(TAG_BD, " locationEntityList : ${locationEntityList.size}")
+                }
+                firstLocation = 0
+                LocationRepository(Application()).deleteFirstLocation(locationEntityList.size)
+                LogUtils().v(TAG_BD, "SE BORRO LOS ${locationEntityList.size} DEL OBD...")
+                LogUtils().v(TAG_BD, "######################### F I N   U L T I M A ######################################")
+
+                /**
+                 * Enviar a IoTHub
+                 */
+                getFirstTripSend()
+
+            }
+            override fun onFailure(e: Exception?) {
+
+            }
+        })
+
+    }
+
+
+    private fun pauseService(){
+
+    }
 }
