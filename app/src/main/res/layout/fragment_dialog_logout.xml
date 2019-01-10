@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:app="http://schemas.android.com/apk/res-auto"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:orientation="vertical">
+
+    <com.mdp.innovation.obd_driving.util.CustomTextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/colorToolbar"
+            android:gravity="center"
+            android:tag="2"
+            android:text="@string/alert"
+            android:paddingBottom="8dp"
+            android:paddingTop="8dp"
+            style="@style/dialogTitle" />
+
+    <com.mdp.innovation.obd_driving.util.CustomTextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="32dp"
+            android:layout_marginRight="32dp"
+            android:layout_marginTop="16dp"
+            android:gravity="center"
+            android:text="@string/alert_logout"
+            style="@style/dialogText" />
+
+    <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal"
+            android:layout_marginTop="16dp">
+
+        <android.support.v7.widget.AppCompatButton
+                android:id="@+id/btnYes"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:text="SÍ"
+                android:textColor="@color/colorToolbar"
+                app:backgroundTint="#FFF"/>
+        <android.support.v7.widget.AppCompatButton
+                android:id="@+id/btnNo"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:text="NO"
+                android:textColor="@color/colorToolbar"
+                app:backgroundTint="#FFF"/>
+
+    </LinearLayout>
+
+
+</LinearLayout>

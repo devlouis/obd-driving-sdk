@@ -2,6 +2,7 @@ package com.mdp.innovation.obd_driving.interactor
 
 import android.util.Log
 import com.mdp.innovation.obd_driving.service.WSService
+import com.mdp.innovation.obd_driving.service.model.LoginResponse
 import com.mdp.innovation.obd_driving.service.model.MyTripsResponse
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.uiThread
@@ -10,41 +11,47 @@ import retrofit2.Callback
 import retrofit2.Response
 
 
-class MyTripsInteractor {
+class LoginInteractor {
 
     private val TAG = javaClass.simpleName
 
-    interface OnTripFinishedListener {
-        fun onGetMyTripsSuccess(response: MyTripsResponse)
-        fun onGetMyTripsError(message: String)
+    interface OnLoginFinishedListener {
+        fun onGetLoginSuccess(response: LoginResponse)
+        fun onGetLoginError(message: String)
     }
 
-    fun getMyTrips(listener: OnTripFinishedListener, VIN: String, page: Int, elements: Int) {
+    fun getLogin(listener: OnLoginFinishedListener, username: String, password: String) {
 
         doAsync{
 
             val service = WSService()
-            val call = service.getMyTrips(VIN, page, elements)
+            val call = service.getLogin(username, password)
             uiThread{
-                call.enqueue(object : Callback<MyTripsResponse> {
-                    override fun onResponse(call: Call<MyTripsResponse>, response: Response<MyTripsResponse>) {
+                call.enqueue(object : Callback<LoginResponse> {
+                    override fun onResponse(call: Call<LoginResponse>, response: Response<LoginResponse>) {
                         Log.i(TAG, response.body().toString())
                         if(response.isSuccessful){
-                            listener.onGetMyTripsSuccess(response.body()!!)
+
+                            if(response.body()!!.success){
+                                listener.onGetLoginSuccess(response.body()!!)
+                            }else{
+                                listener.onGetLoginError(response.body()!!.message)
+                            }
+
                         }else{
                             var message = if(response.errorBody() != null){
                                 response.message() + " | " + response.errorBody()!!.string()
                             }else{
                                 "Error does not supplied."
                             }
-                            listener.onGetMyTripsError(message)
+                            listener.onGetLoginError(message)
                         }
                     }
 
-                    override fun onFailure(call: Call<MyTripsResponse>, t: Throwable) {
+                    override fun onFailure(call: Call<LoginResponse>, t: Throwable) {
                         Log.e(TAG, t.message)
                         Log.e(TAG, t.cause.toString())
-                        listener.onGetMyTripsError(t.message!!)
+                        listener.onGetLoginError(t.message!!)
                     }
                 })
             }

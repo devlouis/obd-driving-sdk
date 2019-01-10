@@ -57,13 +57,13 @@
         <com.mdp.innovation.obd_driving.util.CustomTextView
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:id="@+id/tv_value"
+                android:id="@+id/tv_time"
                 android:layout_weight="0.28"
-                android:textSize="14sp"
+                android:textSize="13sp"
                 android:gravity="center"
                 android:textColor="@color/colorToolbar"
                 android:tag="1"
-                android:text="6.65"/>
+                android:text="10:14:15"/>
         <com.mdp.innovation.obd_driving.util.CustomTextView
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
@@ -77,13 +77,13 @@
         <com.mdp.innovation.obd_driving.util.CustomTextView
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:id="@+id/tv_time"
+                android:id="@+id/tv_speed"
                 android:layout_weight="0.28"
-                android:textSize="13sp"
+                android:textSize="14sp"
                 android:gravity="center"
                 android:textColor="@color/colorToolbar"
                 android:tag="1"
-                android:text="10:14:15"/>
+                android:text="60km/h"/>
 
 
     </LinearLayout>

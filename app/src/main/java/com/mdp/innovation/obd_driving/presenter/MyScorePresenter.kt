@@ -2,6 +2,7 @@ package com.mdp.innovation.obd_driving.presenter
 
 import com.mdp.innovation.obd_driving.ui.MyScoreView
 import com.mdp.innovation.obd_driving.interactor.MyScoreInteractor
+import com.mdp.innovation.obd_driving.service.model.MyScoreResponse
 import com.mdp.innovation.obd_driving.service.model.ScoreResponse
 
 class MyScorePresenter(var myScoreView: MyScoreView?, val myScoreInteractor: MyScoreInteractor) : MyScoreInteractor.OnMyScoreFinishedListener {
@@ -34,5 +35,20 @@ class MyScorePresenter(var myScoreView: MyScoreView?, val myScoreInteractor: MyS
     override fun onGetScoreError(message: String) {
         //myScoreView?.hideProgress()
         myScoreView?.onGetScoreError(message)
+    }
+
+    fun getMyScore(userId: String) {
+        //myScoreView?.showLoading()
+        myScoreInteractor.getMyScore( this, userId)
+    }
+
+    override fun onGetMyScoreSuccess(response: MyScoreResponse) {
+        //myScoreView?.hideLoading()
+        myScoreView?.onGetMyScoreSuccess(response)
+    }
+
+    override fun onGetMyScoreError(message: String) {
+        //myScoreView?.hideLoading()
+        myScoreView?.onGetMyScoreError(message)
     }
 }

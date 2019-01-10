@@ -2,7 +2,6 @@ package com.mdp.innovation.obd_driving.presenter
 
 import com.mdp.innovation.obd_driving.interactor.MyTripsInteractor
 import com.mdp.innovation.obd_driving.service.model.MyTripsResponse
-import com.mdp.innovation.obd_driving.service.model.TripDetailResponse
 import com.mdp.innovation.obd_driving.ui.MyTripsView
 
 class MyTripsPresenter(var myTripsView: MyTripsView?, val myTripsInteractor: MyTripsInteractor) : MyTripsInteractor.OnTripFinishedListener {

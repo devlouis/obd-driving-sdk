@@ -33,7 +33,7 @@ class SplashActivity : BaseAppCompat() {
 
         runnable = Runnable {
             lottie_loading.cancelAnimation()
-            navigator.navigateToMain(this)
+            navigator.navigateToInitial(this)
             finish()
             //overridePendingTransition(R.anim.fadein, R.anim.fadeout)
             //overridePendingTransition(R.anim.slidein, R.anim.slideout)
