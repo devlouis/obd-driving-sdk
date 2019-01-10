@@ -1,6 +1,7 @@
 package com.mdp.innovation.obd_driving.service
 
 import android.util.Log
+import com.google.android.gms.fido.u2f.api.common.RegisterRequest
 import com.mdp.innovation.obd_driving.service.model.*
 import com.mdp.innovation.obd_driving.service.retrofit.ApiRetrofit
 import com.mdp.innovation.obd_driving.util.ConstantsWS
@@ -66,6 +67,30 @@ class WSService {
 
         val service: ApiRetrofit? = retrofit.create(ApiRetrofit::class.java)
         return service!!.getTripDetail(request)
+    }
+
+    fun getLogin(username: String, password: String) : Call<LoginResponse>{
+        var request = LoginRequest(username, password)
+        val retrofit = getRetrofit(WS_URL_LOCAL)
+
+        val service: ApiRetrofit? = retrofit.create(ApiRetrofit::class.java)
+        return service!!.getLogin(request)
+    }
+
+    fun getRegister(name: String, lastName: String, email: String, password: String) : Call<RegisterResponse>{
+        var request = RegisterRequest(name, lastName, email, password)
+        val retrofit = getRetrofit(WS_URL_LOCAL)
+
+        val service: ApiRetrofit? = retrofit.create(ApiRetrofit::class.java)
+        return service!!.getRegister(request)
+    }
+
+    fun getMyScore(userId: String) : Call<MyScoreResponse>{
+        var request = MyScoreRequest(userId)
+        val retrofit = getRetrofit(WS_URL_LOCAL)
+
+        val service: ApiRetrofit? = retrofit.create(ApiRetrofit::class.java)
+        return service!!.getMyScore(request)
     }
 
 }

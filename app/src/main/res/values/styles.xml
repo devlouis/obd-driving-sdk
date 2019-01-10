@@ -54,4 +54,12 @@
         <item name="android:windowBackground">@drawable/background_splash</item>
     </style>
 
+    <style name="LoginHintText" parent="TextAppearance.AppCompat">
+        <item name="android:textColor">#FFF</item>
+        <item name="android:textColorHint">#FFF</item>
+        <item name="colorAccent">#FFF</item>
+        <item name="colorControlNormal">#FFF</item>
+        <item name="colorControlActivated">#FFF</item>
+    </style>
+
 </resources>

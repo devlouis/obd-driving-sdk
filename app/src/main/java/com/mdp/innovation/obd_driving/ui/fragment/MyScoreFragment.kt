@@ -20,11 +20,15 @@ import com.mdp.innovation.obd_driving.ui.activity.HomeActivity
 import com.mdp.innovation.obd_driving.ui.navigation.Navigator
 import com.mdp.innovation.obd_driving.util.CustomAnimate
 import android.util.Log
+import android.view.animation.Animation
+import android.view.animation.AnimationUtils
+import com.mdp.innovation.obd_driving.service.model.MyScoreResponse
 import com.mdp.innovation.obd_driving.service.model.ScoreResponse
 import org.koin.android.ext.android.inject
 import com.mdp.innovation.obd_driving.util.Global
 import com.mdp.innovation.obd_driving.util.Preferences
 import com.mdp.innovation.obd_driving_api.app.core.ConnectOBD
+import java.lang.Exception
 
 
 class MyScoreFragment : BaseServiceFragment(), MyScoreView, HomeActivity.StartLiveDataInterface {
@@ -47,6 +51,7 @@ class MyScoreFragment : BaseServiceFragment(), MyScoreView, HomeActivity.StartLi
 
     private var VIN = ""
     private var tripId = ""
+    private var userId = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -255,6 +260,45 @@ class MyScoreFragment : BaseServiceFragment(), MyScoreView, HomeActivity.StartLi
         val myScore = preferences.getMyScore(context)
         tv_home_prom.text = myScore
 
+        userId = preferences.getDataUser(context)!!.userId!!
+
+        img_refresh.setOnClickListener {
+            Log.d(TAG, "clickkkkkkkkk")
+
+            val startRotateAnimation = AnimationUtils.loadAnimation(context, R.anim.rotate_spin2)
+            it.startAnimation(startRotateAnimation)
+
+            presenter.getMyScore(userId)
+
+            it.isEnabled = false
+
+        }
+
+    }
+
+    override fun onGetMyScoreSuccess(response: MyScoreResponse) {
+        img_refresh.clearAnimation()
+        img_refresh.isEnabled = true
+        if(response != null){
+
+            var scoreStr = "-"
+
+            if(response.score != null){
+                try {
+                    scoreStr = response.score.toString()
+                }catch (ex: Exception){}
+            }
+
+            preferences.setMyScore(context, scoreStr)
+            tv_home_prom.text = scoreStr
+
+        }
+    }
+
+    override fun onGetMyScoreError(message: String) {
+        img_refresh.clearAnimation()
+        img_refresh.isEnabled = true
+        Message.toastLong("Ha ocurrido un error: $message", context)
     }
 
     override fun onResume() {
@@ -322,6 +366,7 @@ class MyScoreFragment : BaseServiceFragment(), MyScoreView, HomeActivity.StartLi
 
         //DEMO
         startCollectDataService()
+        (activity as HomeActivity).simulateSpeed()
         Global.cancelValidated = false
         navigator.navigateToCollectData(fragmentManager, R.id.content)
     }

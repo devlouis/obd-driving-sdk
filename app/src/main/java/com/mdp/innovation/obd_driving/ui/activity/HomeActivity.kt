@@ -1,36 +1,28 @@
 package com.mdp.innovation.obd_driving.ui.activity
 
 import android.Manifest
-import android.app.Activity
 import android.os.Bundle
-import com.mdp.innovation.obd_driving_api.commands.ObdCommand
-import com.mdp.innovation.obd_driving_api.commands.control.ModuleVoltageCommand
 import kotlinx.android.synthetic.main.activity_home.*
-import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
-import android.widget.Toast
 import android.support.v4.view.GravityCompat
 import android.view.Gravity
 import com.mdp.innovation.obd_driving.R
 import com.mdp.innovation.obd_driving.internal.CollectTripDataService
 import com.mdp.innovation.obd_driving.ui.HomeView
 import com.mdp.innovation.obd_driving.ui.navigation.Navigator
-import java.util.*
 import android.os.Handler
 import android.os.Looper
 import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
-import android.support.v4.widget.DrawerLayout
-import android.support.v7.widget.Toolbar
 import android.util.Log
+import android.widget.TextView
 import com.mdp.innovation.obd_driving.ui.InterfaceView
 import com.mdp.innovation.obd_driving.ui.fragment.CancelCollectDialogFragment
-import com.mdp.innovation.obd_driving.ui.fragment.EndTripDialogFragment
+import com.mdp.innovation.obd_driving.ui.fragment.LogoutDialogFragment
 import com.mdp.innovation.obd_driving.ui.fragment.MyScoreFragment
 import com.mdp.innovation.obd_driving.util.Global
-import com.mdp.innovation.obd_driving.util.Message
 import com.mdp.innovation.obd_driving.util.Preferences
 import com.mdp.innovation.obd_driving_api.app.`interface`.ObdGatewayVin
 import com.mdp.innovation.obd_driving_api.app.core.ConnectOBD
@@ -59,8 +51,12 @@ class HomeActivity : BaseServiceActivity(), HomeView, ObdGatewayVin {
 
         myIntent = Intent(applicationContext, serviceClass)
 
-        //val cmds = ArrayList<ObdCommand>()
-        //cmds.add(ModuleVoltageCommand())
+        val dataUser = preferences.getDataUser(applicationContext)
+        val name = dataUser!!.name
+
+        val header = navigation_view.getHeaderView(0)
+        val tv_welcome = header.findViewById<TextView>(R.id.tv_welcome)
+        tv_welcome.text = "Hola $name,"
 
         setDrawerConfig()
 
@@ -169,6 +165,10 @@ class HomeActivity : BaseServiceActivity(), HomeView, ObdGatewayVin {
                 }
                 R.id.action_3 -> {
                     navigator.navigateToConfiguration(supportFragmentManager, R.id.content)
+                }
+                R.id.action_4 -> {
+                    var dialog = LogoutDialogFragment.newInstance()
+                    dialog.show(supportFragmentManager,"logout")
                 }
                 /*R.id.action_3 -> toast("Opcion 3 clicked")
                 R.id.action_4 ->{

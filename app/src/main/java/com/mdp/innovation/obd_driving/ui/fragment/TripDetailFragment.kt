@@ -298,18 +298,19 @@ class TripDetailFragment : BaseFragment(), TripDetailView, OnMapReadyCallback {
         for (item in events){
 
             var eventTypeItem = LayoutInflater.from(context).inflate(R.layout.item_trip_detail_event, null)
-            var tvValue = eventTypeItem.findViewById<TextView>(R.id.tv_value)
+            var tvSpeed = eventTypeItem.findViewById<TextView>(R.id.tv_speed)
             var tvDuration = eventTypeItem.findViewById<TextView>(R.id.tv_duration)
             var tvTime = eventTypeItem.findViewById<TextView>(R.id.tv_time)
-            tvValue.text = item.value
+            tvSpeed.text = item.speed
             tvDuration.text = item.duration
-            var timeStartStr = " - "
+            /*var timeStartStr = " - "
             try{
                 timeStartStr = sdfTime.format(item.start)
             }catch (ex: Exception){
                 Log.d(TAG, ex.message)
             }
-            tvTime.text = timeStartStr
+            tvTime.text = timeStartStr*/
+            tvTime.text = item.start
 
             llEventsContainer.addView(eventTypeItem)
 

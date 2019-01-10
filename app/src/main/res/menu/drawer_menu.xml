@@ -18,4 +18,9 @@
             android:title="Configuración"
             android:icon="@drawable/ic_md_build"
     />
+    <item
+            android:id="@+id/action_4"
+            android:title="Cerrar sesión"
+            android:icon="@drawable/ic_power"
+    />
 </menu>

@@ -90,7 +90,7 @@ class CollectDataFragment : BaseServiceFragment(), HomeActivity.StartLiveDataInt
 
         val myVIN = preferences.getVIN(context)
 
-        tv_vin.text = "Mi VIN es: $myVIN"
+        //tv_vin.text = "Mi VIN es: $myVIN"
 
         toolbar.setNavigationOnClickListener {
             System.out.println("backkkk")

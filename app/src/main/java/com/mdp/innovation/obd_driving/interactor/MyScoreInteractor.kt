@@ -3,6 +3,7 @@ package com.mdp.innovation.obd_driving.interactor
 import android.util.Log
 import com.mdp.innovation.obd_driving.service.model.ScoreResponse
 import com.mdp.innovation.obd_driving.service.WSService
+import com.mdp.innovation.obd_driving.service.model.MyScoreResponse
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.uiThread
 import retrofit2.Call
@@ -19,6 +20,8 @@ class MyScoreInteractor {
         fun onDeviceNoConnected()
         fun onGetScoreSuccess(response: ScoreResponse)
         fun onGetScoreError(message: String)
+        fun onGetMyScoreSuccess(response: MyScoreResponse)
+        fun onGetMyScoreError(message: String)
     }
 
     fun isConnected(listener: OnMyScoreFinishedListener) {
@@ -62,6 +65,40 @@ class MyScoreInteractor {
                         Log.e(TAG, t.message)
                         Log.e(TAG, t.cause.toString())
                         listener.onGetScoreError(t.message!!)
+                    }
+                })
+            }
+
+        }
+
+    }
+
+    fun getMyScore(listener: OnMyScoreFinishedListener, userId: String) {
+
+        doAsync{
+
+            val service = WSService()
+            val call = service.getMyScore(userId)
+            uiThread{
+                call.enqueue(object : Callback<MyScoreResponse> {
+                    override fun onResponse(call: Call<MyScoreResponse>, response: Response<MyScoreResponse>) {
+                        Log.i(TAG, response.body().toString())
+                        if(response.isSuccessful){
+                            listener.onGetMyScoreSuccess(response.body()!!)
+                        }else{
+                            var message = if(response.errorBody() != null){
+                                response.message() + " | " + response.errorBody()!!.string()
+                            }else{
+                                "Error does not supplied."
+                            }
+                            listener.onGetMyScoreError(message)
+                        }
+                    }
+
+                    override fun onFailure(call: Call<MyScoreResponse>, t: Throwable) {
+                        Log.e(TAG, t.message)
+                        Log.e(TAG, t.cause.toString())
+                        listener.onGetMyScoreError(t.message!!)
                     }
                 })
             }

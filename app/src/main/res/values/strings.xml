@@ -18,7 +18,7 @@
     <string name="alert">Alerta</string>
     <string name="notice">Atención</string>
     <string name="alert_cancel_collect">¿Estás seguro que deseas finalizar tu viaje?.</string>
-    <string name="alert_end_trip">Estamos procesando los datos de tu viaje. \n Te notificaremos cuando terminemos.</string>
+    <string name="alert_end_trip">Estamos procesando los datos de tu viaje. \n Actualiza en unos segundos.</string>
     <string name="alert_score_updated">Tu score ha sido actualizado!</string>
 
     <string name="my_trips_empty">Aún no has realizado viajes.</string>
@@ -29,11 +29,26 @@
     <string name="start">Inicio</string>
     <string name="end">Fin</string>
     <string name="events">Eventos</string>
-    <string name="value">Valor</string>
+    <string name="speed">Velocidad</string>
     <string name="hour">Hora</string>
 
     <dimen name="paddingTripDetail">5dp</dimen>
     <dimen name="paddingTripDetailEvents">0dp</dimen>
+
+    <!-- LOGIN -->
+    <string name="username">Email</string>
+    <string name="password">Contraseña</string>
+    <string name="btnLogin">Iniciar sesión</string>
+    <string name="login_register">¿No tienes una cuenta?. Registrate ahora.</string>
+
+
+    <string name="name">Nombres</string>
+    <string name="lastname">Apellidos</string>
+    <string name="repeat_password">Repetir contrseña</string>
+    <string name="register_subtitle">Registro de usuarios</string>
+    <string name="btn_register">Registrarse</string>
+
+    <string name="alert_logout">¿Estás seguro que deseas salir?.</string>
 
 
     <string name="configOption1">Cambiar OBD emparejado</string>
