@@ -66,7 +66,7 @@ object ConnectOBD{
     var RPM = ""
     var KMH = ""
 
-    var statusTrip = "1"
+    var statusTrip = "0"
 
     var handler = Handler()
     private var macDevice = ""
@@ -112,7 +112,7 @@ object ConnectOBD{
     }
 
     fun startLiveData(mObdGatewayVin: ObdGatewayVin) {
-        statusTrip = "1"
+        statusTrip = "0"
 
         appSharedPreference.saveIdRawBD("0")
         Log.d(TAG, "Starting live data...")
@@ -345,8 +345,11 @@ object ConnectOBD{
                     Log.v(TAG, " VAR VIN: $VIN ")
 
 
-                if (contadorTotal == 2)
-                        obdGatewayVin!!.getVin(VIN)
+                if (contadorTotal == 2){
+                    obdGatewayVin!!.getVin(VIN)
+                    statusTrip = "1"
+                }
+
 
             }
         }
@@ -369,11 +372,14 @@ object ConnectOBD{
         val sdf6 = SimpleDateFormat("H:mm:ss")
         val currentDateandTime = sdf6.format(Date())
 
+        val sdf = SimpleDateFormat("yyyy:MM:dd")
+        val currentToDay = sdf.format(Date())
+
         val obdEntity = ObdEntity()
         obdEntity.id_trip = send.getIDTrip(context, vin)
         obdEntity.kmh = kmh
         obdEntity.rpm = rpm
-        obdEntity.dataNew = currentDateandTime
+        obdEntity.dataNew = currentToDay +" "+ currentDateandTime
         obdEntity.status = statusTrip
         ObdRepository(Application()).addObd(obdEntity)
         LogUtils().v(TAG_BD, " OBD ADD : ${currentDateandTime} = ${obdEntity.toString()}")
@@ -384,12 +390,15 @@ object ConnectOBD{
         val sdf6 = SimpleDateFormat("H:mm:ss")
         val currentDateandTime = sdf6.format(Date())
 
+        val sdf = SimpleDateFormat("yyyy:MM:dd")
+        val currentToDay = sdf.format(Date())
+
         val locationEntity = LocationEntity()
         locationEntity.id_trip = send.getIDTrip(context, VIN)
         locationEntity.longitud = location.longitude.toString()
         locationEntity.latitudd = location.latitude.toString()
         locationEntity.bearing = location.bearing.toString()
-        locationEntity.dataNew = currentDateandTime
+        locationEntity.dataNew = currentToDay +" "+ currentDateandTime
         locationEntity.status = statusTrip
         LocationRepository(Application()).addLocation(locationEntity)
         LogUtils().v(TAG_BD, " LOCATION ADD: ${currentDateandTime} = ${locationEntity.toString()}")
@@ -548,7 +557,7 @@ object ConnectOBD{
                  */
                 //
 
-                Handler().postDelayed(sendTripIotHub,2000)
+                Handler().postDelayed(sendTripIotHub,3000)
 
 
             }
@@ -713,7 +722,7 @@ object ConnectOBD{
                 /**
                  * Enviar a IoTHub
                  */
-                getFirstTripSend()
+                Handler().postDelayed(sendTripIotHub,3000)
 
             }
             override fun onFailure(e: Exception?) {
