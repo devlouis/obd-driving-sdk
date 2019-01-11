@@ -44,7 +44,7 @@
 
     <string name="name">Nombres</string>
     <string name="lastname">Apellidos</string>
-    <string name="repeat_password">Repetir contrseña</string>
+    <string name="repeat_password">Repetir contraseña</string>
     <string name="register_subtitle">Registro de usuarios</string>
     <string name="btn_register">Registrarse</string>
 

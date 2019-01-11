@@ -64,7 +64,7 @@ open class BaseServiceFragment : BaseFragment() {
 
         } else {
             Log.i("[INFO]", "Service already running.")
-            Message.toastShort("Service already running.", context)
+            //Message.toastShort("Service already running.", context)
         }
     }
 
@@ -73,18 +73,18 @@ open class BaseServiceFragment : BaseFragment() {
             activity?.stopService(intent)
         } else {
             Log.i("[INFO]", "Service already stopped.")
-            Message.toastShort("Service already stopped.", context)
+            //Message.toastShort("Service already stopped.", context)
         }
     }
 
     private fun serviceIsActive(serviceClass: Class<*>): Boolean{
         if (isServiceRunning(serviceClass)) {
             Log.i("[INFO]", "Service is running.")
-            Message.toastShort("Service is running.", context)
+            //Message.toastShort("Service is running.", context)
             return true
         } else {
             Log.i("[INFO]", "Service is stopped.")
-            Message.toastShort("Service is stopped.", context)
+            //Message.toastShort("Service is stopped.", context)
             return false
         }
     }

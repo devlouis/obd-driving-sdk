@@ -12,6 +12,7 @@ class LoginPresenter(var myTripsView: LoginView?, val loginInteractor: LoginInte
         myTripsView = null
     }
     fun getLogin(username: String, password: String) {
+        myTripsView?.showLoading()
         loginInteractor.getLogin( this, username, password)
     }
 

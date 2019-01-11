@@ -277,7 +277,7 @@ class CollectTripDataService : BaseService(){
     override fun onDestroy() {
         super.onDestroy()
         //toast("Service destroyed.")
-        Toast.makeText(applicationContext, "Service destroyed.", Toast.LENGTH_SHORT).show()
+        //Toast.makeText(applicationContext, "Service destroyed.", Toast.LENGTH_SHORT).show()
         Log.i("[INFO]", "Service destroyed.")
         mHandler.removeCallbacks(mRunnable)
     }

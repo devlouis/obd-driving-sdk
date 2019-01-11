@@ -16,9 +16,9 @@ interface ApiRetrofit {
     open fun getTripDetail(@Body request: TripDetailRequest): Call<TripDetailResponse>
     @POST("login")
     open fun getLogin(@Body request: LoginRequest): Call<LoginResponse>
-    @POST("registeruser")
+    @POST("registrar")
     open fun getRegister(@Body request: RegisterRequest): Call<RegisterResponse>
-    @POST("myscore")
+    @POST("scoreHistorico")
     open fun getMyScore(@Body request: MyScoreRequest): Call<MyScoreResponse>
 
 }

@@ -18,7 +18,7 @@
             android:supportsRtl="true"
             android:name=".MyApplication">
         <activity
-                android:name=".TestMainActivity">
+                android:name=".ui.activity.SplashActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

@@ -11,7 +11,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 class WSService {
     private val TAG = javaClass.simpleName
-    private val WS_URL_SCORE = "https://5243b350.ngrok.io"
+    private val WS_URL_SCORE = "https://09961420.ngrok.io"
     private val WS_URL_LOCAL = "http://192.168.137.1:8080"
 
     /*fun getScore(request: ScoreRequest): ScoreResponse? {
@@ -71,7 +71,7 @@ class WSService {
 
     fun getLogin(username: String, password: String) : Call<LoginResponse>{
         var request = LoginRequest(username, password)
-        val retrofit = getRetrofit(WS_URL_LOCAL)
+        val retrofit = getRetrofit(WS_URL_SCORE)
 
         val service: ApiRetrofit? = retrofit.create(ApiRetrofit::class.java)
         return service!!.getLogin(request)
@@ -79,7 +79,7 @@ class WSService {
 
     fun getRegister(name: String, lastName: String, email: String, password: String) : Call<RegisterResponse>{
         var request = RegisterRequest(name, lastName, email, password)
-        val retrofit = getRetrofit(WS_URL_LOCAL)
+        val retrofit = getRetrofit(WS_URL_SCORE)
 
         val service: ApiRetrofit? = retrofit.create(ApiRetrofit::class.java)
         return service!!.getRegister(request)
@@ -87,7 +87,7 @@ class WSService {
 
     fun getMyScore(userId: String) : Call<MyScoreResponse>{
         var request = MyScoreRequest(userId)
-        val retrofit = getRetrofit(WS_URL_LOCAL)
+        val retrofit = getRetrofit(WS_URL_SCORE)
 
         val service: ApiRetrofit? = retrofit.create(ApiRetrofit::class.java)
         return service!!.getMyScore(request)
