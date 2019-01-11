@@ -1,5 +1,6 @@
 package com.mdp.innovation.obd_driving_api.app.core
 
+import android.annotation.SuppressLint
 import android.app.Application
 import android.content.ComponentName
 import android.content.Context
@@ -37,6 +38,7 @@ import java.lang.Exception
 import java.text.SimpleDateFormat
 
 
+@SuppressLint("StaticFieldLeak")
 object ConnectOBD{
     val TAG = javaClass.simpleName
     val TAG_BD = " BD_LOCAL"
@@ -379,7 +381,7 @@ object ConnectOBD{
         obdEntity.id_trip = send.getIDTrip(context, vin)
         obdEntity.kmh = kmh
         obdEntity.rpm = rpm
-        obdEntity.dataNew = currentToDay +" "+ currentDateandTime
+        obdEntity.dataNew = currentToDay.replace(":","-") +" "+ currentDateandTime
         obdEntity.status = statusTrip
         ObdRepository(Application()).addObd(obdEntity)
         LogUtils().v(TAG_BD, " OBD ADD : ${currentDateandTime} = ${obdEntity.toString()}")
@@ -398,7 +400,7 @@ object ConnectOBD{
         locationEntity.longitud = location.longitude.toString()
         locationEntity.latitudd = location.latitude.toString()
         locationEntity.bearing = location.bearing.toString()
-        locationEntity.dataNew = currentToDay +" "+ currentDateandTime
+        locationEntity.dataNew = currentToDay.replace(":","-") +" "+ currentDateandTime
         locationEntity.status = statusTrip
         LocationRepository(Application()).addLocation(locationEntity)
         LogUtils().v(TAG_BD, " LOCATION ADD: ${currentDateandTime} = ${locationEntity.toString()}")
