@@ -13,6 +13,7 @@ import android.os.IBinder
 import android.util.Log
 import com.mdp.innovation.obd_driving_api.R
 import com.mdp.innovation.obd_driving_api.app.`interface`.ObdGatewayVin
+import com.mdp.innovation.obd_driving_api.app.core.ConnectOBD.initSendDataBD
 import com.mdp.innovation.obd_driving_api.app.core.service.LocationUpdatesService
 import com.mdp.innovation.obd_driving_api.app.ui.config.ObdConfig
 import com.mdp.innovation.obd_driving_api.app.ui.io.*
@@ -63,6 +64,8 @@ object ConnectOBD{
     var eo = ""
 
     var contadorTotal = 0
+    var initSendDataBD = false
+    var firstSend = false
     var contadorTotalLocation = 0
     var contador = 0
     var RPM = ""
@@ -114,7 +117,9 @@ object ConnectOBD{
     }
 
     fun startLiveData(mObdGatewayVin: ObdGatewayVin) {
+        contadorTotalLocation = 0
         statusTrip = "0"
+        initSendDataBD = false
 
         appSharedPreference.saveIdRawBD("0")
         Log.d(TAG, "Starting live data...")
@@ -131,13 +136,10 @@ object ConnectOBD{
     }
 
     fun stopLiveData(){
+
         statusTrip = "2"
         Handler().postDelayed({
             doUnbindService()
-
-            //context!!.bindService(Intent(context!!.applicationContext, LocationUpdatesService::class.java), mServiceConnection, Context.BIND_AUTO_CREATE)
-            //context!!.stopService(Intent(context!!.applicationContext, LocationUpdatesService::class.java))
-            //isServiceBoundLocation = true
             mLocationUpdatesService!!.removeLocationUpdates()
             /**
              * Enviar Data restante
@@ -208,7 +210,7 @@ object ConnectOBD{
             Log.d(TAG, "onServiceConnected")
             try {
                 service!!.startService()
-                Log.d(TAG_BD, " isServiceBoundLocation: ${isServiceBoundLocation}")
+           /*     Log.d(TAG_BD, " isServiceBoundLocation: ${isServiceBoundLocation}")
                 if (!isServiceBoundLocation){
                     LogUtils().v(TAG, " Binding LOCATION Service")
                     context!!.bindService(Intent(context!!.applicationContext, LocationUpdatesService::class.java), mServiceConnection, Context.BIND_AUTO_CREATE)
@@ -216,7 +218,7 @@ object ConnectOBD{
 
                 }else{
                     mLocationUpdatesService!!.requestLocationUpdates()
-                }
+                }*/
 
                 if (preRequisites)
                     btStatus = context!!.getString(R.string.status_bluetooth_connected)
@@ -349,6 +351,21 @@ object ConnectOBD{
 
                 if (contadorTotal == 2){
                     obdGatewayVin!!.getVin(VIN)
+                    statusTrip = "0"
+                    initSendDataBD = true
+                    firstSend = true
+                    Log.d(TAG_BD, " isServiceBoundLocation: ${isServiceBoundLocation}")
+                    if (!isServiceBoundLocation){
+                        LogUtils().v(TAG, " Binding LOCATION Service")
+                        context!!.bindService(Intent(context!!.applicationContext, LocationUpdatesService::class.java), mServiceConnection, Context.BIND_AUTO_CREATE)
+                        //else
+
+                    }else{
+                        mLocationUpdatesService!!.requestLocationUpdates()
+                    }
+
+                }else{
+                    if (statusTrip != "2")
                     statusTrip = "1"
                 }
 
@@ -356,15 +373,22 @@ object ConnectOBD{
             }
         }
         Log.v(TAG, " contador $contador")
-        if (contador == 3){
-            contadorTotal++
-            // ENVIA A BD
-            val sdf7 = SimpleDateFormat("H:mm:ss:SSS")
-            val currentDateandTimeFull = sdf7.format(Date())
-            LogUtils().v(TAG_GET, " GET OBD: ${currentDateandTimeFull} :: ${RPM},${KMH} ")
-            addToBdObd(VIN, RPM, KMH, contadorTotal)
-            contador = 0
-        }
+
+            if (contador == 3) {
+                contadorTotal++
+                /**
+                 * Inicia el envio de dato BD Local
+                 * @param initSendDataBD = true
+                 */
+                if (initSendDataBD) {
+                    val sdf7 = SimpleDateFormat("H:mm:ss:SSS")
+                    val currentDateandTimeFull = sdf7.format(Date())
+                    LogUtils().v(TAG_GET, " GET OBD: ${currentDateandTimeFull} :: ${RPM},${KMH} ")
+                    addToBdObd(VIN, RPM, KMH, contadorTotal)
+                }
+                contador = 0
+            }
+
 
 
     }
@@ -377,8 +401,10 @@ object ConnectOBD{
         val sdf = SimpleDateFormat("yyyy:MM:dd")
         val currentToDay = sdf.format(Date())
 
+
         val obdEntity = ObdEntity()
         obdEntity.id_trip = send.getIDTrip(context, vin)
+        obdEntity.vin = vin
         obdEntity.kmh = kmh
         obdEntity.rpm = rpm
         obdEntity.dataNew = currentToDay.replace(":","-") +" "+ currentDateandTime
@@ -394,6 +420,15 @@ object ConnectOBD{
 
         val sdf = SimpleDateFormat("yyyy:MM:dd")
         val currentToDay = sdf.format(Date())
+
+     /*   if (firstSend) {
+            statusTrip = "0"
+            firstSend = false
+        }else{
+            if (statusTrip != "2")
+                statusTrip = "1"
+        }
+*/
 
         val locationEntity = LocationEntity()
         locationEntity.id_trip = send.getIDTrip(context, VIN)
@@ -444,6 +479,8 @@ object ConnectOBD{
     fun stateUpdateLocation(location: Location) {
         LogUtils().v(TAG_BD, "New location_: ${UtilsLocationService().getLocationText(location)}")
         contadorTotalLocation++
+
+
         addToBdLocation(location)
     }
 
@@ -587,6 +624,7 @@ object ConnectOBD{
                       var value = any as ObdEntity
                       LogUtils().v(TAG_BD, " OBD - value : ${value.toString()}")
                       trip.tripId = value.id_trip
+                      trip.vin = value.vin
                       trip.speed = value.kmh.toInt()
                       trip.rpm = value.rpm.toInt()
                       trip.dataUdate = value.dataNew
@@ -612,12 +650,13 @@ object ConnectOBD{
 
           }
           override fun onFailure() {
-              LogUtils().v(TAG, " id viaje : error - no se encuentra - se registra")
+              //LogUtils().v(TAG, " id viaje : error - no se encuentra - se registra")
               when(table){
                   "OBD" ->  {
                       var value = any as ObdEntity
                       val trip = TripEntity()
                       trip.tripId = value.id_trip
+                      trip.vin = value.vin
                       trip.speed = value.kmh.toInt()
                       trip.rpm = value.rpm.toInt()
                       trip.time = value.dataNew

@@ -15,6 +15,7 @@ public class ObdEntity implements Serializable {
     @ColumnInfo(name = "id")
     private Long id;
     private String id_trip = "";
+    private String vin = "";
     private String rpm = "";
     private String kmh = "";
     private String status = "";
@@ -36,6 +37,14 @@ public class ObdEntity implements Serializable {
 
     public void setId_trip(String id_trip) {
         this.id_trip = id_trip;
+    }
+
+    public String getVin() {
+        return vin;
+    }
+
+    public void setVin(String vin) {
+        this.vin = vin;
     }
 
     public String getRpm() {
@@ -83,6 +92,7 @@ public class ObdEntity implements Serializable {
         return "ObdEntity{" +
                 "id=" + id +
                 ", id_trip='" + id_trip + '\'' +
+                ", vin='" + vin + '\'' +
                 ", rpm='" + rpm + '\'' +
                 ", kmh='" + kmh + '\'' +
                 ", status='" + status + '\'' +
