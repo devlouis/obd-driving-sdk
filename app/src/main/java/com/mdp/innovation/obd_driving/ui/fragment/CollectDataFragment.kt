@@ -14,6 +14,12 @@ import kotlinx.android.synthetic.main.fragment_collect_data.*
 import android.support.annotation.Nullable
 import android.util.Log
 import com.github.anastr.speedviewlib.PointerSpeedometer
+import com.mdp.innovation.obd_driving.interactor.CollectDataInteractor
+import com.mdp.innovation.obd_driving.interactor.MyScoreInteractor
+import com.mdp.innovation.obd_driving.presenter.CollectDataPresenter
+import com.mdp.innovation.obd_driving.presenter.MyScorePresenter
+import com.mdp.innovation.obd_driving.service.model.UpdateVinResponse
+import com.mdp.innovation.obd_driving.ui.CollectDataView
 import com.mdp.innovation.obd_driving.ui.InterfaceView
 import com.mdp.innovation.obd_driving.ui.activity.CollectTripDataActivity
 import com.mdp.innovation.obd_driving.ui.activity.HomeActivity
@@ -25,7 +31,7 @@ import com.mdp.innovation.obd_driving_api.app.core.ConnectOBD
 import org.koin.android.ext.android.inject
 
 
-class CollectDataFragment : BaseServiceFragment(), HomeActivity.StartLiveDataInterface {
+class CollectDataFragment : BaseServiceFragment(), CollectDataView, HomeActivity.StartLiveDataInterface {
 
     companion object {
         fun newInstance(): CollectDataFragment{
@@ -33,12 +39,17 @@ class CollectDataFragment : BaseServiceFragment(), HomeActivity.StartLiveDataInt
         }
     }
 
+    private val presenter = CollectDataPresenter(this, CollectDataInteractor())
+
     //private val presenter = MyScorePresenter(this, MyScoreInteractor())
 
     private val preferences by inject<Preferences>()
 
     var runnable = Runnable {  }
     var handler = Handler(Looper.getMainLooper())
+
+
+    var vinUpdated = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -77,8 +88,8 @@ class CollectDataFragment : BaseServiceFragment(), HomeActivity.StartLiveDataInt
     private val customInterface = object : InterfaceView {
         override fun toDo() {
             Global.tripIsEnded = true
-            stopCollectDataService()
-            //ConnectOBD.stopLiveData()
+            //stopCollectDataService()
+            ConnectOBD.stopLiveData()
             fragmentManager?.popBackStack()
         }
     }
@@ -118,9 +129,9 @@ class CollectDataFragment : BaseServiceFragment(), HomeActivity.StartLiveDataInt
 
                 Global.cancelValidated = true
                 Global.tripIsEnded = true
-                stopCollectDataService()
+                //stopCollectDataService()
                 fragmentManager?.popBackStack()
-                //ConnectOBD.stopLiveData()
+                ConnectOBD.stopLiveData()
 
 
                 it.isEnabled = true
@@ -158,6 +169,15 @@ class CollectDataFragment : BaseServiceFragment(), HomeActivity.StartLiveDataInt
     }*/
 
     override fun getVin(vin: String){
+
+        val userId = preferences.getDataUser(context)!!.userId!!
+
+        if(!vinUpdated){
+            presenter.updateVin(userId, vin)
+        }
+
+        vinUpdated = true
+
         /*Log.i("[INFO]","ACTIVITY getVin: $vin")
         activity!!.runOnUiThread {
             //hideProgress()
@@ -191,5 +211,21 @@ class CollectDataFragment : BaseServiceFragment(), HomeActivity.StartLiveDataInt
                 Message.toastLong(message,context)
             }
         }
+    }
+
+    override fun onUpdateVinSuccess(response: UpdateVinResponse) {
+
+    }
+
+    override fun onUpdateVinError(message: String) {
+
+    }
+
+    override fun showLoading() {
+
+    }
+
+    override fun hideLoading() {
+
     }
 }

@@ -350,8 +350,8 @@ class TripDetailFragment : BaseFragment(), TripDetailView, OnMapReadyCallback {
         tv_duration_value.text = model.duration
         tv_distance_value.text = model.distance
         tv_score_value.text = scoreStr
-        tv_start_value.text = timeStartStr
-        tv_end_value.text = timeEndStr
+        tv_start_value.text = model.timeStart
+        tv_end_value.text = model.timeEnd
     }
 
     private fun setEventAnimation(header: View, body: View){

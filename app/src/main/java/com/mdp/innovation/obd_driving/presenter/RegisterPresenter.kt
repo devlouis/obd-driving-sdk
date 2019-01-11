@@ -9,6 +9,7 @@ class RegisterPresenter(var registerView: RegisterView?, val registerInteractor:
         registerView = null
     }
     fun getRegister(name: String, lastName: String, email: String, password: String) {
+        registerView?.showLoading()
         registerInteractor.getRegister( this, name, lastName, email, password)
     }
 

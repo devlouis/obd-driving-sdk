@@ -11,7 +11,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 class WSService {
     private val TAG = javaClass.simpleName
-    private val WS_URL_SCORE = "https://09961420.ngrok.io"
+    private val WS_URL_SCORE = "https://fc63fee2.ngrok.io"
     private val WS_URL_LOCAL = "http://192.168.137.1:8080"
 
     /*fun getScore(request: ScoreRequest): ScoreResponse? {
@@ -55,7 +55,7 @@ class WSService {
 
     fun getMyTrips(VIN: String, page: Int, elements: Int) : Call<MyTripsResponse>{
         var request = MyTripsRequest(VIN, page,elements)
-        val retrofit = getRetrofit(WS_URL_LOCAL)
+        val retrofit = getRetrofit(WS_URL_SCORE)
 
         val service: ApiRetrofit? = retrofit.create(ApiRetrofit::class.java)
         return service!!.getMyTrips(request)
@@ -63,7 +63,7 @@ class WSService {
 
     fun getTripDetail(tripId: String) : Call<TripDetailResponse>{
         var request = TripDetailRequest(tripId)
-        val retrofit = getRetrofit(WS_URL_LOCAL)
+        val retrofit = getRetrofit(WS_URL_SCORE)
 
         val service: ApiRetrofit? = retrofit.create(ApiRetrofit::class.java)
         return service!!.getTripDetail(request)
@@ -91,6 +91,14 @@ class WSService {
 
         val service: ApiRetrofit? = retrofit.create(ApiRetrofit::class.java)
         return service!!.getMyScore(request)
+    }
+
+    fun updateVin(userId: String, vin: String) : Call<UpdateVinResponse>{
+        var request = UpdateVinRequest(userId, vin)
+        val retrofit = getRetrofit(WS_URL_SCORE)
+
+        val service: ApiRetrofit? = retrofit.create(ApiRetrofit::class.java)
+        return service!!.updateVin(request)
     }
 
 }

@@ -4,6 +4,7 @@ import com.mdp.innovation.obd_driving.ui.MyScoreView
 import com.mdp.innovation.obd_driving.interactor.MyScoreInteractor
 import com.mdp.innovation.obd_driving.service.model.MyScoreResponse
 import com.mdp.innovation.obd_driving.service.model.ScoreResponse
+import com.mdp.innovation.obd_driving.service.model.UpdateVinResponse
 
 class MyScorePresenter(var myScoreView: MyScoreView?, val myScoreInteractor: MyScoreInteractor) : MyScoreInteractor.OnMyScoreFinishedListener {
     fun isConnected() {
@@ -51,4 +52,19 @@ class MyScorePresenter(var myScoreView: MyScoreView?, val myScoreInteractor: MyS
         //myScoreView?.hideLoading()
         myScoreView?.onGetMyScoreError(message)
     }
+
+    /*fun updateVin(userId: String, vin: String) {
+        //myScoreView?.showLoading()
+        myScoreInteractor.updateVin( this, userId, vin)
+    }
+
+    override fun onUpdateVinSuccess(response: UpdateVinResponse) {
+        //myScoreView?.hideLoading()
+        myScoreView?.onUpdateVinSuccess(response)
+    }
+
+    override fun onUpdateVinError(message: String) {
+        //myScoreView?.hideLoading()
+        myScoreView?.onUpdateVinError(message)
+    }*/
 }

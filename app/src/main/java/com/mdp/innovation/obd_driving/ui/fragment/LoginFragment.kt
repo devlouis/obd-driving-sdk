@@ -82,6 +82,7 @@ class LoginFragment : BaseFragment(), LoginView {
         dataUser.name = response.data.name
         dataUser.lastName = response.data.lastName
         dataUser.score = response.data.score
+        dataUser.vin = response.data.vin
 
         var myScore = "-"
         try{

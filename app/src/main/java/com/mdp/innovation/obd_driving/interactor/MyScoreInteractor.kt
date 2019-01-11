@@ -4,6 +4,8 @@ import android.util.Log
 import com.mdp.innovation.obd_driving.service.model.ScoreResponse
 import com.mdp.innovation.obd_driving.service.WSService
 import com.mdp.innovation.obd_driving.service.model.MyScoreResponse
+import com.mdp.innovation.obd_driving.service.model.UpdateVinResponse
+import com.mdp.innovation.obd_driving_api.app.core.ConnectOBD
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.uiThread
 import retrofit2.Call
@@ -22,21 +24,23 @@ class MyScoreInteractor {
         fun onGetScoreError(message: String)
         fun onGetMyScoreSuccess(response: MyScoreResponse)
         fun onGetMyScoreError(message: String)
+        //fun onUpdateVinSuccess(response: UpdateVinResponse)
+        //fun onUpdateVinError(message: String)
     }
 
     fun isConnected(listener: OnMyScoreFinishedListener) {
-        var isConnected = true
+        /*var isConnected = true
         if (isConnected)  listener.onDeviceConnected()
-        else listener.onDeviceNoConnected()
+        else listener.onDeviceNoConnected()*/
 
-        /*var result = ConnectOBD.verifyMacOBD()
+        var result = ConnectOBD.verifyMacOBD()
         Log.i("macBluetooth:", result.macBluetooth)
         Log.i("result:", result.result.toString())
         if(result.result){
             listener.onDeviceConnected()
         }else{
             listener.onDeviceNoConnected()
-        }*/
+        }
     }
 
     fun getScore(listener: OnMyScoreFinishedListener, VIN: String, tripId: String) {
@@ -105,8 +109,39 @@ class MyScoreInteractor {
 
         }
 
-
-
-
     }
+
+    /*fun updateVin(listener: OnMyScoreFinishedListener, userId: String, vin: String) {
+
+        doAsync{
+
+            val service = WSService()
+            val call = service.updateVin(userId, vin)
+            uiThread{
+                call.enqueue(object : Callback<UpdateVinResponse> {
+                    override fun onResponse(call: Call<UpdateVinResponse>, response: Response<UpdateVinResponse>) {
+                        Log.i(TAG, response.body().toString())
+                        if(response.isSuccessful){
+                            listener.onUpdateVinSuccess(response.body()!!)
+                        }else{
+                            var message = if(response.errorBody() != null){
+                                response.message() + " | " + response.errorBody()!!.string()
+                            }else{
+                                "Error does not supplied."
+                            }
+                            listener.onUpdateVinError(message)
+                        }
+                    }
+
+                    override fun onFailure(call: Call<UpdateVinResponse>, t: Throwable) {
+                        Log.e(TAG, t.message)
+                        Log.e(TAG, t.cause.toString())
+                        listener.onUpdateVinError(t.message!!)
+                    }
+                })
+            }
+
+        }
+
+    }*/
 }

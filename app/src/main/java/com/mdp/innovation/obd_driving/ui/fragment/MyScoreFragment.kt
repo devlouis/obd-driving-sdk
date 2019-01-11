@@ -257,7 +257,8 @@ class MyScoreFragment : BaseServiceFragment(), MyScoreView, HomeActivity.StartLi
 
         //showProgress()
 
-        val myScore = preferences.getMyScore(context)
+        var myScore = preferences.getMyScore(context)
+        if(myScore == "null") myScore = "-"
         tv_home_prom.text = myScore
 
         userId = preferences.getDataUser(context)!!.userId!!
@@ -358,17 +359,19 @@ class MyScoreFragment : BaseServiceFragment(), MyScoreView, HomeActivity.StartLi
         handler.removeCallbacks(runnable)
 
         //SDK
-        //showProgress()
-        //(activity as HomeActivity).startLiveData()
+        showLoading()
+        (activity as HomeActivity).startLiveData()
         //(activity as HomeActivity).simulateSpeed()
-        //navigator.navigateToCollectData(fragmentManager, R.id.content)
+        navigator.navigateToCollectData(fragmentManager, R.id.content)
+
+
 
 
         //DEMO
-        startCollectDataService()
+        /*startCollectDataService()
         (activity as HomeActivity).simulateSpeed()
         Global.cancelValidated = false
-        navigator.navigateToCollectData(fragmentManager, R.id.content)
+        navigator.navigateToCollectData(fragmentManager, R.id.content)*/
     }
 
     override fun onDestroy() {

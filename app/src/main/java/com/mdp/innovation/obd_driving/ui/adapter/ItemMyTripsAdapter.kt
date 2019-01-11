@@ -77,13 +77,15 @@ class ItemMyTripsAdapter(private var mDataList: java.util.ArrayList<ItemMyTripsM
             var dateStr = " - "
             var scoreStr = " - "
             try{
-                dateStr = sdf.format(mDataList[position]?.timeStart)
+                //dateStr = sdf.format(mDataList[position]?.timeStart)
                 scoreStr = mDataList[position]?.score.toString()
             }catch (ex: Exception){
                 Log.d(TAG, ex.message)
             }
 
-            holder.tv_date_value.text = dateStr
+            //holder.tv_date_value.text = dateStr
+
+            holder.tv_date_value.text = mDataList[position]?.timeStart
             holder.tv_duration_value.text = mDataList[position]?.duration
             holder.tv_score_value.text = scoreStr
         }else if(holder is MyViewHolderProgress){

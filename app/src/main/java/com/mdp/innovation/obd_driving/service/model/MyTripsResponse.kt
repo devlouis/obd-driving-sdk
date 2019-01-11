@@ -4,7 +4,7 @@ import java.util.*
 
 data class MyTripsResponse(val trips: List<Trip>, val total: Int) {
 
-    data class Trip(val tripId: String, val timeStart: Date, val timeEnd: Date,
+    data class Trip(val tripId: String, val timeStart: String, val timeEnd: String,
                     val duration: String, val distance: String, val score: Float)
 
 }

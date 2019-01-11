@@ -10,9 +10,9 @@ interface ApiRetrofit {
 
     @POST("api")
     open fun getScore(@Body request: ScoreRequest): Call<ScoreResponse>
-    @POST("mytrips")
+    @POST("listarViajes")
     open fun getMyTrips(@Body request: MyTripsRequest): Call<MyTripsResponse>
-    @POST("tripdetail")
+    @POST("detalleViaje")
     open fun getTripDetail(@Body request: TripDetailRequest): Call<TripDetailResponse>
     @POST("login")
     open fun getLogin(@Body request: LoginRequest): Call<LoginResponse>
@@ -20,5 +20,7 @@ interface ApiRetrofit {
     open fun getRegister(@Body request: RegisterRequest): Call<RegisterResponse>
     @POST("scoreHistorico")
     open fun getMyScore(@Body request: MyScoreRequest): Call<MyScoreResponse>
+    @POST("updateVin")
+    open fun updateVin(@Body request: UpdateVinRequest): Call<UpdateVinResponse>
 
 }

@@ -4,11 +4,11 @@ import java.util.*
 
 class ItemMyTripsModel {
 
-    var timeStart: Date? = null
+    var timeStart: String? = null
     var duration: String? = null
     var score: Float? = null
     var distance: String? = null
-    var timeEnd: Date? = null
+    var timeEnd: String? = null
     var tripId: String? = null
 
 }

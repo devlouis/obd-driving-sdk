@@ -21,6 +21,7 @@ import com.mdp.innovation.obd_driving.ui.MyTripsView
 import com.mdp.innovation.obd_driving.ui.adapter.ItemMyTripsAdapter
 import com.mdp.innovation.obd_driving.ui.navigation.Navigator
 import com.mdp.innovation.obd_driving.util.Message
+import com.mdp.innovation.obd_driving.util.Preferences
 import org.koin.android.ext.android.inject
 import java.util.*
 
@@ -36,6 +37,7 @@ class MyTripsFragment : BaseFragment(), MyTripsView {
     private val navigator by inject<Navigator>()
 
     private val presenter = MyTripsPresenter(this, MyTripsInteractor())
+    private val preferences by inject<Preferences>()
 
     private val elementsByPage = 15
     private var currentPage = 1
@@ -96,7 +98,9 @@ class MyTripsFragment : BaseFragment(), MyTripsView {
                 mRecyclerView!!.postDelayed({
                     adapter.notifyItemInserted(itemMyTripsModelList.size - 1)
 
-                    presenter.getMyTrips("XXXXXXX", currentPage, elementsByPage, false)
+                    val vin = preferences.getDataUser(context)!!.vin
+
+                    //presenter.getMyTrips(vin!!, currentPage, elementsByPage, false)
 
                     /*handler.postDelayed({
 
@@ -137,7 +141,11 @@ class MyTripsFragment : BaseFragment(), MyTripsView {
 
     private fun initUI(){
 
-        presenter.getMyTrips("XXXXXXX", currentPage, elementsByPage, true)
+        //presenter.getMyTrips("XXXXXXX", currentPage, elementsByPage, true)
+
+        val vin = preferences.getDataUser(context)!!.vin
+
+        presenter.getMyTrips(vin!!, currentPage, elementsByPage, true)
 
     }
 
