@@ -22,7 +22,7 @@ public class TripEntity implements Serializable {
     private Long id;
 
     private String tripId = "";
-    private String live_date = "";
+    private String vin = "";
     private Float lat = 0.0f;
     private Float lon = 0.0f;
     private Float bearing = 0.0f;
@@ -49,12 +49,12 @@ public class TripEntity implements Serializable {
         this.tripId = tripId;
     }
 
-    public String getLive_date() {
-        return live_date;
+    public String getVin() {
+        return vin;
     }
 
-    public void setLive_date(String live_date) {
-        this.live_date = live_date;
+    public void setVin(String vin) {
+        this.vin = vin;
     }
 
     public Float getLat() {
@@ -127,7 +127,7 @@ public class TripEntity implements Serializable {
         return "TripEntity{" +
                 "id=" + id +
                 ", tripId='" + tripId + '\'' +
-                ", live_date='" + live_date + '\'' +
+                ", vin='" + vin + '\'' +
                 ", lat='" + lat + '\'' +
                 ", lon='" + lon + '\'' +
                 ", bearing='" + bearing + '\'' +
