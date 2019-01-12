@@ -170,9 +170,15 @@ class CollectDataFragment : BaseServiceFragment(), CollectDataView, HomeActivity
 
     override fun getVin(vin: String){
 
-        val userId = preferences.getDataUser(context)!!.userId!!
-
         if(!vinUpdated){
+
+            var dataUser = preferences.getDataUser(context)
+
+            val userId = dataUser!!.userId!!
+
+            dataUser!!.vin = vin
+            preferences.setDataUser(context,dataUser)
+
             presenter.updateVin(userId, vin)
         }
 

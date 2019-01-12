@@ -85,20 +85,22 @@ class MyTripsFragment : BaseFragment(), MyTripsView {
         itemMyTripsModelList.add(option1)
         itemMyTripsModelList.add(option1)*/
 
+        itemMyTripsModelList.clear()
+
         mRecyclerView = view.findViewById(R.id.rv_my_trips)
         var mLayoutManager = LinearLayoutManager(activity, LinearLayoutManager.VERTICAL, false)
         mRecyclerView!!.layoutManager = mLayoutManager
         //var adapter = ItemMyTripsAdapter(itemMyTripsModelList, context)
         adapter = ItemMyTripsAdapter(context, itemMyTripsModelList, mRecyclerView!!)
         mRecyclerView!!.adapter = adapter
-        adapter.setOnLoadMoreListener(object : ItemMyTripsAdapter.OnLoadMoreListener{
+        /*adapter.setOnLoadMoreListener(object : ItemMyTripsAdapter.OnLoadMoreListener{
             override fun onLoadMore() {
                 itemMyTripsModelList.add(null)
 
                 mRecyclerView!!.postDelayed({
                     adapter.notifyItemInserted(itemMyTripsModelList.size - 1)
 
-                    val vin = preferences.getDataUser(context)!!.vin
+                    val vin = preferences.getDataUser(context)!!.vin*/
 
                     //presenter.getMyTrips(vin!!, currentPage, elementsByPage, false)
 
@@ -114,11 +116,11 @@ class MyTripsFragment : BaseFragment(), MyTripsView {
                         adapter.stopScroll()
                     }, 2000)*/
 
-                },100)
+                /*},100)
 
                 println("load")
             }
-        })
+        })*/
 
         adapter.setOnClickItemListener(object : ItemMyTripsAdapter.OnClickItemListener{
             override fun onClick(item: ItemMyTripsModel) {
@@ -165,8 +167,8 @@ class MyTripsFragment : BaseFragment(), MyTripsView {
             }
             isFirstLoad = false
         }else{
-            itemMyTripsModelList.removeAt(itemMyTripsModelList.size - 1)
-            adapter.notifyItemRemoved(itemMyTripsModelList.size)
+            //itemMyTripsModelList.removeAt(itemMyTripsModelList.size - 1)
+            //adapter.notifyItemRemoved(itemMyTripsModelList.size)
 
             if(response.total == elementsFetched){
                 adapter.stopScroll()

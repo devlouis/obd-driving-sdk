@@ -117,6 +117,18 @@ object ConnectOBD{
     }
 
     fun startLiveData(mObdGatewayVin: ObdGatewayVin) {
+        /**
+         *
+         */
+        contadorTotal = 0
+
+        limit = 0
+        limit2 = LIMIT
+        TripRepository(Application()).deleteAll()
+        ObdRepository(Application()).deleteAll()
+        LocationRepository(Application()).deleteAll()
+        start = false
+
         contadorTotalLocation = 0
         statusTrip = "0"
         initSendDataBD = false
@@ -373,7 +385,6 @@ object ConnectOBD{
             }
         }
         Log.v(TAG, " contador $contador")
-
             if (contador == 3) {
                 contadorTotal++
                 /**

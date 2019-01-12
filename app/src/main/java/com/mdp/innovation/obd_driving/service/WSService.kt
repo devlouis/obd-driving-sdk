@@ -11,8 +11,9 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 class WSService {
     private val TAG = javaClass.simpleName
-    private val WS_URL_SCORE = "https://fc63fee2.ngrok.io"
-    private val WS_URL_LOCAL = "http://192.168.137.1:8080"
+    //private val WS_URL_SCORE = "https://fc63fee2.ngrok.io"
+    private val WS_URL_SCORE = "https://mdpdigitalcar.mybluemix.net"
+    //private val WS_URL_LOCAL = "http://192.168.137.1:8080"
 
     /*fun getScore(request: ScoreRequest): ScoreResponse? {
         val retrofit: Retrofit? = Retrofit.Builder()

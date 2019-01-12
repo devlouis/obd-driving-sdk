@@ -50,7 +50,7 @@ class TripDetailFragment : BaseFragment(), TripDetailView, OnMapReadyCallback {
         }
     }
 
-    private val sdfDateTime = SimpleDateFormat("dd/MM/yyyy HH:mm:ss")
+    private val sdfDateTime = SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
     private val sdfTime = SimpleDateFormat("HH:mm:ss")
 
     private lateinit var myMap: GoogleMap
@@ -303,14 +303,15 @@ class TripDetailFragment : BaseFragment(), TripDetailView, OnMapReadyCallback {
             var tvTime = eventTypeItem.findViewById<TextView>(R.id.tv_time)
             tvSpeed.text = item.speed
             tvDuration.text = item.duration
-            /*var timeStartStr = " - "
+            var timeStartStr = " - "
             try{
-                timeStartStr = sdfTime.format(item.start)
+                var date = sdfDateTime.parse(item.start)
+                timeStartStr = sdfTime.format(date)
             }catch (ex: Exception){
                 Log.d(TAG, ex.message)
             }
-            tvTime.text = timeStartStr*/
-            tvTime.text = item.start
+            tvTime.text = timeStartStr
+            //tvTime.text = item.start
 
             llEventsContainer.addView(eventTypeItem)
 
