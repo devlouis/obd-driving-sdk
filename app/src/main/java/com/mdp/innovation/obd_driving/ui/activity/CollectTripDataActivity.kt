@@ -11,6 +11,7 @@ import com.mdp.innovation.obd_driving.ui.HomeView
 import com.mdp.innovation.obd_driving.ui.fragment.CancelCollectDialogFragment
 import com.mdp.innovation.obd_driving.ui.navigation.Navigator
 import com.mdp.innovation.obd_driving.util.Global
+import com.mdp.innovation.obd_driving_api.app.core.ConnectOBD
 import org.koin.android.ext.android.inject
 
 class CollectTripDataActivity : BaseServiceActivity(){
@@ -46,5 +47,6 @@ class CollectTripDataActivity : BaseServiceActivity(){
             dialog.show(fragmentManager,"cancel_collect")
         }*/
     }
+
 
 }
