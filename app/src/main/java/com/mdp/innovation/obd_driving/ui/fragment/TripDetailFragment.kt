@@ -36,8 +36,7 @@ import com.google.android.gms.maps.model.*
 import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
 import android.support.v4.view.ViewCompat.animate
-
-
+import com.mdp.innovation.obd_driving_api.app.core.ConnectOBD
 
 
 class TripDetailFragment : BaseFragment(), TripDetailView, OnMapReadyCallback {
@@ -410,6 +409,16 @@ class TripDetailFragment : BaseFragment(), TripDetailView, OnMapReadyCallback {
 
     override fun hideLoading() {
         loading.visibility = View.GONE
+    }
+
+    override fun onStop() {
+        if (ConnectOBD.isServiceBoundLocation) {
+            // Desconectarse del servicio.
+            // Esto le indica al servicio que esta actividad ya no está en primer plano
+            // y que el servicio puede responder promoviéndose a sí mismo a un servicio en primer plano.
+            ConnectOBD.doUnbindServiceLocation()
+        }
+        super.onStop()
     }
 
 }

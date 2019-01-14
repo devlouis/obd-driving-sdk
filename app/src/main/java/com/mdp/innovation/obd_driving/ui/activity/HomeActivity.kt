@@ -250,4 +250,14 @@ class HomeActivity : BaseServiceActivity(), HomeView, ObdGatewayVin {
     }
 
 
+    override fun onStop() {
+        if (ConnectOBD.isServiceBoundLocation) {
+            // Desconectarse del servicio.
+            // Esto le indica al servicio que esta actividad ya no está en primer plano
+            // y que el servicio puede responder promoviéndose a sí mismo a un servicio en primer plano.
+            ConnectOBD.doUnbindServiceLocation()
+        }
+        super.onStop()
+    }
+
 }
