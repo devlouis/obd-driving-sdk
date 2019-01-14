@@ -89,6 +89,7 @@ class CollectDataFragment : BaseServiceFragment(), CollectDataView, HomeActivity
         override fun toDo() {
             Global.tripIsEnded = true
             //stopCollectDataService()
+            MyScoreFragment.appFirstStart = false
             ConnectOBD.stopLiveData()
             fragmentManager?.popBackStack()
         }
@@ -130,6 +131,7 @@ class CollectDataFragment : BaseServiceFragment(), CollectDataView, HomeActivity
                 Global.cancelValidated = true
                 Global.tripIsEnded = true
                 //stopCollectDataService()
+                MyScoreFragment.appFirstStart = false
                 fragmentManager?.popBackStack()
                 ConnectOBD.stopLiveData()
 

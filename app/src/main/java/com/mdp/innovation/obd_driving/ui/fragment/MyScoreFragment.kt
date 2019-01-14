@@ -37,6 +37,7 @@ class MyScoreFragment : BaseServiceFragment(), MyScoreView, HomeActivity.StartLi
         fun newInstance(): MyScoreFragment{
             return MyScoreFragment()
         }
+        var appFirstStart = true
     }
 
     private val navigator by inject<Navigator>()
@@ -87,10 +88,10 @@ class MyScoreFragment : BaseServiceFragment(), MyScoreView, HomeActivity.StartLi
         super.onActivityCreated(savedInstanceState)
         initUI()
 
-        if(isActiveCollectDataService()){
+        /*if(isActiveCollectDataService()){
             navigator.navigateToCollectData(fragmentManager, R.id.content)
             Global.cancelValidated = false
-        }
+        }*/
     }
 
     private fun validateConsultScore(isFirstTimeInput: Boolean){
@@ -138,37 +139,6 @@ class MyScoreFragment : BaseServiceFragment(), MyScoreView, HomeActivity.StartLi
         tripId = "0caacd33-1626-4767-93d1-5cbd3ce0217a"
         presenter.getScore(VIN, tripId)
 
-        /*doAsync{
-            //val service = WSService()
-            val VIN = "D1"
-            val tripId = "04a76229-b13b-427b-a1b9-695ea44a0ee2"
-            //var request = ScoreRequest(VIN, tripId)
-            //val response = service.getScore(request)
-
-
-
-            uiThread{
-
-                val acelerationScore = response.VIN?.aceleracion
-                val brakingScore = response?.VIN?.frenado
-                val newScore = 10 + (acelerationScore!!.toFloat()) + (brakingScore!!.toFloat())
-                if(response != null && response?.VIN != null && acelerationScore != null && brakingScore != null){
-                    val lastTripCalculed = preferences.getLastTripCalculed(context)
-                    if(tripId != lastTripCalculed){
-                        preferences.setLastTripCalculed(context, tripId)
-                        preferences.setMyScore(context, newScore.toString())
-                        preferences.setScorePending(context, false)
-                        tv_home_prom.text = newScore.toString()
-                        hideScorePendingProgress()
-
-                        var dialog = EndTripDialogFragment()
-                        dialog.show(fragmentManager,"end_trip")
-                    }
-                }
-
-                //Toast.makeText(context,"El puerto es: " + newScore,Toast.LENGTH_LONG).show()
-            }
-        }*/
     }
 
     override fun onGetScoreSuccess(response: ScoreResponse) {
@@ -223,7 +193,7 @@ class MyScoreFragment : BaseServiceFragment(), MyScoreView, HomeActivity.StartLi
         activity!!.runOnUiThread {
             hideLoading()
             Message.toastLong(message,activity!!.applicationContext)
-            navigator.navigateToCollectData(fragmentManager, R.id.content)
+            //navigator.navigateToCollectData(fragmentManager, R.id.content)
 
         }
     }
@@ -241,6 +211,10 @@ class MyScoreFragment : BaseServiceFragment(), MyScoreView, HomeActivity.StartLi
     private fun initUI(){
 
         if(showScorePending) showScorePendingProgress()
+
+        if(ConnectOBD.isServiceBoundLocation && appFirstStart){
+            navigator.navigateToCollectData(fragmentManager, R.id.content)
+        }
 
         CustomAnimate.setButtonAnimation(btnStartTrip)
 
@@ -362,7 +336,7 @@ class MyScoreFragment : BaseServiceFragment(), MyScoreView, HomeActivity.StartLi
         showLoading()
         (activity as HomeActivity).startLiveData()
         //(activity as HomeActivity).simulateSpeed()
-        navigator.navigateToCollectData(fragmentManager, R.id.content)
+        //navigator.navigateToCollectData(fragmentManager, R.id.content)
 
 
 
