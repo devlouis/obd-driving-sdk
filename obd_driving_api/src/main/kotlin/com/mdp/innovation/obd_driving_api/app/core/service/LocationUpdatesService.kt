@@ -39,7 +39,7 @@ class LocationUpdatesService : Service() {
      * El intervalo deseado para las actualizaciones de ubicación Inexacto.
      * Las actualizaciones pueden ser más o menos frecuentes.
      */
-    private val UPDATE_INTERVAL_IN_MILLISECONDS: Long = 500
+    private val UPDATE_INTERVAL_IN_MILLISECONDS: Long = 1000
 
     /**
      * La tasa más rápida para actualizaciones de ubicación activa.
@@ -272,8 +272,8 @@ class LocationUpdatesService : Service() {
 
     private fun createLocationRequest() {
         mLocationRequest = LocationRequest()
-        mLocationRequest.interval = 500
-        mLocationRequest.fastestInterval = 500
+        mLocationRequest.interval = 1000
+        mLocationRequest.fastestInterval = 1000
         mLocationRequest.priority = LocationRequest.PRIORITY_HIGH_ACCURACY
     }
 
