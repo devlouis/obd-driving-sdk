@@ -340,7 +340,9 @@ object ConnectOBD{
                 contador++
                 val command = job.command as SpeedCommand
                 KMH = command.metricSpeed.toString()
-                obdGatewayVin!!.getSpeedKm(KMH)
+                if (contadorTotal >= 2){
+                    obdGatewayVin!!.getSpeedKm(KMH)
+                }
                 Log.v(TAG, " Speed: ${command.metricSpeed}")
             }
             AvailableCommandNames.ENGINE_RPM.toString() -> {

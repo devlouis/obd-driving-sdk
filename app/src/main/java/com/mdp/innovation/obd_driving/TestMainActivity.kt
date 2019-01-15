@@ -1,5 +1,7 @@
 package com.mdp.innovation.obd_driving
 
+import android.app.Activity
+import android.app.PendingIntent.getActivity
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
@@ -47,7 +49,7 @@ class TestMainActivity : BaseAppCompat(), ObdGatewayVin {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main_test)
-
+        runa = false
         tripRepository = (application as MyApplication).tripRepository
         obdRepository = (application as MyApplication).obdRepository
         locationRepository = (application as MyApplication).locationRepository
@@ -93,7 +95,7 @@ class TestMainActivity : BaseAppCompat(), ObdGatewayVin {
             //nextActivity(SensorActivity::class.java, true)
         }
         btnCheckConecction.setOnClickListener {
-            ConnectOBD.CheckConecction()
+            LogUtils().v(TAG, " check Service : ${ConnectOBD.CheckConecction()}")
         }
 
         btnVerifyMac.setOnClickListener {
@@ -159,6 +161,7 @@ class TestMainActivity : BaseAppCompat(), ObdGatewayVin {
 
     override fun onStart() {
         super.onStart()
+        runa = false
        /* bindService(
             Intent(this, LocationUpdatesService::class.java), mServiceConnection,
             Context.BIND_AUTO_CREATE
@@ -172,12 +175,14 @@ class TestMainActivity : BaseAppCompat(), ObdGatewayVin {
             // Esto le indica al servicio que esta actividad ya no está en primer plano
             // y que el servicio puede responder promoviéndose a sí mismo a un servicio en primer plano.
             ConnectOBD.doUnbindServiceLocation()
+            runa = false
         }
         super.onStop()
     }
 
 
     override fun getVin(vin: String) {
+        runa = true
         Log.v(TAG, " VIN___: $vin")
         runOnUiThread {
             button.text = "Detener viaje"
@@ -217,9 +222,38 @@ class TestMainActivity : BaseAppCompat(), ObdGatewayVin {
 
     }
 
+    var runa = false
     override fun getSpeedKm(kmh: String) {
         Log.v(TAG, " getSpeedKm: $kmh")
+        if (Activity() != null) {
+            runOnUiThread {
+                tviSpeed.text = "$kmh km/h"
+            }
+            //tviSpeed.text = "$kmh km/h"
+        }else{
+            tviSpeed.text = "$kmh km/h"
+        }
+
+        Log.v(TAG, " getSpeedKm: runa ${runa}")
+
+        if (!runa){
+            tviSpeed.text = "$kmh km/h"
+        }
+
     }
+
+
+
+    override fun onResume() {
+        super.onResume()
+        runa = false
+    }
+
+    override fun onRestart() {
+        super.onRestart()
+        runa = false
+    }
+
 
 
     /**
