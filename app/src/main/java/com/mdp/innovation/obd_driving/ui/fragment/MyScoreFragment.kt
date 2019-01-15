@@ -198,7 +198,7 @@ class MyScoreFragment : BaseServiceFragment(), MyScoreView, HomeActivity.StartLi
         }
     }
 
-    override fun onStop() {
+    /*override fun onStop() {
         if (ConnectOBD.isServiceBoundLocation) {
             // Desconectarse del servicio.
             // Esto le indica al servicio que esta actividad ya no está en primer plano
@@ -206,13 +206,14 @@ class MyScoreFragment : BaseServiceFragment(), MyScoreView, HomeActivity.StartLi
             ConnectOBD.doUnbindServiceLocation()
         }
         super.onStop()
-    }
+    }*/
 
     private fun initUI(){
 
         if(showScorePending) showScorePendingProgress()
 
-        if(ConnectOBD.isServiceBoundLocation && appFirstStart){
+        if(ConnectOBD.CheckConecction() && appFirstStart){
+
             navigator.navigateToCollectData(fragmentManager, R.id.content)
         }
 
