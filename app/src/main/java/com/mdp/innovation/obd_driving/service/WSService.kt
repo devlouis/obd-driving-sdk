@@ -1,7 +1,6 @@
 package com.mdp.innovation.obd_driving.service
 
 import android.util.Log
-import com.google.android.gms.fido.u2f.api.common.RegisterRequest
 import com.mdp.innovation.obd_driving.service.model.*
 import com.mdp.innovation.obd_driving.service.retrofit.ApiRetrofit
 import com.mdp.innovation.obd_driving.util.ConstantsWS
