@@ -2,17 +2,14 @@ package com.mdp.innovation.obd_driving
 
 import android.app.Activity
 import android.app.PendingIntent.getActivity
-import android.content.ComponentName
-import android.content.Context
-import android.content.Intent
-import android.content.ServiceConnection
-import android.os.Bundle
-import android.os.Environment
-import android.os.Handler
-import android.os.IBinder
+import android.content.*
+import android.os.*
+import android.preference.PreferenceManager
+import android.support.v4.content.LocalBroadcastManager
 import android.support.v7.app.AlertDialog
 import android.util.Log
 import android.widget.Toast
+import com.airbnb.lottie.utils.Utils
 import com.mdp.innovation.obd_driving_api.app.`interface`.ObdGatewayVin
 import com.mdp.innovation.obd_driving_api.app.core.BaseAppCompat
 import com.mdp.innovation.obd_driving_api.app.core.ConnectOBD
@@ -33,11 +30,12 @@ import java.io.FileInputStream
 import java.io.FileOutputStream
 import java.io.IOException
 import java.nio.channels.FileChannel
+import android.content.Intent.getIntent
+import android.os.Bundle
+
+
 
 class TestMainActivity : BaseAppCompat(), ObdGatewayVin {
-
-
-
 
     val TAG = javaClass.simpleName
     //GPS Service
@@ -45,11 +43,13 @@ class TestMainActivity : BaseAppCompat(), ObdGatewayVin {
     private var isServiceBoundLocation: Boolean = false
 
     //var sendata = SendDataOBD()
+    private lateinit var myReceiver: MyReceiver
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main_test)
-        runa = false
+        myReceiver = MyReceiver()
+        Log.v(TAG, " getSpeedKm: onCreate -- ")
         tripRepository = (application as MyApplication).tripRepository
         obdRepository = (application as MyApplication).obdRepository
         locationRepository = (application as MyApplication).locationRepository
@@ -58,10 +58,10 @@ class TestMainActivity : BaseAppCompat(), ObdGatewayVin {
         //sendata.InitClient()
         //Handler().post(mQueueCommands2)
 
-        updateArticle("6")
+        //updateArticle("6")
 
-        if (ConnectOBD.isServiceBoundLocation){
-            button.text = "Detener viaje"
+        if (ConnectOBD.CheckConecction()){
+            button.text = "Detener viaje..."
         }else{
             button.text = "Iniciar Viaje"
         }
@@ -130,6 +130,7 @@ class TestMainActivity : BaseAppCompat(), ObdGatewayVin {
     override fun onDestroy() {
       /*  LogUtils().v("OBDRestar", "OBDRestar")
         ConnectOBD.restarServiceOBD()*/
+
         super.onDestroy()
     }
 
@@ -161,7 +162,6 @@ class TestMainActivity : BaseAppCompat(), ObdGatewayVin {
 
     override fun onStart() {
         super.onStart()
-        runa = false
        /* bindService(
             Intent(this, LocationUpdatesService::class.java), mServiceConnection,
             Context.BIND_AUTO_CREATE
@@ -175,14 +175,14 @@ class TestMainActivity : BaseAppCompat(), ObdGatewayVin {
             // Esto le indica al servicio que esta actividad ya no está en primer plano
             // y que el servicio puede responder promoviéndose a sí mismo a un servicio en primer plano.
             ConnectOBD.doUnbindServiceLocation()
-            runa = false
         }
+      /*  PreferenceManager.getDefaultSharedPreferences(this)
+            .unregisterOnSharedPreferenceChangeListener(this)*/
         super.onStop()
     }
 
 
     override fun getVin(vin: String) {
-        runa = true
         Log.v(TAG, " VIN___: $vin")
         runOnUiThread {
             button.text = "Detener viaje"
@@ -222,39 +222,24 @@ class TestMainActivity : BaseAppCompat(), ObdGatewayVin {
 
     }
 
-    var runa = false
+
     override fun getSpeedKm(kmh: String) {
         Log.v(TAG, " getSpeedKm: $kmh")
-        if (Activity() != null) {
-            runOnUiThread {
-                tviSpeed.text = "$kmh km/h"
-            }
-            //tviSpeed.text = "$kmh km/h"
-        }else{
-            tviSpeed.text = "$kmh km/h"
-        }
-
-        Log.v(TAG, " getSpeedKm: runa ${runa}")
-
-        if (!runa){
-            tviSpeed.text = "$kmh km/h"
-        }
-
     }
 
 
 
     override fun onResume() {
         super.onResume()
-        runa = false
+        LocalBroadcastManager.getInstance(this).registerReceiver(
+            myReceiver, IntentFilter(ConnectOBD.ACTION_BROADCAST)
+        )
     }
 
-    override fun onRestart() {
-        super.onRestart()
-        runa = false
+    override fun onPause() {
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(myReceiver)
+        super.onPause()
     }
-
-
 
     /**
      * TEST CHECK BD
@@ -343,6 +328,17 @@ class TestMainActivity : BaseAppCompat(), ObdGatewayVin {
 
     }
 
+    /**
+     * Receiver for broadcasts sent by [LocationUpdatesService].
+     */
+    private inner class MyReceiver : BroadcastReceiver() {
+        override fun onReceive(context: Context, intent: Intent) {
+            val extras = intent.extras
+            val speed = extras.getString(ConnectOBD.EXTRA_SPEED)
+            Log.v(TAG, " getSpeedKm: onReceive  ${speed} km/h")
+            tviSpeed.text = "${speed} ::: km/h"
+        }
+    }
 
 
 }

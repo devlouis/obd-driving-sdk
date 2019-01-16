@@ -236,4 +236,5 @@ class CollectDataFragment : BaseServiceFragment(), CollectDataView, HomeActivity
     override fun hideLoading() {
 
     }
+
 }
