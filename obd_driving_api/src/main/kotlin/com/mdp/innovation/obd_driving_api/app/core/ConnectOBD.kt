@@ -3,6 +3,10 @@ package com.mdp.innovation.obd_driving_api.app.core
 import android.annotation.SuppressLint
 import android.app.Application
 import android.content.*
+import android.hardware.Sensor
+import android.hardware.SensorEvent
+import android.hardware.SensorEventListener
+import android.hardware.SensorManager
 import android.location.Location
 import android.os.CountDownTimer
 import android.os.Handler
@@ -86,6 +90,8 @@ object ConnectOBD{
     //GPS Service
     private var mLocationUpdatesService : LocationUpdatesService? = null
 
+
+
     fun initialize(context: Context) {
         this.context = context
         //todo Crashlytics.getInstance().crash() // Force a crash
@@ -166,6 +172,7 @@ object ConnectOBD{
     }
 
     fun stopLiveDataforError(){
+
         doUnbindService()
         mLocationUpdatesService!!.RemoveAll()
         //doUnbindServiceLocation()
@@ -428,6 +435,12 @@ object ConnectOBD{
         obdEntity.rpm = rpm
         obdEntity.dataNew = currentToDay.replace(":","-") +" "+ currentDateandTime
         obdEntity.status = statusTrip
+        if (sensorAccelerometer != null){
+            obdEntity.ax = sensorAccelerometer!!.values[0]
+            obdEntity.ay = sensorAccelerometer!!.values[1]
+            obdEntity.az = sensorAccelerometer!!.values[2]
+        }
+
         ObdRepository(Application()).addObd(obdEntity)
         LogUtils().v(TAG_BD, " OBD ADD : ${currentDateandTime} = ${obdEntity.toString()}")
     }
@@ -464,9 +477,11 @@ object ConnectOBD{
     /**
      * Actualización del estado
      */
+    private var sensorAccelerometer: SensorEvent? = null
     @JvmStatic
-    fun stateUpdate(job: ObdCommandJob, ctx: Context) {
+    fun stateUpdate(job: ObdCommandJob, sensorAccelerometer: SensorEvent,  ctx: Context) {
         this.context = ctx
+        this.sensorAccelerometer = sensorAccelerometer
         val cmdName = job.command.name
         val cmdID = LookUpCommand(cmdName)
         //context.snackBarSucceso(cmdID, claContent)
@@ -642,10 +657,17 @@ object ConnectOBD{
                       LogUtils().v(TAG_BD, " OBD - value : ${value.toString()}")
                       trip.tripId = value.id_trip
                       trip.vin = value.vin
-                      trip.speed = value.kmh.toInt()
+                      if (value.kmh.isNotEmpty()){
+                          trip.speed =  value.kmh.toInt()
+                      }else{
+                          trip.speed =  -1
+                      }
                       trip.rpm = value.rpm.toInt()
                       trip.dataUdate = value.dataNew
                       trip.status = value.status
+                      trip.ax = value.ax
+                      trip.ay = value.ay
+                      trip.az = value.az
                       TripRepository(Application()).update(trip)
                       LogUtils().v(TAG_BD, " OBD BD update : ${trip.toString()}")
 
@@ -674,10 +696,19 @@ object ConnectOBD{
                       val trip = TripEntity()
                       trip.tripId = value.id_trip
                       trip.vin = value.vin
-                      trip.speed = value.kmh.toInt()
+
+                      if (value.kmh.isNotEmpty()){
+                          trip.speed =  value.kmh.toInt()
+                      }else{
+                          trip.speed =  -1
+                      }
+
                       trip.rpm = value.rpm.toInt()
                       trip.time = value.dataNew
                       trip.status = value.status
+                      trip.ax = value.ax
+                      trip.ay = value.ay
+                      trip.az = value.az
                       TripRepository(Application()).add(trip)
                       LogUtils().v(TAG_BD, " OBD NEW INSERT: ${trip.toString()}")
                   }
@@ -789,6 +820,7 @@ object ConnectOBD{
         })
 
     }
+
 
 
 
