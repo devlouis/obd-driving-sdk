@@ -18,7 +18,7 @@
             android:supportsRtl="true"
             android:name=".MyApplication">
         <activity
-                android:name=".TestMainActivity">
+                android:name=".ui.activity.SplashActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -57,6 +57,12 @@
                 android:name=".internal.CollectTripDataService"
                 android:enabled="true"
                 android:exported="true">
+        </service>
+
+        <service android:name=".internal.firebase.MyFirebaseMessagingService">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+            </intent-filter>
         </service>
 
         <meta-data

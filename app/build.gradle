@@ -90,11 +90,9 @@ dependencies {
     implementation 'com.google.android.gms:play-services-maps:16.0.0'
     implementation 'com.android.support:mediarouter-v7:27.1.1'
 
-    // Check for v11.4.2 or higher
     implementation 'com.google.firebase:firebase-core:16.0.6'
-
-    // Add dependency
     implementation 'com.crashlytics.sdk.android:crashlytics:2.9.7'
+    implementation 'com.google.firebase:firebase-messaging:17.3.4'
 }
 
 

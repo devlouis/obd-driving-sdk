@@ -7,8 +7,12 @@ import android.view.ViewGroup
 
 import com.mdp.innovation.obd_driving.R
 import android.support.annotation.Nullable
+import android.text.method.PasswordTransformationMethod
 import android.util.Log
 import com.crashlytics.android.Crashlytics
+import com.google.android.gms.tasks.OnCompleteListener
+import com.google.firebase.iid.FirebaseInstanceId
+import com.google.firebase.iid.InstanceIdResult
 import com.mdp.innovation.obd_driving.interactor.LoginInteractor
 import com.mdp.innovation.obd_driving.model.DataUserModel
 import com.mdp.innovation.obd_driving.presenter.LoginPresenter
@@ -20,6 +24,13 @@ import com.mdp.innovation.obd_driving.util.Preferences
 import kotlinx.android.synthetic.main.fragment_login.*
 import org.koin.android.ext.android.inject
 import java.lang.Exception
+import android.widget.Toast
+import com.mdp.innovation.obd_driving.ui.activity.MainActivity
+import com.google.firebase.internal.FirebaseAppHelper.getToken
+import android.support.annotation.NonNull
+import com.google.android.gms.tasks.Task
+import org.jetbrains.anko.doAsync
+
 
 class LoginFragment : BaseFragment(), LoginView {
     val TAG =  javaClass.simpleName
@@ -35,6 +46,28 @@ class LoginFragment : BaseFragment(), LoginView {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        /*FirebaseInstanceId.getInstance().instanceId.addOnCompleteListener(object : OnCompleteListener<InstanceIdResult> {
+            override fun onComplete(task: Task<InstanceIdResult>) {
+                if (!task.isSuccessful) {
+                    Log.w(TAG, "getInstanceId failed", task.exception)
+                    return
+                }
+
+                // Get new Instance ID token
+                val token = task.result!!.token
+
+                // Log and toast
+                Log.d(TAG, token)
+                Message.toastLong(token, context)
+            }
+        })*/
+
+
+
+        /*doAsync {
+            FirebaseInstanceId.getInstance().deleteInstanceId()
+        }*/
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,savedInstanceState: Bundle?): View? {
@@ -61,15 +94,12 @@ class LoginFragment : BaseFragment(), LoginView {
         btn_login.setOnClickListener { v ->
             Log.d(TAG, "CLickkkkkkkk")
 
-            val username = et_email.text.toString()
-            val password = et_password.text.toString()
+            if(validate()){
+                val username = et_username.text.toString()
+                val password = et_password.text.toString()
 
-            //presenter.getLogin(username, password)
-
-            //Crashlytics.getInstance().crash()
-
-            val fex : String? = null
-            fex!!.length
+                presenter.getLogin(username, password)
+            }
 
         }
 
@@ -77,6 +107,35 @@ class LoginFragment : BaseFragment(), LoginView {
             Log.d(TAG, "To register.")
             navigator.navigateToRegisterUser(fragmentManager!!, R.id.content)
         }
+
+        et_password.transformationMethod = PasswordTransformationMethod()
+
+    }
+
+    private fun validate() : Boolean{
+        var result = true
+
+        val username = et_username.text.toString().trim()
+        val password = et_password.text.toString().trim()
+
+        if(username.length == 0){
+            et_username_layout.isErrorEnabled = true
+            et_username_layout.error = resources.getString(R.string.message_fields_filled)
+            et_username.requestFocus()
+            result = false
+        }else{
+            et_username_layout.isErrorEnabled = false
+            if(password.length == 0){
+                et_password_layout.isErrorEnabled = true
+                et_password_layout.error = resources.getString(R.string.message_fields_filled)
+                et_password.requestFocus()
+                result = false
+            }else{
+                et_password_layout.isErrorEnabled = false
+            }
+        }
+
+        return result
 
     }
 
