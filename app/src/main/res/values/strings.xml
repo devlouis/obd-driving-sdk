@@ -47,8 +47,15 @@
     <string name="repeat_password">Repetir contraseña</string>
     <string name="register_subtitle">Registro de usuarios</string>
     <string name="btn_register">Registrarse</string>
+    <string name="message_fields_filled">Debe llenar todos los campos.</string>
+    <string name="message_passwords_repeat">Las contraseñas deben ser iguales.</string>
+    <string name="message_email_valid">Debe ingresar un correo válido.</string>
 
     <string name="alert_logout">¿Estás seguro que deseas salir?.</string>
+
+    <string name="notifications_admin_channel_id">01</string>
+    <string name="notifications_admin_channel_name">Canal 01</string>
+    <string name="notifications_admin_channel_description">Canal principal</string>
 
 
     <string name="configOption1">Cambiar OBD emparejado</string>
