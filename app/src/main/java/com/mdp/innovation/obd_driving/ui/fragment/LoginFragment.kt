@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import com.mdp.innovation.obd_driving.R
 import android.support.annotation.Nullable
 import android.util.Log
+import com.crashlytics.android.Crashlytics
 import com.mdp.innovation.obd_driving.interactor.LoginInteractor
 import com.mdp.innovation.obd_driving.model.DataUserModel
 import com.mdp.innovation.obd_driving.presenter.LoginPresenter
@@ -63,7 +64,13 @@ class LoginFragment : BaseFragment(), LoginView {
             val username = et_email.text.toString()
             val password = et_password.text.toString()
 
-            presenter.getLogin(username, password)
+            //presenter.getLogin(username, password)
+
+            //Crashlytics.getInstance().crash()
+
+            val fex : String? = null
+            fex!!.length
+
         }
 
         tv_register.setOnClickListener { v ->

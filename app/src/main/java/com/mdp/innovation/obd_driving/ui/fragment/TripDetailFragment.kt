@@ -9,7 +9,6 @@ import com.mdp.innovation.obd_driving.R
 import android.support.v7.widget.Toolbar
 import kotlinx.android.synthetic.main.fragment_trip_detail.*
 import android.support.annotation.Nullable
-import android.support.constraint.ConstraintLayout
 import android.util.Log
 import android.widget.LinearLayout
 import android.widget.TextView
@@ -21,10 +20,6 @@ import com.mdp.innovation.obd_driving.service.model.TripDetailResponse
 import com.mdp.innovation.obd_driving.ui.TripDetailView
 import com.mdp.innovation.obd_driving.util.Message
 import java.text.SimpleDateFormat
-import com.google.android.gms.maps.CameraUpdateFactory.newLatLngZoom
-import com.google.android.gms.maps.model.BitmapDescriptorFactory.HUE_GREEN
-import com.google.android.gms.maps.CameraUpdateFactory.newLatLngZoom
-import android.R.attr.clickable
 import android.graphics.Bitmap
 import android.graphics.Color
 import android.graphics.drawable.BitmapDrawable
@@ -33,9 +28,6 @@ import android.view.MotionEvent
 import android.view.animation.AnimationUtils
 import android.widget.ImageView
 import com.google.android.gms.maps.model.*
-import android.animation.Animator
-import android.animation.AnimatorListenerAdapter
-import android.support.v4.view.ViewCompat.animate
 import com.mdp.innovation.obd_driving_api.app.core.ConnectOBD
 
 

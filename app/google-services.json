@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "44055281479",
+    "firebase_url": "https://digital-car-platform.firebaseio.com",
+    "project_id": "digital-car-platform",
+    "storage_bucket": "digital-car-platform.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:44055281479:android:5281391e1be38c84",
+        "android_client_info": {
+          "package_name": "com.mdp.innovation.obd_driving"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "44055281479-ikdfofkr5n84bq182q0un4p9e53tarsp.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCEsls73-lNmht1_cae6jJw4aujoryzL3M"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
