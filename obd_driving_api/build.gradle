@@ -55,8 +55,8 @@ dependencies {
     implementation 'com.microsoft.azure.sdk.iot:iot-device-client:1.14.0'
 
     //Google Play Service
-    implementation 'com.google.android.gms:play-services-location:11.0.0'
-    implementation 'com.google.android.gms:play-services-maps:11.0.0'
+    implementation 'com.google.android.gms:play-services-location:16.0.0'
+    implementation 'com.google.android.gms:play-services-maps:16.0.0'
 
     // Room components
     implementation "android.arch.persistence.room:runtime:$rootProject.roomVersion"

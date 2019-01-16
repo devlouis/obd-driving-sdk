@@ -64,12 +64,12 @@ class LoginFragment : BaseFragment(), LoginView {
             val username = et_email.text.toString()
             val password = et_password.text.toString()
 
-            //presenter.getLogin(username, password)
+            presenter.getLogin(username, password)
 
             //Crashlytics.getInstance().crash()
 
-            val fex : String? = null
-            fex!!.length
+            /*val fex : String? = null
+            fex!!.length*/
 
         }
 

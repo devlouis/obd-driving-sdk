@@ -39,7 +39,7 @@ class TestMainActivity : BaseAppCompat(), ObdGatewayVin {
 
     val TAG = javaClass.simpleName
     //GPS Service
-    private var mLocationUpdatesService : LocationUpdatesService? = null
+    private var mLocationUpdatesService: LocationUpdatesService? = null
     private var isServiceBoundLocation: Boolean = false
 
     //var sendata = SendDataOBD()
@@ -60,9 +60,9 @@ class TestMainActivity : BaseAppCompat(), ObdGatewayVin {
 
         //updateArticle("6")
 
-        if (ConnectOBD.CheckConecction()){
+        if (ConnectOBD.CheckConecction()) {
             button.text = "Detener viaje..."
-        }else{
+        } else {
             button.text = "Iniciar Viaje"
         }
 
@@ -80,7 +80,7 @@ class TestMainActivity : BaseAppCompat(), ObdGatewayVin {
         }
     }
 
-    fun onClickListener(){
+    fun onClickListener() {
 
         button.setOnClickListener {
             if (!ConnectOBD.CheckConecction())
@@ -100,7 +100,8 @@ class TestMainActivity : BaseAppCompat(), ObdGatewayVin {
 
         btnVerifyMac.setOnClickListener {
             Log.v(TAG, " verifyMacOBD: ${ConnectOBD.verifyMacOBD()}")
-            tviVerifyMac.text = "Boolean: ${ConnectOBD.verifyMacOBD().result} \nMac: ${ConnectOBD.verifyMacOBD().macBluetooth}"
+            tviVerifyMac.text =
+                    "Boolean: ${ConnectOBD.verifyMacOBD().result} \nMac: ${ConnectOBD.verifyMacOBD().macBluetooth}"
         }
 
         idSendDataIoT.setOnClickListener {
@@ -116,11 +117,11 @@ class TestMainActivity : BaseAppCompat(), ObdGatewayVin {
     }
 
 
-    private fun showDialodAlert(msg: String){
+    private fun showDialodAlert(msg: String) {
         val builderAlertDialog = AlertDialog.Builder(this@TestMainActivity)
         builderAlertDialog.setTitle("Driving OBD")
         builderAlertDialog.setMessage(msg)
-        builderAlertDialog.setPositiveButton("Ok") {dialog, which ->
+        builderAlertDialog.setPositiveButton("Ok") { dialog, which ->
             dialog.dismiss()
         }
         var dialog = builderAlertDialog.create()
@@ -128,7 +129,7 @@ class TestMainActivity : BaseAppCompat(), ObdGatewayVin {
     }
 
     override fun onDestroy() {
-      /*  LogUtils().v("OBDRestar", "OBDRestar")
+        /*  LogUtils().v("OBDRestar", "OBDRestar")
         ConnectOBD.restarServiceOBD()*/
 
         super.onDestroy()
@@ -162,7 +163,7 @@ class TestMainActivity : BaseAppCompat(), ObdGatewayVin {
 
     override fun onStart() {
         super.onStart()
-       /* bindService(
+        /* bindService(
             Intent(this, LocationUpdatesService::class.java), mServiceConnection,
             Context.BIND_AUTO_CREATE
         )*/
@@ -176,7 +177,7 @@ class TestMainActivity : BaseAppCompat(), ObdGatewayVin {
             // y que el servicio puede responder promoviéndose a sí mismo a un servicio en primer plano.
             ConnectOBD.doUnbindServiceLocation()
         }
-      /*  PreferenceManager.getDefaultSharedPreferences(this)
+        /*  PreferenceManager.getDefaultSharedPreferences(this)
             .unregisterOnSharedPreferenceChangeListener(this)*/
         super.onStop()
     }
@@ -199,7 +200,7 @@ class TestMainActivity : BaseAppCompat(), ObdGatewayVin {
         //ConnectOBD.doUnbindService()
         runOnUiThread {
 
-            when(type){
+            when (type) {
                 /**
                  * Se dejo de recibir informacion de OBD
                  */
@@ -221,13 +222,6 @@ class TestMainActivity : BaseAppCompat(), ObdGatewayVin {
         }
 
     }
-
-
-    override fun getSpeedKm(kmh: String) {
-        Log.v(TAG, " getSpeedKm: $kmh")
-    }
-
-
 
     override fun onResume() {
         super.onResume()

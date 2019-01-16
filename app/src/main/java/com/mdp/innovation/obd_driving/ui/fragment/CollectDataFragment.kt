@@ -1,6 +1,9 @@
 package com.mdp.innovation.obd_driving.ui.fragment
 
+import android.content.BroadcastReceiver
 import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -12,6 +15,7 @@ import com.mdp.innovation.obd_driving.R
 import android.support.v7.widget.Toolbar
 import kotlinx.android.synthetic.main.fragment_collect_data.*
 import android.support.annotation.Nullable
+import android.support.v4.content.LocalBroadcastManager
 import android.util.Log
 import com.github.anastr.speedviewlib.PointerSpeedometer
 import com.mdp.innovation.obd_driving.interactor.CollectDataInteractor
@@ -28,6 +32,8 @@ import com.mdp.innovation.obd_driving.util.Global
 import com.mdp.innovation.obd_driving.util.Message
 import com.mdp.innovation.obd_driving.util.Preferences
 import com.mdp.innovation.obd_driving_api.app.core.ConnectOBD
+import com.mdp.innovation.obd_driving_api.app.core.service.LocationUpdatesService
+import kotlinx.android.synthetic.main.activity_main_test.*
 import org.koin.android.ext.android.inject
 
 
@@ -51,6 +57,9 @@ class CollectDataFragment : BaseServiceFragment(), CollectDataView, HomeActivity
 
     var vinUpdated = false
 
+    private lateinit var myReceiver: MyReceiver
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -63,11 +72,13 @@ class CollectDataFragment : BaseServiceFragment(), CollectDataView, HomeActivity
 
     override fun onActivityCreated(@Nullable savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
+        myReceiver = MyReceiver()
         initUI()
         (activity as HomeActivity).setOnStartLiveDataListener(this)
     }
 
     override fun onPause() {
+        LocalBroadcastManager.getInstance(requireActivity()).unregisterReceiver(myReceiver)
         super.onPause()
         Global.appIsOpen = false
         (activity as HomeActivity).setOnStartLiveDataListener(null)
@@ -75,6 +86,10 @@ class CollectDataFragment : BaseServiceFragment(), CollectDataView, HomeActivity
 
     override fun onResume() {
         super.onResume()
+        LocalBroadcastManager.getInstance(requireActivity()).registerReceiver(
+            myReceiver, IntentFilter(ConnectOBD.ACTION_BROADCAST)
+        )
+
         Global.appIsOpen = true
 
         if(Global.isPendingToBack){
@@ -199,15 +214,6 @@ class CollectDataFragment : BaseServiceFragment(), CollectDataView, HomeActivity
 
     }
 
-    override fun getSpeedKm(kmh: String) {
-        Log.d("Sabee", kmh)
-        val speed = kmh.toFloat()
-        activity!!.runOnUiThread {
-            speedometer.speedTo(speed)
-        }
-
-    }
-
     override fun errorConnect(message: String){
         //hideProgress()
         //Message.toastLong(message,context)
@@ -237,4 +243,16 @@ class CollectDataFragment : BaseServiceFragment(), CollectDataView, HomeActivity
 
     }
 
+    /**
+     * Receiver for broadcasts sent by [ConnectOBD].
+     */
+    private inner class MyReceiver : BroadcastReceiver() {
+        override fun onReceive(context: Context, intent: Intent) {
+            val extras = intent.extras
+            val speed = extras.getString(ConnectOBD.EXTRA_SPEED)
+            Log.v("CollDataFrag ", " getSpeedKm: onReceive  ${speed} km/h")
+            speedometer.speedTo(speed.toFloat())
+
+        }
+    }
 }
