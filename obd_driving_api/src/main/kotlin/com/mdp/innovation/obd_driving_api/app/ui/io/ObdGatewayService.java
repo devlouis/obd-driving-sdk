@@ -19,8 +19,6 @@ import com.mdp.innovation.obd_driving_api.app.ui.activity.PairObdActivity;
 import com.mdp.innovation.obd_driving_api.app.utils.LogUtils;
 import com.mdp.innovation.obd_driving_api.commands.protocol.*;
 import com.mdp.innovation.obd_driving_api.commands.temperature.AmbientAirTemperatureCommand;
-import com.mdp.innovation.obd_driving_api.data.Broadcast.OBDRestarBroadcastReceiver;
-import com.mdp.innovation.obd_driving_api.data.IoTHub.SendDataOBD;
 import com.mdp.innovation.obd_driving_api.data.store.SharedPreference;
 import com.mdp.innovation.obd_driving_api.enums.ObdProtocols;
 import com.mdp.innovation.obd_driving_api.exceptions.UnsupportedCommandException;

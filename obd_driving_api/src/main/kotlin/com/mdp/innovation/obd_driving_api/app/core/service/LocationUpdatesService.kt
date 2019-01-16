@@ -31,7 +31,7 @@ class LocationUpdatesService : Service() {
      */
     private val CHANNEL_ID = "channel_001"
     internal val ACTION_BROADCAST = "${PACKAGE_NAME} .broadcast"
-    internal val EXTRA_LOCATION = "${PACKAGE_NAME} .location"
+    val EXTRA_LOCATION = "${PACKAGE_NAME} .location"
     private val EXTRA_STARTED_FROM_NOTIFICATION = PACKAGE_NAME.toString() + ".started_from_notification"
 
 
@@ -282,9 +282,10 @@ class LocationUpdatesService : Service() {
         ConnectOBD.stateUpdateLocation(location = location)
         mLocation = location
         // Notify anyone listening for broadcasts about the new location.
-        val intent = Intent(ACTION_BROADCAST)
+    /*    val intent = Intent(ACTION_BROADCAST)
         intent.putExtra(EXTRA_LOCATION, location)
-        LocalBroadcastManager.getInstance(applicationContext).sendBroadcast(intent)
+        LocalBroadcastManager.getInstance(applicationContext).sendBroadcast(intent)*/
+
         // Update notification content if running as a foreground service.
         //mNotificationManager.notify(NOTIFICATION_ID, getNotification())
       if (serviceIsRunningInForeground(this)) {

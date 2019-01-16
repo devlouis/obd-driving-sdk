@@ -90,7 +90,7 @@ class HomeActivity : BaseServiceActivity(), HomeView, ObdGatewayVin {
         runnable = Runnable {
 
             speed = fex[index]
-            startLiveDataInterface?.getSpeedKm(speed.toString())
+            //startLiveDataInterface?.getSpeedKm(speed.toString())
 
             increase = when(index){
                 0 -> true
@@ -129,9 +129,9 @@ class HomeActivity : BaseServiceActivity(), HomeView, ObdGatewayVin {
 
     }
 
-    override fun getSpeedKm(kmh: String) {
+/*    override fun getSpeedKm(kmh: String) {
         startLiveDataInterface?.getSpeedKm(kmh)
-    }
+    }*/
 
     override fun errorConnect(message: String, type: Int){
         /*hideProgress()
@@ -244,7 +244,6 @@ class HomeActivity : BaseServiceActivity(), HomeView, ObdGatewayVin {
     }*/
 
     interface StartLiveDataInterface {
-        fun getSpeedKm(kmh: String)
         fun errorConnect(message: String)
         fun getVin(vin: String)
     }

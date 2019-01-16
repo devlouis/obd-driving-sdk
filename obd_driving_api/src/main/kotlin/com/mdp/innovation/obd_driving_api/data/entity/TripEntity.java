@@ -27,7 +27,7 @@ public class TripEntity implements Serializable {
     private Float lon = 0.0f;
     private Float bearing = 0.0f;
     private Integer rpm = 0;
-    private Integer speed = 0;
+    private Integer speed = -1;
     private String status = "";
     private String time = "";
     private String dataUdate = "";

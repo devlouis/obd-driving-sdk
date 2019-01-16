@@ -2,15 +2,14 @@ package com.mdp.innovation.obd_driving_api.app.core
 
 import android.annotation.SuppressLint
 import android.app.Application
-import android.content.ComponentName
-import android.content.Context
-import android.content.Intent
-import android.content.ServiceConnection
+import android.content.*
 import android.location.Location
 import android.os.CountDownTimer
 import android.os.Handler
 import android.os.IBinder
+import android.support.v4.content.LocalBroadcastManager
 import android.util.Log
+import android.widget.Toast
 import com.mdp.innovation.obd_driving_api.R
 import com.mdp.innovation.obd_driving_api.app.`interface`.ObdGatewayVin
 import com.mdp.innovation.obd_driving_api.app.core.ConnectOBD.initSendDataBD
@@ -79,6 +78,10 @@ object ConnectOBD{
     val send = SendDataOBD()
 
     var statusContinueTrip = false
+
+    val PACKAGE_NAME = "com.mdp.innovation.obd_driving_api.app.core"
+    val EXTRA_SPEED = "${PACKAGE_NAME}.speed"
+    val ACTION_BROADCAST = "$PACKAGE_NAME.broadcast"
 
     //GPS Service
     private var mLocationUpdatesService : LocationUpdatesService? = null
@@ -341,7 +344,10 @@ object ConnectOBD{
                 val command = job.command as SpeedCommand
                 KMH = command.metricSpeed.toString()
                 if (contadorTotal >= 2){
-                    obdGatewayVin!!.getSpeedKm(KMH)
+                    //obdGatewayVin!!.getSpeedKm(KMH)
+                    val intent = Intent(ACTION_BROADCAST)
+                    intent.putExtra(EXTRA_SPEED, KMH)
+                    LocalBroadcastManager.getInstance(Application()).sendBroadcast(intent)
                 }
                 Log.v(TAG, " Speed: ${command.metricSpeed}")
             }
@@ -492,8 +498,6 @@ object ConnectOBD{
     fun stateUpdateLocation(location: Location) {
         LogUtils().v(TAG_BD, "New location_: ${UtilsLocationService().getLocationText(location)}")
         contadorTotalLocation++
-
-
         addToBdLocation(location)
     }
 
@@ -787,7 +791,5 @@ object ConnectOBD{
     }
 
 
-    private fun pauseService(){
 
-    }
 }
