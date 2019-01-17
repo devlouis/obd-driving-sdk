@@ -1,12 +1,17 @@
 package com.mdp.innovation.obd_driving_api.app.ui.io;
 
 import android.app.Activity;
+import android.app.Application;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
@@ -61,10 +66,24 @@ public class ObdGatewayService extends AbstractGatewayService  {
         this.context = context;
     }*/
 
+    /**
+     * Sensores
+     */
+    private SensorManager mSensorManager;
+    private Sensor mSensorAcc;
+    private Sensor mSensorGyr;
+    private Sensor mSensorMgt;
+    private SensorEventListener sensorEventListener;
+
+    private SensorEvent sensorAccelerometer;
+    private SensorEvent sensorGyroscope;
+    private SensorEvent sensorMagneticr;
+
     public void startService() throws IOException {
         Log.d(TAG, "Starting service..");
         Log.v(" OBDRestar ", " Starting service...*");
         this.activity = activity;
+        initSensor();
         // get the remote Bluetooth device
         //final String remoteDevice = prefs.getString(ConfigActivity.BLUETOOTH_LIST_KEY, null);
         appSharedPreference = new SharedPreference(this);
@@ -72,6 +91,7 @@ public class ObdGatewayService extends AbstractGatewayService  {
         final String remoteDevice = Macdevice.get(appSharedPreference.getMAC_DEVICE());
         Log.v(" OBDRestar ", " remoteDevice " + remoteDevice);
         Log.v(" remoteDevice: ", remoteDevice);
+
         if (remoteDevice == null || "".equals(remoteDevice)) {
             Toast.makeText(ctx, getString(R.string.text_bluetooth_nodevice), Toast.LENGTH_LONG).show();
 
@@ -136,6 +156,7 @@ public class ObdGatewayService extends AbstractGatewayService  {
         isRunning = true;
         try {
             sock = BluetoothManager.connect(dev);
+            startSensor();
         } catch (Exception e2) {
             Log.e(TAG, "There was an error while establishing Bluetooth connection. Stopping app..", e2);
             stopService();
@@ -252,7 +273,7 @@ public class ObdGatewayService extends AbstractGatewayService  {
                 }
                 send.sendData2();*/
                 final ObdCommandJob job2 = job;
-                ConnectOBD.stateUpdate(job2,ctx);
+                ConnectOBD.stateUpdate(job2, sensorAccelerometer ,ctx);
             }
         }
 
@@ -263,7 +284,7 @@ public class ObdGatewayService extends AbstractGatewayService  {
      */
     public void stopService() {
         Log.d(TAG, "Stopping service..");
-
+        stopSensor();
         //notificationManager.cancel(NOTIFICATION_ID);
         jobsQueue.clear();
         isRunning = false;
@@ -335,4 +356,69 @@ public class ObdGatewayService extends AbstractGatewayService  {
         ConnectOBD.startmQueue();
         return START_STICKY;
     }*/
+
+    /**
+     * OBTENER SENSORES
+     */
+    public void initSensor(){
+        /**
+         * obtener sensores para usar
+         */
+        mSensorManager = (SensorManager) ctx.getSystemService(Context.SENSOR_SERVICE);
+        mSensorAcc = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+        mSensorGyr = mSensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE);
+        mSensorMgt = mSensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
+
+        /**
+         * validar si existe sensor
+         */
+        if (mSensorAcc == null)
+            new LogUtils().v(TAG, " No se encuentra sensor de Acelerometro" );
+        if (mSensorGyr == null)
+            new LogUtils().v(TAG, " No se encuentra sensor de Giroscopio" );
+        if (mSensorMgt == null)
+            new LogUtils().v(TAG, " No se encuentra sensor de Magnetometro" );
+
+        getSensor();
+    }
+
+    private void getSensor(){
+        sensorEventListener = new SensorEventListener() {
+            @Override
+            public void onSensorChanged(SensorEvent event) {
+                switch (event.sensor.getType()){
+                    case Sensor.TYPE_ACCELEROMETER :
+                        sensorAccelerometer = event;
+                        new LogUtils().v("SENSOR ACCE", "X =" + sensorAccelerometer.values[0]);
+                        new LogUtils().v("SENSOR ACCE", "Y =" + sensorAccelerometer.values[1]);
+                        new LogUtils().v("SENSOR ACCE", "Z =" + sensorAccelerometer.values[2]);
+
+                        break;
+                    case Sensor.TYPE_GYROSCOPE :
+
+                        break;
+                    case Sensor.TYPE_MAGNETIC_FIELD :
+
+                        break;
+                }
+            }
+
+            @Override
+            public void onAccuracyChanged(Sensor sensor, int i) {
+
+            }
+        };
+
+    }
+
+    private void startSensor(){
+        mSensorManager.registerListener(sensorEventListener, mSensorAcc, SensorManager.SENSOR_DELAY_NORMAL);
+        mSensorManager.registerListener(sensorEventListener, mSensorGyr, SensorManager.SENSOR_DELAY_NORMAL);
+        mSensorManager.registerListener(sensorEventListener, mSensorMgt, SensorManager.SENSOR_DELAY_NORMAL);
+    }
+    private void stopSensor(){
+        mSensorManager.unregisterListener(sensorEventListener, mSensorAcc);
+        mSensorManager.unregisterListener(sensorEventListener, mSensorGyr);
+        mSensorManager.unregisterListener(sensorEventListener, mSensorMgt);
+    }
 }

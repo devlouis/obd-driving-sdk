@@ -23,6 +23,8 @@ public class LocationEntity implements Serializable {
     private String dataNew = "";
     private String dataUdate = "";
 
+
+
     @NonNull
     public Long getId() {
         return id;
@@ -87,6 +89,8 @@ public class LocationEntity implements Serializable {
     public void setDataUdate(String dataUdate) {
         this.dataUdate = dataUdate;
     }
+
+
 
     @Override
     public String toString() {

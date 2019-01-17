@@ -22,6 +22,13 @@ public class ObdEntity implements Serializable {
     private String dataNew = "";
     private String dataUdate = "";
 
+    /**
+     * Data Sensores*/
+    private float ax = 0.0f;
+    private float ay = 0.0f;
+    private float az = 0.0f;
+
+
     @NonNull
     public Long getId() {
         return id;
@@ -87,6 +94,30 @@ public class ObdEntity implements Serializable {
         this.dataUdate = dataUdate;
     }
 
+    public float getAx() {
+        return ax;
+    }
+
+    public void setAx(float ax) {
+        this.ax = ax;
+    }
+
+    public float getAy() {
+        return ay;
+    }
+
+    public void setAy(float ay) {
+        this.ay = ay;
+    }
+
+    public float getAz() {
+        return az;
+    }
+
+    public void setAz(float az) {
+        this.az = az;
+    }
+
     @Override
     public String toString() {
         return "ObdEntity{" +
@@ -98,6 +129,9 @@ public class ObdEntity implements Serializable {
                 ", status='" + status + '\'' +
                 ", dataNew='" + dataNew + '\'' +
                 ", dataUdate='" + dataUdate + '\'' +
+                ", ax='" + ax + '\'' +
+                ", ay='" + ay + '\'' +
+                ", az='" + az + '\'' +
                 '}';
     }
 }

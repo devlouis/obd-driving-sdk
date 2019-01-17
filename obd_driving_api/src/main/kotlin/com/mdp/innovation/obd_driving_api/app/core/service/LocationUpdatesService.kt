@@ -4,6 +4,10 @@ import android.app.*
 import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
+import android.hardware.Sensor
+import android.hardware.SensorEvent
+import android.hardware.SensorEventListener
+import android.hardware.SensorManager
 import android.location.Location
 import android.os.*
 import android.support.v4.app.NotificationCompat
@@ -76,6 +80,19 @@ class LocationUpdatesService : Service() {
 
     private var mServiceHandler: Handler? = null
 
+    /**
+     * Sensores
+     */
+    lateinit var mSensorManager : SensorManager
+    lateinit var mSensorAcc : Sensor
+    lateinit var mSensorGyr : Sensor
+    lateinit var mSensorMgt : Sensor
+    lateinit var sensorEventListener: SensorEventListener
+
+    lateinit var sensorAccelerometer: SensorEvent
+    lateinit var sensorGyroscope: SensorEvent
+    lateinit var sensorMagneticr: SensorEvent
+
     override fun onCreate() {
         super.onCreate()
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
@@ -85,6 +102,7 @@ class LocationUpdatesService : Service() {
                 onNewLocation(locationResult!!.lastLocation)
             }
         }
+
         createLocationRequest()
         getLastLocation()
 
@@ -104,8 +122,77 @@ class LocationUpdatesService : Service() {
 
     }
 
+    fun initSensor(){
+        /**
+         * obtener sensores para usar
+         */
+        mSensorManager = getSystemService(Context.SENSOR_SERVICE) as SensorManager
+        mSensorAcc = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
+        mSensorGyr = mSensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE)
+        mSensorMgt = mSensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD)
+
+        /**
+         * validar si existe sensor
+         */
+        if (mSensorAcc == null)
+            LogUtils().v(TAG, " No se encuentra sensor de Acelerometro" )
+        if (mSensorGyr == null)
+            LogUtils().v(TAG, " No se encuentra sensor de Giroscopio" )
+        if (mSensorMgt == null)
+            LogUtils().v(TAG, " No se encuentra sensor de Magnetometro" )
+
+        getSensor()
+    }
+
+    fun startSensor(){
+        mSensorManager.registerListener(sensorEventListener, mSensorAcc, SensorManager.SENSOR_DELAY_NORMAL)
+        mSensorManager.registerListener(sensorEventListener, mSensorGyr, SensorManager.SENSOR_DELAY_NORMAL)
+        mSensorManager.registerListener(sensorEventListener, mSensorMgt, SensorManager.SENSOR_DELAY_NORMAL)
+    }
+    fun stopSensor(){
+        mSensorManager.unregisterListener(sensorEventListener, mSensorAcc)
+        mSensorManager.unregisterListener(sensorEventListener, mSensorGyr)
+        mSensorManager.unregisterListener(sensorEventListener, mSensorMgt)
+    }
+
+    fun getSensor(){
+        sensorEventListener = object : SensorEventListener {
+            override fun onSensorChanged(event: SensorEvent) {
+                when(event.sensor.type){
+                    Sensor.TYPE_ACCELEROMETER -> {
+                        sensorAccelerometer = event
+                        LogUtils().v("SENSOR ACCE", "X = ${"%.6f".format(sensorAccelerometer.values[0])}")
+                        LogUtils().v("SENSOR ACCE", "Y = ${"%.6f".format(sensorAccelerometer.values[1])}")
+                        LogUtils().v("SENSOR ACCE", "Z = ${"%.6f".format(sensorAccelerometer.values[2])}")
+
+                    }
+                    Sensor.TYPE_GYROSCOPE -> {
+                        sensorGyroscope = event
+                        LogUtils().v("SENSOR GYRO", "X = ${"%.6f".format(sensorGyroscope.values[0])}")
+                        LogUtils().v("SENSOR GYRO", "Y = ${"%.6f".format(sensorGyroscope.values[1])}")
+                        LogUtils().v("SENSOR GYRO", "Z = ${"%.6f".format(sensorGyroscope.values[2])}")
+                    }
+                    Sensor.TYPE_MAGNETIC_FIELD -> {
+                        sensorMagneticr = event
+                        LogUtils().v("SENSOR MAGNE", "X = ${"%.6f".format(sensorMagneticr.values[0])}")
+                        LogUtils().v("SENSOR MAGNE", "Y = ${"%.6f".format(sensorMagneticr.values[1])}")
+                        LogUtils().v("SENSOR MAGNE", "Z = ${"%.6f".format(sensorMagneticr.values[2])}")
+                    }
+                }
+            }
+
+            override fun onAccuracyChanged(sensor: Sensor, int: Int) {
+
+            }
+        }
+
+    }
+
+
+
     fun RemoveAll(){
         removeLocationUpdates()
+        //stopSensor()
         //stopSelf()
     }
 
@@ -119,6 +206,7 @@ class LocationUpdatesService : Service() {
         // We got here because the user decided to remove location updates from the notification.
         if (startedFromNotification) {
             removeLocationUpdates()
+            //stopSensor()
             stopSelf()
         }
         return START_NOT_STICKY
@@ -182,6 +270,7 @@ class LocationUpdatesService : Service() {
             mFusedLocationClient.requestLocationUpdates(mLocationRequest,
                 mLocationCallback, Looper.myLooper()
             )
+            //startSensor()
         } catch (unlikely: SecurityException) {
             UtilsLocationService().setRequestingLocationUpdates(this, false)
             LogUtils().v(TAG, " Lost location permission. Could not request updates. $unlikely")
@@ -193,6 +282,7 @@ class LocationUpdatesService : Service() {
     fun removeLocationUpdates() {
         LogUtils().v(TAG, "Removing location updates")
         try {
+            //stopSensor()
             mFusedLocationClient.removeLocationUpdates(mLocationCallback)
             UtilsLocationService().setRequestingLocationUpdates(this, false)
             stopSelf()
@@ -261,11 +351,11 @@ class LocationUpdatesService : Service() {
                     if (task.isSuccessful && task.result != null) {
                         mLocation = task.result!!
                     } else {
-                        LogUtils().v(TAG, "Failed to get location.")
+                        LogUtils().v("BD_LOCAL", "Failed to get location.")
                     }
                 }
         } catch (unlikely: SecurityException) {
-            LogUtils().v(TAG, "Lost location permission.$unlikely")
+            LogUtils().v("BD_LOCAL", "Lost location permission.$unlikely")
         }
 
     }

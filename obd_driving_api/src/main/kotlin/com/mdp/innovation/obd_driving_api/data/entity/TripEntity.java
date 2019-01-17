@@ -31,6 +31,11 @@ public class TripEntity implements Serializable {
     private String status = "";
     private String time = "";
     private String dataUdate = "";
+    /**
+     * Data Sensores*/
+    private float ax = 0.0f;
+    private float ay = 0.0f;
+    private float az = 0.0f;
 
 
     public Long getId() {
@@ -121,6 +126,29 @@ public class TripEntity implements Serializable {
         this.dataUdate = dataUdate;
     }
 
+    public float getAx() {
+        return ax;
+    }
+
+    public void setAx(float ax) {
+        this.ax = ax;
+    }
+
+    public float getAy() {
+        return ay;
+    }
+
+    public void setAy(float ay) {
+        this.ay = ay;
+    }
+
+    public float getAz() {
+        return az;
+    }
+
+    public void setAz(float az) {
+        this.az = az;
+    }
 
     @Override
     public String toString() {
@@ -128,18 +156,21 @@ public class TripEntity implements Serializable {
                 "id=" + id +
                 ", tripId='" + tripId + '\'' +
                 ", vin='" + vin + '\'' +
-                ", lat='" + lat + '\'' +
-                ", lon='" + lon + '\'' +
-                ", bearing='" + bearing + '\'' +
-                ", rpm='" + rpm + '\'' +
-                ", speed='" + speed + '\'' +
+                ", lat=" + lat +
+                ", lon=" + lon +
+                ", bearing=" + bearing +
+                ", rpm=" + rpm +
+                ", speed=" + speed +
                 ", status='" + status + '\'' +
                 ", time='" + time + '\'' +
                 ", dataUdate='" + dataUdate + '\'' +
+                ", ax=" + ax +
+                ", ay=" + ay +
+                ", az=" + az +
                 '}';
     }
 
-    /*@Override
+/*@Override
     public String toString() {
         return "{" +
                 "'id':'" + id + "',"+

@@ -27,6 +27,7 @@ public abstract class AbstractGatewayService extends Service {
     protected NotificationManager notificationManager;
     protected Context ctx;
 
+
     protected boolean isRunning = false;
     protected Long queueCounter = 0L;
     protected BlockingQueue<ObdCommandJob> jobsQueue = new LinkedBlockingQueue<>();
