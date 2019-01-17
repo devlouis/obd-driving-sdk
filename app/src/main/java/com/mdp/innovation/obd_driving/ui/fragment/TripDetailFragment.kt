@@ -342,11 +342,18 @@ class TripDetailFragment : BaseFragment(), TripDetailView, OnMapReadyCallback {
             Log.d(TAG, ex.message)
         }
 
-        tv_duration_value.text = model.duration
-        tv_distance_value.text = model.distance
-        tv_score_value.text = scoreStr
-        tv_start_value.text = model.timeStart
-        tv_end_value.text = model.timeEnd
+        try{
+            tv_duration_value.text = model.duration
+            tv_distance_value.text = model.distance
+            tv_score_value.text = scoreStr
+            tv_start_value.text = model.timeStart
+            tv_end_value.text = model.timeEnd
+        }catch (ex: Exception){
+            Message.toastLong("Hubo un problema al cargar el viaje. Vuelva a intentarlo.", context)
+            fragmentManager!!.popBackStack()
+        }
+
+
     }
 
     private fun setEventAnimation(header: View, body: View){
