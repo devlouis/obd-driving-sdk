@@ -9,6 +9,6 @@ class DataUserModel {
     var lastName: String? = null
     var score: Float? = null
     var vin: String? = null
-
+    var token: String? = null
 
 }

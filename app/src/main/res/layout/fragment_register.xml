@@ -131,6 +131,7 @@
                     android:textColor="#FFF"
                     android:backgroundTint="#FFF"
                     android:textColorHint="#FFF"
+                    android:singleLine="true"
                     android:hint="@string/password" />
 
         </android.support.design.widget.TextInputLayout>
@@ -156,6 +157,7 @@
                     android:textColor="#FFF"
                     android:backgroundTint="#FFF"
                     android:textColorHint="#FFF"
+                    android:singleLine="true"
                     android:hint="@string/repeat_password" />
 
         </android.support.design.widget.TextInputLayout>

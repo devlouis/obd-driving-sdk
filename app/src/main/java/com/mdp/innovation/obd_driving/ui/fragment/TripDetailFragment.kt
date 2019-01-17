@@ -36,7 +36,8 @@ class TripDetailFragment : BaseFragment(), TripDetailView, OnMapReadyCallback {
     companion object {
         fun newInstance(model : ItemMyTripsModel): TripDetailFragment{
             val fragment = TripDetailFragment()
-            fragment.model = model
+                fragment.model = model
+
             return fragment
         }
     }
@@ -202,6 +203,8 @@ class TripDetailFragment : BaseFragment(), TripDetailView, OnMapReadyCallback {
     }
 
     override fun onGetTripDetailSuccess(response: TripDetailResponse) {
+
+        if(context == null) return
 
         var events = response.events
         var scores = response.scores
@@ -396,11 +399,11 @@ class TripDetailFragment : BaseFragment(), TripDetailView, OnMapReadyCallback {
     }
 
     override fun showLoading() {
-        loading.visibility = View.VISIBLE
+        if(loading != null) loading.visibility = View.VISIBLE
     }
 
     override fun hideLoading() {
-        loading.visibility = View.GONE
+        if(loading != null) loading.visibility = View.GONE
     }
 
     override fun onStop() {
@@ -412,5 +415,7 @@ class TripDetailFragment : BaseFragment(), TripDetailView, OnMapReadyCallback {
         }
         super.onStop()
     }
+
+
 
 }

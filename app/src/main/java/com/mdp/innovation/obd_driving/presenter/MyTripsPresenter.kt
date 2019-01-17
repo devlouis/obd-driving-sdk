@@ -9,17 +9,17 @@ class MyTripsPresenter(var myTripsView: MyTripsView?, val myTripsInteractor: MyT
         myTripsView = null
     }
     fun getMyTrips(vin: String, page: Int, elements: Int, showLoading: Boolean) {
-        if(showLoading) myTripsView?.showLoading()
+        if(showLoading) myTripsView!!.showLoading()
         myTripsInteractor.getMyTrips( this, vin, page, elements)
     }
 
     override fun onGetMyTripsSuccess(response: MyTripsResponse) {
-        myTripsView?.hideLoading()
-        myTripsView?.onGetMyTripsSuccess(response)
+        myTripsView!!.hideLoading()
+        myTripsView!!.onGetMyTripsSuccess(response)
     }
 
     override fun onGetMyTripsError(message: String) {
-        myTripsView?.hideLoading()
-        myTripsView?.onGetMyTripsError(message)
+        myTripsView!!.hideLoading()
+        myTripsView!!.onGetMyTripsError(message)
     }
 }

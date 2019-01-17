@@ -20,12 +20,12 @@ class LoginInteractor {
         fun onGetLoginError(message: String)
     }
 
-    fun getLogin(listener: OnLoginFinishedListener, username: String, password: String) {
+    fun getLogin(listener: OnLoginFinishedListener, username: String, password: String, token: String) {
 
         doAsync{
 
             val service = WSService()
-            val call = service.getLogin(username, password)
+            val call = service.getLogin(username, password, token)
             uiThread{
                 call.enqueue(object : Callback<LoginResponse> {
                     override fun onResponse(call: Call<LoginResponse>, response: Response<LoginResponse>) {

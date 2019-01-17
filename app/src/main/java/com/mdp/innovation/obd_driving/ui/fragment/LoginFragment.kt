@@ -44,13 +44,22 @@ class LoginFragment : BaseFragment(), LoginView {
     private val preferences by inject<Preferences>()
     private val presenter = LoginPresenter(this, LoginInteractor())
 
+    lateinit var firebaseToken: String
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        /*FirebaseInstanceId.getInstance().instanceId.addOnCompleteListener(object : OnCompleteListener<InstanceIdResult> {
+        FirebaseInstanceId.getInstance().instanceId.addOnCompleteListener(object : OnCompleteListener<InstanceIdResult> {
             override fun onComplete(task: Task<InstanceIdResult>) {
                 if (!task.isSuccessful) {
-                    Log.w(TAG, "getInstanceId failed", task.exception)
+
+                    var message = if(task.exception != null){
+                        "getInstanceId failed: " + task.exception!!.message
+                    }else{
+                        "getInstanceId failed: No error to show"
+                    }
+                    Log.w(TAG, message, task.exception)
+                    Message.toastLong(message, context)
                     return
                 }
 
@@ -59,9 +68,10 @@ class LoginFragment : BaseFragment(), LoginView {
 
                 // Log and toast
                 Log.d(TAG, token)
-                Message.toastLong(token, context)
+                //Message.toastLong(token, context)
+                firebaseToken = token
             }
-        })*/
+        })
 
 
 
@@ -86,7 +96,7 @@ class LoginFragment : BaseFragment(), LoginView {
     private fun initUI(){
 
         if(preferences.getDataUser(context) != null){
-            navigator.navigateToMain(activity)
+            navigator.navigateToHome(activity)
             activity!!.finish()
             return
         }
@@ -95,10 +105,10 @@ class LoginFragment : BaseFragment(), LoginView {
             Log.d(TAG, "CLickkkkkkkk")
 
             if(validate()){
-                val username = et_username.text.toString()
-                val password = et_password.text.toString()
+                val username = et_username.text.toString().trim()
+                val password = et_password.text.toString().trim()
 
-                presenter.getLogin(username, password)
+                presenter.getLogin(username, password, firebaseToken)
             }
 
         }
@@ -149,6 +159,7 @@ class LoginFragment : BaseFragment(), LoginView {
         dataUser.lastName = response.data.lastName
         dataUser.score = response.data.score
         dataUser.vin = response.data.vin
+        dataUser.token = firebaseToken
 
         var myScore = "-"
         try{
@@ -158,7 +169,7 @@ class LoginFragment : BaseFragment(), LoginView {
         preferences.setDataUser(context, dataUser)
         preferences.setMyScore(context, myScore)
 
-        navigator.navigateToMain(activity)
+        navigator.navigateToHome(activity)
         activity!!.finish()
 
     }

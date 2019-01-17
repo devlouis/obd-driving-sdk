@@ -11,9 +11,9 @@ class LoginPresenter(var myTripsView: LoginView?, val loginInteractor: LoginInte
     fun onDestroy() {
         myTripsView = null
     }
-    fun getLogin(username: String, password: String) {
+    fun getLogin(username: String, password: String, token: String) {
         myTripsView?.showLoading()
-        loginInteractor.getLogin( this, username, password)
+        loginInteractor.getLogin( this, username, password, token)
     }
 
     override fun onGetLoginSuccess(response: LoginResponse) {

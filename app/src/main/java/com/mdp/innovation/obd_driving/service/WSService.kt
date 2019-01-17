@@ -69,8 +69,8 @@ class WSService {
         return service!!.getTripDetail(request)
     }
 
-    fun getLogin(username: String, password: String) : Call<LoginResponse>{
-        var request = LoginRequest(username, password)
+    fun getLogin(username: String, password: String, token: String) : Call<LoginResponse>{
+        var request = LoginRequest(username, password, token)
         val retrofit = getRetrofit(WS_URL_SCORE)
 
         val service: ApiRetrofit? = retrofit.create(ApiRetrofit::class.java)

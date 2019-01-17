@@ -5,6 +5,7 @@ import android.support.annotation.IdRes
 import android.app.Activity
 import android.content.Intent
 import com.mdp.innovation.obd_driving.model.ItemMyTripsModel
+import com.mdp.innovation.obd_driving.ui.activity.HomeActivity
 import com.mdp.innovation.obd_driving.ui.activity.InitialActivity
 import com.mdp.innovation.obd_driving.ui.activity.MainActivity
 import com.mdp.innovation.obd_driving.ui.fragment.*
@@ -62,6 +63,13 @@ class Navigator {
     fun navigateToMain(activity: Activity?) {
         if (activity != null) {
             var intent = Intent(activity, MainActivity::class.java)
+            //intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            activity.startActivity(intent)
+        }
+    }
+    fun navigateToHome(activity: Activity?) {
+        if (activity != null) {
+            var intent = Intent(activity, HomeActivity::class.java)
             //intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
             activity.startActivity(intent)
         }

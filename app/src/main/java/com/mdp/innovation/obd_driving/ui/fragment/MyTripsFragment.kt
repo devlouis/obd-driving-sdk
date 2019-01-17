@@ -208,11 +208,11 @@ class MyTripsFragment : BaseFragment(), MyTripsView {
     }
 
     override fun showLoading() {
-        loading.visibility = View.VISIBLE
+        if(loading != null) loading.visibility = View.VISIBLE
     }
 
     override fun hideLoading() {
-        loading.visibility = View.GONE
+        if(loading != null) loading.visibility = View.GONE
     }
 
 

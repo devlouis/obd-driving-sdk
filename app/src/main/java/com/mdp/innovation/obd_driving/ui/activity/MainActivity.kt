@@ -24,7 +24,7 @@ import android.Manifest.permission.ACCESS_FINE_LOCATION
 import android.content.pm.PackageManager
 import android.os.Build
 import android.support.v4.content.ContextCompat
-
+import com.mdp.innovation.obd_driving.ui.fragment.LogoutDialogFragment
 
 
 class MainActivity : BaseAppCompat(),MainView {
@@ -53,6 +53,11 @@ class MainActivity : BaseAppCompat(),MainView {
                 nextActivity(PairObdActivity::class.java, true)
                 it.isEnabled = true
             }, 100L)
+        }
+
+        btn_close.setOnClickListener {
+            var dialog = LogoutDialogFragment.newInstance()
+            dialog.show(supportFragmentManager,"logout")
         }
 
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
