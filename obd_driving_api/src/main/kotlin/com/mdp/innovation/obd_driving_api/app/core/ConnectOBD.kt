@@ -100,7 +100,7 @@ object ConnectOBD{
         appSharedPreference = SharedPreference(context)
         macDevice = appSharedPreference.getMacBluetooth()[appSharedPreference.MAC_DEVICE]!!
         VIN =  appSharedPreference.getVinCar()[appSharedPreference.VIN_CAR]!!
-        Handler().postDelayed(initClientIotHub, 2000)
+        //Handler().postDelayed(initClientIotHub, 5500)
         //send.sendDataJsonString("")
         LogUtils().v(TAG, " macDevice:: $macDevice")
         LogUtils().v(TAG, " obdGatewayVin:: $obdGatewayVin")
@@ -109,11 +109,7 @@ object ConnectOBD{
 
     }
 
-    private val initClientIotHub = object : Runnable {
-        override fun run() {
-            send.InitClient()
-        }
-    }
+    private val initClientIotHub = Runnable { send.InitClient() }
 
     /**
      * Verificar si la mac del OBD esta guardado.
@@ -129,6 +125,8 @@ object ConnectOBD{
         /**
          *
          */
+        Handler().postDelayed(initClientIotHub, 100)
+
         contadorTotal = 0
 
         limit = 0
@@ -154,6 +152,8 @@ object ConnectOBD{
         }else{
             obdGatewayVin!!.errorConnect(context!!.getString(R.string.mac_bluetooh_empty), OBD_NO_PAIRED)
         }
+
+        UtilsNetwork().isOnline(context!!)
     }
 
     fun stopLiveData(){
