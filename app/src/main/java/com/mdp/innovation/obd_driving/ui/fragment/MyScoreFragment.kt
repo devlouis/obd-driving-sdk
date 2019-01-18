@@ -28,6 +28,7 @@ import org.koin.android.ext.android.inject
 import com.mdp.innovation.obd_driving.util.Global
 import com.mdp.innovation.obd_driving.util.Preferences
 import com.mdp.innovation.obd_driving_api.app.core.ConnectOBD
+import com.mdp.innovation.obd_driving_api.app.utils.LogUtils
 import java.lang.Exception
 
 
@@ -207,9 +208,13 @@ class MyScoreFragment : BaseServiceFragment(), MyScoreView, HomeActivity.StartLi
     private fun initUI(){
 
         if(showScorePending) showScorePendingProgress()
+        LogUtils().v("BD_LOCAL", " ${ConnectOBD.CheckConecction()}####################################")
 
-        if(ConnectOBD.CheckConecction() && appFirstStart){
+    /*    if(appFirstStart){
+            navigator.navigateToCollectData(fragmentManager, R.id.content)
+        }*/
 
+        if(ConnectOBD.CheckConecction()){
             navigator.navigateToCollectData(fragmentManager, R.id.content)
         }
 

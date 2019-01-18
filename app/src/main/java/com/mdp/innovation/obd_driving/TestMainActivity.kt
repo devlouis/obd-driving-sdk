@@ -135,31 +135,6 @@ class TestMainActivity : BaseAppCompat(), ObdGatewayVin {
         super.onDestroy()
     }
 
-    /**
-     * GPS
-     */
-    // Monitors the state of the connection to the service.
-    private val mServiceConnection = object : ServiceConnection {
-
-        override fun onServiceConnected(name: ComponentName, binder: IBinder) {
-            // val binder = service as LocationUpdatesService.LocalBinder
-            val binder = binder as LocationUpdatesService.LocalBinder
-            //mLocationUpdatesService = (binder as LocationUpdatesService.LocalBinder).service
-            mLocationUpdatesService = binder.service
-            mLocationUpdatesService!!.requestLocationUpdates()
-
-/*            val binder = service as LocationUpdatesService.LocalBinder
-            mLocationUpdatesService = binder.service
-            mLocationUpdatesService!!.requestLocationUpdates()*/
-
-            isServiceBoundLocation = true
-        }
-
-        override fun onServiceDisconnected(name: ComponentName) {
-            mLocationUpdatesService = null
-            isServiceBoundLocation = false
-        }
-    }
 
     override fun onStart() {
         super.onStart()
