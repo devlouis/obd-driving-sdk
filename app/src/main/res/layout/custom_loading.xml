@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/black_transparent"
+        android:id="@+id/rlaCargando"
+        android:elevation="20dp"
+        android:clickable="true">
+
+    <LinearLayout
+            android:layout_width="250dp"
+            android:layout_height="wrap_content"
+            android:padding="10dp"
+            android:background="@drawable/custom_border_loading"
+            android:orientation="vertical"
+            android:layout_centerVertical="true"
+            android:layout_centerHorizontal="true">
+
+
+        <ProgressBar
+                android:visibility="visible"
+                android:layout_margin="4dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_gravity="center_horizontal" />
+
+
+        <TextView
+                android:id="@+id/tviIsotipo"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_below="@+id/tviTitle"
+                android:layout_centerHorizontal="true"
+                android:layout_gravity="center_vertical"
+                android:layout_toEndOf="@+id/pbaCargando"
+                android:layout_toRightOf="@+id/pbaCargando"
+                android:gravity="center|top"
+                android:padding="5dp"
+                android:text="Un momento por favor."
+                android:textColor="@color/black" />
+
+    </LinearLayout>
+
+</RelativeLayout>

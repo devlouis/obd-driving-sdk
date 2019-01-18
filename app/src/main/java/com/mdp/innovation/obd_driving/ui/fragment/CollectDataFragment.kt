@@ -140,6 +140,9 @@ class CollectDataFragment : BaseServiceFragment(), CollectDataView, HomeActivity
 
         btnEndTrip.setOnClickListener {
             //nextActivity(PairObdActivity::class.java, true)
+            vLoading.visibility = View.VISIBLE
+            ConnectOBD.stopLiveData()
+
             it.isEnabled = false
             it.postDelayed({
 
@@ -148,11 +151,12 @@ class CollectDataFragment : BaseServiceFragment(), CollectDataView, HomeActivity
                 //stopCollectDataService()
                 MyScoreFragment.appFirstStart = false
                 fragmentManager?.popBackStack()
-                ConnectOBD.stopLiveData()
+
 
 
                 it.isEnabled = true
-            }, 100L)
+                vLoading.visibility = View.GONE
+            }, 2000)
         }
 
     }

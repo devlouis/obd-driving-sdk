@@ -160,6 +160,7 @@ object ConnectOBD{
 
         statusTrip = "2"
         Handler().postDelayed({
+            LogUtils().v(TAG_BD, "######################### POST 1.5 SEG ######################################")
             doUnbindService()
             mLocationUpdatesService!!.removeLocationUpdates()
             /**
@@ -167,8 +168,10 @@ object ConnectOBD{
              * @param mSyncronizarBDtoIothub remuevo el handler
              */
             handler.removeCallbacks(mSyncronizarBDtoIothub)
-            getAllTrip()
-        }, 1000)
+
+            Handler().postDelayed({ getAllOBD() },1000)
+
+        }, 1500)
     }
 
     fun stopLiveDataforError(){
@@ -232,6 +235,7 @@ object ConnectOBD{
             Log.d(TAG, "onServiceConnected")
             try {
                 service!!.startService()
+                mLocationUpdatesService!!.requestLocationUpdates()
            /*     Log.d(TAG_BD, " isServiceBoundLocation: ${isServiceBoundLocation}")
                 if (!isServiceBoundLocation){
                     LogUtils().v(TAG, " Binding LOCATION Service")
@@ -277,6 +281,12 @@ object ConnectOBD{
 
     private fun doBindService(){
 
+        if (!isServiceBoundLocation){
+            LogUtils().v(TAG, " Binding LOCATION Service")
+            context!!.bindService(Intent(context!!.applicationContext, LocationUpdatesService::class.java), mServiceConnection, Context.BIND_AUTO_CREATE)
+        }
+
+
         if (!isServiceBound) {
             LogUtils().v(TAG, "Binding OBD service..")
             if (preRequisites) {
@@ -286,11 +296,7 @@ object ConnectOBD{
             }
         }
 
-     /*   if (!isServiceBoundLocation){
-            LogUtils().v(TAG, " Binding LOCATION Service")
-            context!!.bindService(Intent(context!!.applicationContext, LocationUpdatesService::class.java), mServiceConnection, Context.BIND_AUTO_CREATE)
 
-        }*/
     }
 
       fun doUnbindService() {
@@ -382,14 +388,8 @@ object ConnectOBD{
                     initSendDataBD = true
                     firstSend = true
                     Log.d(TAG_BD, " isServiceBoundLocation: ${isServiceBoundLocation}")
-                    if (!isServiceBoundLocation){
-                        LogUtils().v(TAG, " Binding LOCATION Service")
-                        context!!.bindService(Intent(context!!.applicationContext, LocationUpdatesService::class.java), mServiceConnection, Context.BIND_AUTO_CREATE)
-                        //else
 
-                    }else{
-                        mLocationUpdatesService!!.requestLocationUpdates()
-                    }
+
 
                 }else{
                     if (statusTrip != "2")
@@ -401,6 +401,7 @@ object ConnectOBD{
         }
         Log.v(TAG, " contador $contador")
             if (contador == 3) {
+                contador = 0
                 contadorTotal++
                 /**
                  * Inicia el envio de dato BD Local
@@ -412,7 +413,7 @@ object ConnectOBD{
                     LogUtils().v(TAG_GET, " GET OBD: ${currentDateandTimeFull} :: ${RPM},${KMH} ")
                     addToBdObd(VIN, RPM, KMH, contadorTotal)
                 }
-                contador = 0
+
             }
 
 
@@ -544,11 +545,15 @@ object ConnectOBD{
     // Monitors the state of the connection to the service.
     private val mServiceConnection = object : ServiceConnection {
 
-        override fun onServiceConnected(name: ComponentName, binder: IBinder) {
+        override fun onServiceConnected(name: ComponentName, service: IBinder) {
             //val binder = binder as LocationUpdatesService.LocalBinder
-            mLocationUpdatesService = (binder as LocationUpdatesService.LocalBinder).service
-            mLocationUpdatesService!!.requestLocationUpdates()
+           /* mLocationUpdatesService = (binder as LocationUpdatesService.LocalBinder).service
+            mLocationUpdatesService!!.requestLocationUpdates()*/
+
+            val binder = service as LocationUpdatesService.LocalBinder
+            mLocationUpdatesService = binder.service
             isServiceBoundLocation = true
+
         }
 
         override fun onServiceDisconnected(name: ComponentName) {
@@ -763,7 +768,9 @@ object ConnectOBD{
                 count = tripEntityList.size
                 LogUtils().v(TAG_BD, " Datos restantes : ${count}")
                 LogUtils().v(TAG_BD, " Datos tripEntityList : ${tripEntityList.toString()}")
-                getAllOBD()
+                LogUtils().v(TAG_BD, " Datos tripEntityList ultimo: ${tripEntityList[count-1]}")
+                Toast.makeText(context, "ULTIMO STATUS ${tripEntityList[count-1].status} -- HORA ${tripEntityList[count-1].time}", Toast.LENGTH_LONG).show()
+                //getAllOBD()
             }
             override fun onFailure(e: Exception?) {
 
@@ -807,7 +814,7 @@ object ConnectOBD{
                 LocationRepository(Application()).deleteFirstLocation(locationEntityList.size)
                 LogUtils().v(TAG_BD, "SE BORRO LOS ${locationEntityList.size} DEL OBD...")
                 LogUtils().v(TAG_BD, "######################### F I N   U L T I M A ######################################")
-
+                getAllTrip()
                 /**
                  * Enviar a IoTHub
                  */
