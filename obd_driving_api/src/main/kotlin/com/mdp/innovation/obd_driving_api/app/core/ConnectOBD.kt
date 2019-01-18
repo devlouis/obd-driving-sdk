@@ -146,6 +146,7 @@ object ConnectOBD{
         Log.d(TAG, "Starting live data...")
         this.obdGatewayVin = mObdGatewayVin
         if (macDevice.isNotEmpty()) {
+            appSharedPreference.saveIdTrip(generateIDTrip())
             doBindService()
             // start command execution
             Handler().post(mQueueCommands)
