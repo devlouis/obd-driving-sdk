@@ -13,8 +13,8 @@
     <string name="subtitle_start_trip">Para empezar un nuevo viaje, presiona el botón INICIAR VIAJE.</string>
     <string name="subtitle_end_trip">Para finalizar el viaje, presiona el botón TERMINAR VIAJE.</string>
     <string name="btn_connect">CONECTAR</string>
-    <string name="btn_start_trip">INICIAR VIAJE</string>
-    <string name="btn_end_trip">TERMINAR VIAJE</string>
+    <string name="btn_start_trip">INICIAR\nVIAJE</string>
+    <string name="btn_end_trip">TERMINAR\nVIAJE</string>
     <string name="alert">Alerta</string>
     <string name="notice">Atención</string>
     <string name="alert_cancel_collect">¿Estás seguro que deseas finalizar tu viaje?.</string>

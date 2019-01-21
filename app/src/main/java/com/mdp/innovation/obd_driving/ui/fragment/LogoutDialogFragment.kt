@@ -7,10 +7,12 @@ import android.view.ViewGroup
 
 import com.mdp.innovation.obd_driving.R
 import android.support.annotation.Nullable
+import com.google.firebase.iid.FirebaseInstanceId
 import com.mdp.innovation.obd_driving.ui.navigation.Navigator
 import com.mdp.innovation.obd_driving.util.CustomAnimate
 import com.mdp.innovation.obd_driving.util.Preferences
 import kotlinx.android.synthetic.main.fragment_dialog_cancel_collect.*
+import org.jetbrains.anko.doAsync
 import org.koin.android.ext.android.inject
 
 
@@ -47,6 +49,10 @@ class LogoutDialogFragment : BaseDialogFragment() {
             it.isEnabled = false
             it.postDelayed({
                 dismiss()
+
+                doAsync {
+                    FirebaseInstanceId.getInstance().deleteInstanceId()
+                }
 
                 preferences.removeAll(context)
                 navigator.navigateToInitial(activity)

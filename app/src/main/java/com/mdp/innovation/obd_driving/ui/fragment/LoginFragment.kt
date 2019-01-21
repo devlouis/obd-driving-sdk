@@ -9,7 +9,6 @@ import com.mdp.innovation.obd_driving.R
 import android.support.annotation.Nullable
 import android.text.method.PasswordTransformationMethod
 import android.util.Log
-import com.crashlytics.android.Crashlytics
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.iid.FirebaseInstanceId
 import com.google.firebase.iid.InstanceIdResult
@@ -24,12 +23,7 @@ import com.mdp.innovation.obd_driving.util.Preferences
 import kotlinx.android.synthetic.main.fragment_login.*
 import org.koin.android.ext.android.inject
 import java.lang.Exception
-import android.widget.Toast
-import com.mdp.innovation.obd_driving.ui.activity.MainActivity
-import com.google.firebase.internal.FirebaseAppHelper.getToken
-import android.support.annotation.NonNull
 import com.google.android.gms.tasks.Task
-import org.jetbrains.anko.doAsync
 
 
 class LoginFragment : BaseFragment(), LoginView {

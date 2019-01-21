@@ -112,7 +112,7 @@ class CollectDataFragment : BaseServiceFragment(), CollectDataView, HomeActivity
 
     private fun initUI(){
         val toolbar = includeToolbar as Toolbar
-        toolbar.title = "Procesando..."
+        toolbar.title = "Viaje en proceso..."
         toolbar.setNavigationIcon(R.drawable.ic_arrow_back)
 
         val myVIN = preferences.getVIN(context)

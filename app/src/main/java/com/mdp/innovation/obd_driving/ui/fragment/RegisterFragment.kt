@@ -107,7 +107,7 @@ class RegisterFragment : BaseFragment(), RegisterView {
                 }else{
                     et_email_layout.isErrorEnabled = false
 
-                    if(!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()){
+                    if(!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches() || email.contains(" ")){
                         et_email_layout.isErrorEnabled = true
                         et_email_layout.error = resources.getString(R.string.message_email_valid)
                         et_email_layout.requestFocus()
