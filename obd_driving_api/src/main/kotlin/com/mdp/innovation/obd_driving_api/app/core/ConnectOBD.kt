@@ -80,7 +80,7 @@ object ConnectOBD{
     var handler = Handler()
     private var macDevice = ""
     var VIN = ""
-    val send = SendDataOBD()
+    val sendDataOBD = SendDataOBD()
 
     var statusContinueTrip = false
 
@@ -113,7 +113,7 @@ object ConnectOBD{
 
     }
 
-    private val initClientIotHub = Runnable { send.InitClient() }
+    private val initClientIotHub = Runnable { sendDataOBD.InitClient() }
 
     /**
      * Verificar si la mac del OBD esta guardado.
@@ -457,7 +457,7 @@ object ConnectOBD{
 
         val obdEntity = ObdEntity()
         obdEntity.userId = USER_ID
-        obdEntity.id_trip = send.getIDTrip(context, vin)
+        obdEntity.id_trip = sendDataOBD.getIDTrip(context, vin)
         obdEntity.vin = vin
         obdEntity.kmh = kmh
         obdEntity.rpm = rpm
@@ -483,7 +483,7 @@ object ConnectOBD{
 
         val locationEntity = LocationEntity()
         locationEntity.userId = USER_ID
-        locationEntity.id_trip = send.getIDTrip(context, VIN)
+        locationEntity.id_trip = sendDataOBD.getIDTrip(context, VIN)
         locationEntity.longitud = location.longitude.toString()
         locationEntity.latitudd = location.latitude.toString()
         locationEntity.bearing = location.bearing.toString()
@@ -785,7 +785,7 @@ object ConnectOBD{
                         LogUtils().v(TAG_BD, " CHANGE ${tripEntityList[tripEntityList.size-1].toString()}")
                     }
 
-                    send.sendDataJsonString(JSONUtils.generateJSONArray(tripEntityList).toString())
+                    sendDataOBD.sendDataJsonString(JSONUtils.generateJSONArray(tripEntityList).toString())
                     getAllTrip()
                 }
             }
