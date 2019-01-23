@@ -16,6 +16,7 @@ import android.support.v7.widget.Toolbar
 import kotlinx.android.synthetic.main.fragment_collect_data.*
 import android.support.annotation.Nullable
 import android.support.v4.content.LocalBroadcastManager
+import android.support.v7.app.AlertDialog
 import android.util.Log
 import com.github.anastr.speedviewlib.PointerSpeedometer
 import com.mdp.innovation.obd_driving.interactor.CollectDataInteractor
@@ -33,7 +34,9 @@ import com.mdp.innovation.obd_driving.util.Message
 import com.mdp.innovation.obd_driving.util.Preferences
 import com.mdp.innovation.obd_driving_api.app.core.ConnectOBD
 import com.mdp.innovation.obd_driving_api.app.core.service.LocationUpdatesService
+import com.mdp.innovation.obd_driving_api.app.utils.LogUtils
 import kotlinx.android.synthetic.main.activity_main_test.*
+import kotlinx.android.synthetic.main.custom_loading.*
 import org.koin.android.ext.android.inject
 
 
@@ -218,19 +221,6 @@ class CollectDataFragment : BaseServiceFragment(), CollectDataView, HomeActivity
 
     }
 
-    override fun errorConnect(message: String){
-        //hideProgress()
-        //Message.toastLong(message,context)
-
-        Log.i("[INFO]","ACTIVITY errorConnect: $message")
-        if(activity != null){
-            activity!!.runOnUiThread {
-                //hideProgress()
-                Message.toastLong(message,context)
-            }
-        }
-    }
-
     override fun onUpdateVinSuccess(response: UpdateVinResponse) {
 
     }
@@ -250,13 +240,73 @@ class CollectDataFragment : BaseServiceFragment(), CollectDataView, HomeActivity
     /**
      * Receiver for broadcasts sent by [ConnectOBD].
      */
+    val OBD_LOST = 404
+    val OBD_ERROR = 401
+    val OBD_NO_PAIRED = 301
     private inner class MyReceiver : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
             val extras = intent.extras
             val speed = extras.getString(ConnectOBD.EXTRA_SPEED)
-            Log.v("CollDataFrag ", " getSpeedKm: onReceive  ${speed} km/h")
-            speedometer.speedTo(speed.toFloat())
+            val typeError = extras.getInt(ConnectOBD.EXTRA_ERROR_TYPE)
+            val messageError = extras.getString(ConnectOBD.EXTRA_ERROR_MSG)
 
+            if (speed.isNotEmpty()){
+                LogUtils().v("CollDataFrag ", " getSpeedKm: onReceive  ${speed} km/h")
+                speedometer.speedTo(speed.toFloat())
+            }else if (typeError != 0){
+                when (typeError) {
+                    /**
+                     * Se dejo de recibir informacion de OBD
+                     */
+                    OBD_LOST -> {
+                        //showDialodAlert("${messageError} - 5 seg espera")
+                        LogUtils().v("CollDataFrag ", " errorConnect: ${messageError} - 5 seg espera")
+
+                        vLoading.visibility = View.VISIBLE
+                        tviIsotipo.text = "Se detecto que al auto se apago...\n" +
+                                         "Un momento por favor"
+                        btnEndTrip.isEnabled = false
+                        Handler().postDelayed({
+                            Global.cancelValidated = true
+                            Global.tripIsEnded = true
+                            MyScoreFragment.appFirstStart = false
+                            fragmentManager?.popBackStack()
+                            btnEndTrip.isEnabled = true
+                            vLoading.visibility = View.GONE
+                        }, 2000)
+
+                    }
+                    OBD_ERROR -> {
+                        LogUtils().v("CollDataFrag ", " errorConnect: $messageError")
+                        //Message.toastLong(messageError,context)
+                        showDialodAlert("${messageError}")
+                    }
+                    OBD_NO_PAIRED -> {
+                        LogUtils().v("CollDataFrag ", " errorConnect: $messageError")
+                        //Message.toastLong(messageError,context)
+                        showDialodAlert("${messageError}")
+                    }
+                    else -> {
+                        showDialodAlert("${messageError}")
+                    }
+                }
+            }
         }
     }
+
+
+    private fun showDialodAlert(msg: String) {
+        val builderAlertDialog = AlertDialog.Builder(requireActivity())
+        builderAlertDialog.setTitle("Driving OBD")
+        builderAlertDialog.setMessage(msg)
+        builderAlertDialog.setPositiveButton("Ok") { dialog, which ->
+            dialog.dismiss()
+        }
+        var dialog = builderAlertDialog.create()
+        dialog.show()
+    }
+
+
+
+
 }

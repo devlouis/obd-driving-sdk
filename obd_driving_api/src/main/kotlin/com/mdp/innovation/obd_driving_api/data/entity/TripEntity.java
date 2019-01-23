@@ -20,7 +20,7 @@ public class TripEntity implements Serializable {
     @NonNull
     @ColumnInfo(name = "id")
     private Long id;
-
+    private String userId = "";
     private String tripId = "";
     private String vin = "";
     private Float lat = 0.0f;
@@ -44,6 +44,14 @@ public class TripEntity implements Serializable {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
     }
 
     public String getTripId() {
@@ -154,6 +162,7 @@ public class TripEntity implements Serializable {
     public String toString() {
         return "TripEntity{" +
                 "id=" + id +
+                ", userId='" + userId + '\'' +
                 ", tripId='" + tripId + '\'' +
                 ", vin='" + vin + '\'' +
                 ", lat=" + lat +
@@ -170,7 +179,7 @@ public class TripEntity implements Serializable {
                 '}';
     }
 
-/*@Override
+    /*@Override
     public String toString() {
         return "{" +
                 "'id':'" + id + "',"+

@@ -84,7 +84,7 @@ class TestMainActivity : BaseAppCompat(), ObdGatewayVin {
 
         button.setOnClickListener {
             if (!ConnectOBD.CheckConecction())
-                ConnectOBD.startLiveData(this)
+                ConnectOBD.startLiveData(this,"5c460df4387a710934beb1e7")
             else
                 ConnectOBD.stopLiveData()
 
@@ -170,34 +170,6 @@ class TestMainActivity : BaseAppCompat(), ObdGatewayVin {
     val OBD_LOST = 404
     val OBD_ERROR = 401
     val OBD_NO_PAIRED = 301
-    override fun errorConnect(message: String, type: Int) {
-
-        //ConnectOBD.doUnbindService()
-        runOnUiThread {
-
-            when (type) {
-                /**
-                 * Se dejo de recibir informacion de OBD
-                 */
-                OBD_LOST -> {
-                    showDialodAlert("${message} - 5 seg espera")
-                    Log.v(TAG, " errorConnect: ${message} - 5 seg espera")
-                }
-                OBD_ERROR -> {
-                    Log.v(TAG, " errorConnect: $message")
-                }
-                OBD_NO_PAIRED -> {
-                    Log.v(TAG, " errorConnect: $message")
-                }
-                else -> {
-                    showDialodAlert("${message}")
-                }
-            }
-
-        }
-
-    }
-
     override fun onResume() {
         super.onResume()
         LocalBroadcastManager.getInstance(this).registerReceiver(
@@ -304,8 +276,37 @@ class TestMainActivity : BaseAppCompat(), ObdGatewayVin {
         override fun onReceive(context: Context, intent: Intent) {
             val extras = intent.extras
             val speed = extras.getString(ConnectOBD.EXTRA_SPEED)
-            Log.v(TAG, " getSpeedKm: onReceive  ${speed} km/h")
-            tviSpeed.text = "${speed} ::: km/h"
+            val typeError = extras.getInt(ConnectOBD.EXTRA_ERROR_TYPE)
+            val messageError = extras.getString(ConnectOBD.EXTRA_ERROR_MSG)
+
+            if (speed.isNotEmpty()){
+                Log.v(TAG, " getSpeedKm: onReceive  ${speed} km/h")
+                tviSpeed.text = "${speed} ::: km/h"
+            }else if (typeError != 0){
+                when (typeError) {
+                    /**
+                     * Se dejo de recibir informacion de OBD
+                     */
+                    OBD_LOST -> {
+                        showDialodAlert("${messageError} - 5 seg espera")
+                        LogUtils().v("CollDataFrag ", " errorConnect: ${messageError} - 5 seg espera")
+                    }
+                    OBD_ERROR -> {
+                        LogUtils().v("CollDataFrag ", " errorConnect: $messageError")
+                        //Message.toastLong(messageError,context)
+                        showDialodAlert("${messageError}")
+                    }
+                    OBD_NO_PAIRED -> {
+                        LogUtils().v("CollDataFrag ", " errorConnect: $messageError")
+                        //Message.toastLong(messageError,context)
+                        showDialodAlert("${messageError}")
+                    }
+                    else -> {
+                        showDialodAlert("${messageError}")
+                    }
+                }
+            }
+
         }
     }
 

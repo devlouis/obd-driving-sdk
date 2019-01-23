@@ -16,7 +16,6 @@ import android.util.Log
 import android.widget.Toast
 import com.mdp.innovation.obd_driving_api.R
 import com.mdp.innovation.obd_driving_api.app.`interface`.ObdGatewayVin
-import com.mdp.innovation.obd_driving_api.app.core.ConnectOBD.initSendDataBD
 import com.mdp.innovation.obd_driving_api.app.core.service.LocationUpdatesService
 import com.mdp.innovation.obd_driving_api.app.ui.config.ObdConfig
 import com.mdp.innovation.obd_driving_api.app.ui.io.*
@@ -54,6 +53,8 @@ object ConnectOBD{
     val OBD_ERROR = 401
     val OBD_NO_PAIRED = 301
 
+    var USER_ID = ""
+
     private var service: AbstractGatewayService? = null
     private var isServiceBound: Boolean = false
     var isServiceBoundLocation: Boolean = false
@@ -68,7 +69,7 @@ object ConnectOBD{
 
     var contadorTotal = 0
     var initSendDataBD = false
-    var firstSend = false
+
     var contadorTotalLocation = 0
     var contador = 0
     var RPM = ""
@@ -85,7 +86,10 @@ object ConnectOBD{
 
     val PACKAGE_NAME = "com.mdp.innovation.obd_driving_api.app.core"
     val EXTRA_SPEED = "${PACKAGE_NAME}.speed"
+    val EXTRA_ERROR_TYPE = "${PACKAGE_NAME}.error"
+    val EXTRA_ERROR_MSG = "${PACKAGE_NAME}.message"
     val ACTION_BROADCAST = "$PACKAGE_NAME.broadcast"
+    var OBD_DISCONNECT = false
 
     //GPS Service
     private var mLocationUpdatesService : LocationUpdatesService? = null
@@ -121,10 +125,11 @@ object ConnectOBD{
         return Result(macDevice.isNotEmpty(), macDevice)
     }
 
-    fun startLiveData(mObdGatewayVin: ObdGatewayVin) {
+    fun startLiveData(mObdGatewayVin: ObdGatewayVin, idUser: String) {
         /**
          *
          */
+        USER_ID = idUser
         Handler().postDelayed(initClientIotHub, 100)
 
         contadorTotal = 0
@@ -150,7 +155,9 @@ object ConnectOBD{
             Handler().post(mQueueCommands)
             handler.post(mSyncronizarBDtoIothub)
         }else{
-            obdGatewayVin!!.errorConnect(context!!.getString(R.string.mac_bluetooh_empty), OBD_NO_PAIRED)
+            //obdGatewayVin!!.errorConnect(context!!.getString(R.string.mac_bluetooh_empty), OBD_NO_PAIRED)
+            sendBroadcasrReceiver("", OBD_NO_PAIRED, context!!.getString(R.string.mac_bluetooh_empty))
+
         }
 
         UtilsNetwork().isOnline(context!!)
@@ -159,6 +166,7 @@ object ConnectOBD{
     fun stopLiveData(){
 
         statusTrip = "2"
+
         Handler().postDelayed({
             LogUtils().v(TAG_BD, "######################### POST 1.5 SEG ######################################")
             doUnbindService()
@@ -171,13 +179,13 @@ object ConnectOBD{
 
             Handler().postDelayed({ getAllOBD() },1000)
 
-        }, 1500)
+        }, 1000)
     }
 
     fun stopLiveDataforError(){
 
         doUnbindService()
-        mLocationUpdatesService!!.RemoveAll()
+        mLocationUpdatesService!!.removeLocationUpdates()
         //doUnbindServiceLocation()
 
         /**
@@ -185,10 +193,7 @@ object ConnectOBD{
          */
         startTimerContinue()
 
-        obdGatewayVin!!.errorConnect("Se perdio conexion al OBD", OBD_LOST)
-
-
-
+        //obdGatewayVin!!.errorConnect("Se perdio conexion al OBD", OBD_LOST)
 
 
     }
@@ -199,6 +204,16 @@ object ConnectOBD{
         override fun onFinish() {
             statusContinueTrip = false
             LogUtils().v(TAG_BD, " COULDDOWN: ${secondsRemaining} - TERMINO TIEMPO DE ESPERA")
+            OBD_DISCONNECT = true
+            stopLiveData()
+
+            /*val intent = Intent(ACTION_BROADCAST)
+            intent.putExtra(EXTRA_SPEED, "")
+            intent.putExtra(EXTRA_ERROR_TYPE, OBD_LOST)
+            intent.putExtra(EXTRA_ERROR_MSG, "Se perdio conexion al OBD")
+            LocalBroadcastManager.getInstance(Application()).sendBroadcast(intent)*/
+
+            sendBroadcasrReceiver("", OBD_LOST, "Se perdio conexion al OBD")
         }
 
         override fun onTick(millisUntilFinished: Long) {
@@ -236,6 +251,8 @@ object ConnectOBD{
             try {
                 service!!.startService()
                 mLocationUpdatesService!!.requestLocationUpdates()
+
+
            /*     Log.d(TAG_BD, " isServiceBoundLocation: ${isServiceBoundLocation}")
                 if (!isServiceBoundLocation){
                     LogUtils().v(TAG, " Binding LOCATION Service")
@@ -253,8 +270,8 @@ object ConnectOBD{
                 btStatus = context!!.getString(R.string.status_bluetooth_error_connecting)
 
                 doUnbindService()
-                obdGatewayVin!!.errorConnect(context!!.getString(R.string.status_bluetooth_error_connecting), OBD_ERROR)
-
+                //obdGatewayVin!!.errorConnect(context!!.getString(R.string.status_bluetooth_error_connecting), OBD_ERROR)
+                sendBroadcasrReceiver("", OBD_ERROR, context!!.getString(R.string.status_bluetooth_error_connecting))
             }
         }
 
@@ -358,9 +375,15 @@ object ConnectOBD{
                 KMH = command.metricSpeed.toString()
                 if (contadorTotal >= 2){
                     //obdGatewayVin!!.getSpeedKm(KMH)
-                    val intent = Intent(ACTION_BROADCAST)
+              /*      val intent = Intent(ACTION_BROADCAST)
                     intent.putExtra(EXTRA_SPEED, KMH)
-                    LocalBroadcastManager.getInstance(Application()).sendBroadcast(intent)
+                    intent.putExtra(EXTRA_ERROR_TYPE, 0)
+                    intent.putExtra(EXTRA_ERROR_MSG, "")
+                    LocalBroadcastManager.getInstance(Application()).sendBroadcast(intent)*/
+
+                    sendBroadcasrReceiver(KMH, 0, "")
+
+
                 }
                 Log.v(TAG, " Speed: ${command.metricSpeed}")
             }
@@ -371,22 +394,25 @@ object ConnectOBD{
                 Log.v(TAG, " Rpm: ${command.rpm}")
             }
             AvailableCommandNames.VIN.toString() -> {
-                contador++
                 val command = job.command as VinCommand
 
-                if (VIN != command.formattedResult){
-                    VIN = command.formattedResult
-                    Log.v(TAG, " VIN $VIN")
-                    appSharedPreference.saveVinCar(VIN)
-                }else
-                    Log.v(TAG, " VAR VIN: $VIN ")
+                contador++
 
 
                 if (contadorTotal == 2){
+
+                    if (command.formattedResult.isNotEmpty()){
+                        if (VIN != command.formattedResult){
+                            VIN = command.formattedResult
+                            Log.v(TAG, " VIN $VIN")
+                            appSharedPreference.saveVinCar(VIN)
+                        }else
+                            Log.v(TAG, " VAR VIN: $VIN ")
+                    }
                     obdGatewayVin!!.getVin(VIN)
+
                     statusTrip = "0"
                     initSendDataBD = true
-                    firstSend = true
                     Log.d(TAG_BD, " isServiceBoundLocation: ${isServiceBoundLocation}")
 
 
@@ -430,6 +456,7 @@ object ConnectOBD{
 
 
         val obdEntity = ObdEntity()
+        obdEntity.userId = USER_ID
         obdEntity.id_trip = send.getIDTrip(context, vin)
         obdEntity.vin = vin
         obdEntity.kmh = kmh
@@ -454,16 +481,8 @@ object ConnectOBD{
         val sdf = SimpleDateFormat("yyyy:MM:dd")
         val currentToDay = sdf.format(Date())
 
-     /*   if (firstSend) {
-            statusTrip = "0"
-            firstSend = false
-        }else{
-            if (statusTrip != "2")
-                statusTrip = "1"
-        }
-*/
-
         val locationEntity = LocationEntity()
+        locationEntity.userId = USER_ID
         locationEntity.id_trip = send.getIDTrip(context, VIN)
         locationEntity.longitud = location.longitude.toString()
         locationEntity.latitudd = location.latitude.toString()
@@ -480,7 +499,7 @@ object ConnectOBD{
      */
     private var sensorAccelerometer: SensorEvent? = null
     @JvmStatic
-    fun stateUpdate(job: ObdCommandJob, sensorAccelerometer: SensorEvent,  ctx: Context) {
+    fun stateUpdate(job: ObdCommandJob, sensorAccelerometer: SensorEvent?,  ctx: Context) {
         this.context = ctx
         this.sensorAccelerometer = sensorAccelerometer
         val cmdName = job.command.name
@@ -514,7 +533,10 @@ object ConnectOBD{
     fun stateUpdateLocation(location: Location) {
         LogUtils().v(TAG_BD, "New location_: ${UtilsLocationService().getLocationText(location)}")
         contadorTotalLocation++
-        addToBdLocation(location)
+        if (initSendDataBD){
+            addToBdLocation(location)
+        }
+
     }
 
     /**
@@ -661,6 +683,7 @@ object ConnectOBD{
                       var value = any as ObdEntity
                       LogUtils().v(TAG_BD, " OBD - value : ${value.toString()}")
                       trip.tripId = value.id_trip
+                      trip.userId = value.userId
                       trip.vin = value.vin
                       if (value.kmh.isNotEmpty()){
                           trip.speed =  value.kmh.toInt()
@@ -681,6 +704,7 @@ object ConnectOBD{
                       var value = any as LocationEntity
                       LogUtils().v(TAG_BD, " LOCATION - value : ${value.toString()}")
                       trip.tripId = value.id_trip
+                      trip.userId = value.userId
                       trip.lat = value.latitudd.toFloat()
                       trip.lon = value.longitud.toFloat()
                       trip.bearing = value.bearing.toFloat()
@@ -700,6 +724,7 @@ object ConnectOBD{
                       var value = any as ObdEntity
                       val trip = TripEntity()
                       trip.tripId = value.id_trip
+                      trip.userId = value.userId
                       trip.vin = value.vin
 
                       if (value.kmh.isNotEmpty()){
@@ -721,6 +746,7 @@ object ConnectOBD{
                       var value = any as LocationEntity
                       val trip = TripEntity()
                       trip.tripId = value.id_trip
+                      trip.userId = value.userId
                       trip.lat = value.latitudd.toFloat()
                       trip.lon = value.longitud.toFloat()
                       trip.bearing = value.bearing.toFloat()
@@ -752,7 +778,15 @@ object ConnectOBD{
                 }else{
                     limit = (limit2 - (LIMIT - tripEntityList.size))
                     limit2 = limit + LIMIT
+
+                    if (OBD_DISCONNECT){
+                        OBD_DISCONNECT = false
+                        tripEntityList[tripEntityList.size-1].status = "2"
+                        LogUtils().v(TAG_BD, " CHANGE ${tripEntityList[tripEntityList.size-1].toString()}")
+                    }
+
                     send.sendDataJsonString(JSONUtils.generateJSONArray(tripEntityList).toString())
+                    getAllTrip()
                 }
             }
             override fun onFailure(e: Exception?) {
@@ -814,10 +848,12 @@ object ConnectOBD{
                 LocationRepository(Application()).deleteFirstLocation(locationEntityList.size)
                 LogUtils().v(TAG_BD, "SE BORRO LOS ${locationEntityList.size} DEL OBD...")
                 LogUtils().v(TAG_BD, "######################### F I N   U L T I M A ######################################")
-                getAllTrip()
+
                 /**
                  * Enviar a IoTHub
                  */
+
+
                 Handler().postDelayed(sendTripIotHub,3000)
 
             }
@@ -826,6 +862,14 @@ object ConnectOBD{
             }
         })
 
+    }
+
+    fun sendBroadcasrReceiver(_EXTRA_SPEED: String, _EXTRA_ERROR_TYPE: Int, _EXTRA_ERROR_MSG: String){
+        val intent = Intent(ACTION_BROADCAST)
+        intent.putExtra(EXTRA_SPEED, _EXTRA_SPEED)
+        intent.putExtra(EXTRA_ERROR_TYPE, _EXTRA_ERROR_TYPE)
+        intent.putExtra(EXTRA_ERROR_MSG, _EXTRA_ERROR_MSG)
+        LocalBroadcastManager.getInstance(context!!).sendBroadcast(intent)
     }
 
 

@@ -18,6 +18,7 @@ import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
 import android.util.Log
 import android.widget.TextView
+import com.mdp.innovation.obd_driving.model.DataUserModel
 import com.mdp.innovation.obd_driving.ui.InterfaceView
 import com.mdp.innovation.obd_driving.ui.fragment.CancelCollectDialogFragment
 import com.mdp.innovation.obd_driving.ui.fragment.LogoutDialogFragment
@@ -44,6 +45,7 @@ class HomeActivity : BaseServiceActivity(), HomeView, ObdGatewayVin {
     private var startLiveDataInterface: StartLiveDataInterface? = null
 
     //var sabe = SendDataOBD()
+    lateinit var dataUser: DataUserModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -51,7 +53,7 @@ class HomeActivity : BaseServiceActivity(), HomeView, ObdGatewayVin {
 
         myIntent = Intent(applicationContext, serviceClass)
 
-        val dataUser = preferences.getDataUser(applicationContext)
+        dataUser = preferences.getDataUser(applicationContext)!!
         val name = dataUser!!.name
 
         val header = navigation_view.getHeaderView(0)
@@ -75,7 +77,7 @@ class HomeActivity : BaseServiceActivity(), HomeView, ObdGatewayVin {
     }
 
     fun startLiveData(){
-        ConnectOBD.startLiveData(this)
+        ConnectOBD.startLiveData(this, dataUser.userId!!)
     }
 
     fun simulateSpeed(){
@@ -132,19 +134,6 @@ class HomeActivity : BaseServiceActivity(), HomeView, ObdGatewayVin {
 /*    override fun getSpeedKm(kmh: String) {
         startLiveDataInterface?.getSpeedKm(kmh)
     }*/
-
-    override fun errorConnect(message: String, type: Int){
-        /*hideProgress()
-        Message.toastLong(message,applicationContext)
-
-        Log.i("[INFO]","ACTIVITY errorConnect: $message")
-        runOnUiThread {
-            hideProgress()
-            Message.toastLong(message,applicationContext)
-        }*/
-
-        startLiveDataInterface?.errorConnect(message)
-    }
 
     override fun showProgress() {
         //progress.visibility = View.VISIBLE
@@ -244,7 +233,6 @@ class HomeActivity : BaseServiceActivity(), HomeView, ObdGatewayVin {
     }*/
 
     interface StartLiveDataInterface {
-        fun errorConnect(message: String)
         fun getVin(vin: String)
     }
 

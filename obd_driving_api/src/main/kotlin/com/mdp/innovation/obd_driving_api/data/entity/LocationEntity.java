@@ -15,6 +15,8 @@ public class LocationEntity implements Serializable {
     @ColumnInfo(name = "id")
     private Long id;
 
+    private String userId = "";
+
     private String id_trip = "";
     private String latitudd = "";
     private String longitud = "";
@@ -32,6 +34,14 @@ public class LocationEntity implements Serializable {
 
     public void setId(@NonNull Long id) {
         this.id = id;
+    }
+
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
     }
 
     public String getId_trip() {
@@ -91,11 +101,11 @@ public class LocationEntity implements Serializable {
     }
 
 
-
     @Override
     public String toString() {
         return "LocationEntity{" +
                 "id=" + id +
+                ", userId='" + userId + '\'' +
                 ", id_trip='" + id_trip + '\'' +
                 ", latitudd='" + latitudd + '\'' +
                 ", longitud='" + longitud + '\'' +
