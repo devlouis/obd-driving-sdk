@@ -269,7 +269,7 @@ class TripDetailFragment : BaseFragment(), TripDetailView, OnMapReadyCallback {
     }
 
     override fun onGetTripDetailError(message: String) {
-        if(context == null) return
+        if(context == null)  return
 
         Message.toastLong("Ocurrió un error: "+message+". \n Vuelva a intentarlo en unos segundos.", context)
     }
