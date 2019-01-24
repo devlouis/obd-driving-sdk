@@ -8,9 +8,9 @@ class MyTripsPresenter(var myTripsView: MyTripsView?, val myTripsInteractor: MyT
     fun onDestroy() {
         myTripsView = null
     }
-    fun getMyTrips(vin: String, page: Int, elements: Int, showLoading: Boolean) {
+    fun getMyTrips(userId: String, page: Int, elements: Int, showLoading: Boolean) {
         if(showLoading) myTripsView!!.showLoading()
-        myTripsInteractor.getMyTrips( this, vin, page, elements)
+        myTripsInteractor.getMyTrips( this, userId, page, elements)
     }
 
     override fun onGetMyTripsSuccess(response: MyTripsResponse) {

@@ -16,22 +16,39 @@ import android.os.Looper
 import android.support.annotation.RequiresApi
 import android.support.v4.app.NotificationCompat
 import android.support.v4.app.TaskStackBuilder
+import android.support.v4.content.LocalBroadcastManager
+import android.util.Log
 import android.widget.Toast
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import com.mdp.innovation.obd_driving.R
+import com.mdp.innovation.obd_driving.interactor.TokenInteractor
+import com.mdp.innovation.obd_driving.service.model.UpdateTokenResponse
 import com.mdp.innovation.obd_driving.ui.activity.HomeActivity
+import com.mdp.innovation.obd_driving.util.Constants
+import com.mdp.innovation.obd_driving.util.Preferences
+import org.koin.android.ext.android.inject
 import java.util.*
 
 class MyFirebaseMessagingService : FirebaseMessagingService()  {
 
+    private val TAG = javaClass.simpleName
     private lateinit var notificationManager: NotificationManager
     private val ADMIN_CHANNEL_ID = "01"
+
+    private val TYPE_TRIP_FINISHED = "1"
+
+    private val preferences by inject<Preferences>()
 
     override fun onMessageReceived(message: RemoteMessage){
         super.onMessageReceived(message)
 
         //addNotification()
+
+        val title = message.data["title"].toString()
+        val body = message.data["body"].toString()
+        val type = message.data["type"].toString()
+        val score = message.data["score"].toString()
 
         notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
@@ -40,35 +57,54 @@ class MyFirebaseMessagingService : FirebaseMessagingService()  {
         }
         val notificationId = Random().nextInt(60000)
 
-        val resultIntent = Intent(this, HomeActivity::class.java)
+        /*val resultIntent = Intent(this, HomeActivity::class.java)
+        resultIntent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
         val stackBuilder = TaskStackBuilder.create(this)
         stackBuilder.addParentStack(HomeActivity::class.java)
         stackBuilder.addNextIntent(resultIntent)
-        val resultPendingIntent = stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT)
+        val resultPendingIntent = stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT)*/
+
+        val intent = Intent(this, HomeActivity::class.java)
+        intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
+        val contentIntent = PendingIntent.getActivity(this, Random().nextInt(), intent, 0)
 
         val notificationBuilder = NotificationCompat.Builder(this, ADMIN_CHANNEL_ID)
             .setSmallIcon(R.mipmap.icon)
-            .setContentTitle(message.notification!!.title)
-            .setContentText(message.notification!!.body)
-            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-            .setContentIntent(resultPendingIntent)
+            //.setContentTitle(message.notification!!.title)
+            //.setContentText(message.notification!!.body)
+            .setContentTitle(title)
+            .setContentText(body)
+            .setPriority(NotificationCompat.PRIORITY_LOW)
+            .setContentIntent(contentIntent)
             .setStyle(NotificationCompat.BigTextStyle())
             .setAutoCancel(true)
+            .setOngoing(false)
             .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
 
         val notification = notificationBuilder.build()
-        notification.flags = Notification.FLAG_ONGOING_EVENT
+        notification.flags = Notification.FLAG_ONGOING_EVENT or Notification.FLAG_AUTO_CANCEL
 
         notificationManager.notify(0, notification)
 
-        val handler = Handler(Looper.getMainLooper())
-        handler.post{
-            Toast.makeText(applicationContext, "Llegó un PUSH!", Toast.LENGTH_SHORT).show()
+        when(type){
+            TYPE_TRIP_FINISHED -> tripFinished(score)
         }
 
+    }
 
+    private fun tripFinished(score: String){
+        val handler = Handler(Looper.getMainLooper())
+        handler.post{
+            Toast.makeText(applicationContext, "Llegó el PUSH!: $score", Toast.LENGTH_SHORT).show()
 
+            preferences.setMyScore(applicationContext, score)
 
+            val intent = Intent(Constants.ACTION_BROADCAST_PUSH)
+            intent.putExtra(Constants.ACTION_TYPE_PUSH, Constants.TYPE_TRIP_FINISHED)
+            intent.putExtra(Constants.DATA_NEW_SCORE, score)
+            LocalBroadcastManager.getInstance(applicationContext).sendBroadcast(intent)
+
+        }
     }
 
     @RequiresApi(api = Build.VERSION_CODES.O)
@@ -84,6 +120,29 @@ class MyFirebaseMessagingService : FirebaseMessagingService()  {
         if (notificationManager != null) {
             notificationManager.createNotificationChannel(adminChannel)
         }
+    }
+
+    override fun onNewToken(token: String) {
+        Log.d(TAG, "Refreshed token: $token")
+
+        if(preferences.getDataUser(applicationContext) != null){
+            //ENDPOINT ADD TOKEN PUSH
+
+            /*val dataUser = preferences.getDataUser(applicationContext)
+
+            val interactor = TokenInteractor()
+            interactor.updateToken(object: TokenInteractor.OnUpdateTokenFinishedListener{
+                override fun onUpdateTokenSuccess(response: UpdateTokenResponse) {
+                    Log.d(TAG,"El token se actualizó correctamente.")
+                }
+
+                override fun onUpdateTokenError(message: String) {
+                    Log.d(TAG,"Error: $message")
+                }
+            }, dataUser!!.userId!!, token, dataUser!!.token!!)*/
+        }
+
+        preferences.setTokenPush(applicationContext, token)
     }
 
     private fun addNotification() {

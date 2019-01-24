@@ -146,8 +146,9 @@ class MyTripsFragment : BaseFragment(), MyTripsView {
         //presenter.getMyTrips("XXXXXXX", currentPage, elementsByPage, true)
 
         val vin = preferences.getDataUser(context)!!.vin
+        val userId = preferences.getDataUser(context)!!.userId
 
-        presenter.getMyTrips(vin!!, currentPage, elementsByPage, true)
+        presenter.getMyTrips(userId!!, currentPage, elementsByPage, true)
 
     }
 
