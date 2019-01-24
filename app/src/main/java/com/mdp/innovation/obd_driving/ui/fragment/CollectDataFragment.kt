@@ -105,7 +105,7 @@ class CollectDataFragment : BaseServiceFragment(), CollectDataView, HomeActivity
             Global.tripIsEnded = true
             //stopCollectDataService()
             MyScoreFragment.appFirstStart = false
-            ConnectOBD.stopLiveData()
+            //ConnectOBD.stopLiveData()
             fragmentManager?.popBackStack()
         }
     }
@@ -141,7 +141,7 @@ class CollectDataFragment : BaseServiceFragment(), CollectDataView, HomeActivity
         btnEndTrip.setOnClickListener {
             //nextActivity(PairObdActivity::class.java, true)
             vLoading.visibility = View.VISIBLE
-            ConnectOBD.stopLiveData()
+            //ConnectOBD.stopLiveData()
 
             it.isEnabled = false
             it.postDelayed({

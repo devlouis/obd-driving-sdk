@@ -1,6 +1,9 @@
 package com.mdp.innovation.obd_driving.ui.fragment
 
 import android.bluetooth.BluetoothAdapter
+import android.content.Context
+import android.net.ConnectivityManager
+import android.net.wifi.WifiManager
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -11,25 +14,25 @@ import android.view.ViewGroup
 import com.mdp.innovation.obd_driving.R
 import android.support.v7.widget.Toolbar
 import com.mdp.innovation.obd_driving.ui.MyScoreView
-import com.mdp.innovation.obd_driving.util.Message
 import kotlinx.android.synthetic.main.fragment_my_score.*
 import android.support.annotation.Nullable
 import com.mdp.innovation.obd_driving.interactor.MyScoreInteractor
 import com.mdp.innovation.obd_driving.presenter.MyScorePresenter
 import com.mdp.innovation.obd_driving.ui.activity.HomeActivity
 import com.mdp.innovation.obd_driving.ui.navigation.Navigator
-import com.mdp.innovation.obd_driving.util.CustomAnimate
 import android.util.Log
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
 import com.mdp.innovation.obd_driving.service.model.MyScoreResponse
 import com.mdp.innovation.obd_driving.service.model.ScoreResponse
+import com.mdp.innovation.obd_driving.util.*
 import org.koin.android.ext.android.inject
-import com.mdp.innovation.obd_driving.util.Global
-import com.mdp.innovation.obd_driving.util.Preferences
 import com.mdp.innovation.obd_driving_api.app.core.ConnectOBD
 import com.mdp.innovation.obd_driving_api.app.utils.LogUtils
+import org.jetbrains.anko.doAsync
 import java.lang.Exception
+import java.net.HttpURLConnection
+import java.net.URL
 
 
 class MyScoreFragment : BaseServiceFragment(), MyScoreView, HomeActivity.StartLiveDataInterface {
@@ -224,11 +227,90 @@ class MyScoreFragment : BaseServiceFragment(), MyScoreView, HomeActivity.StartLi
             //nextActivity(PairObdActivity::class.java, true)
             //navigator.navigateToCollectData(fragmentManager, R.id.content)
 
+            showLoading()
             it.isEnabled = false
+            it.postDelayed({
+
+                Connection.validate(activity!!, object : Connection.OnConnectionFinishedListener{
+                    override fun onConnectionFinished(code: Int) {
+                        when(code){
+                            Connection.OK ->{
+                                hideLoading()
+                                presenter.isConnected()
+                                it.isEnabled = true
+                            }
+                            Connection.NO_NETWORK ->{
+                                hideLoading()
+                                Message.toastLong("Debe conectarse a una red.", context)
+                                it.isEnabled = true
+                            }
+                            Connection.NO_CONNECTION ->{
+                                hideLoading()
+                                Message.toastLong("Hay problemas con su señal de internet. Inténtelo nuevamente.", context)
+                                it.isEnabled = true
+                            }
+                            Connection.EXCEPTION ->{
+                                hideLoading()
+                                Message.toastLong("Ocurrió un problema. Inténtelo en unos minutos.", context)
+                                it.isEnabled = true
+                            }
+                        }
+                    }
+                })
+
+
+            }, 100L)
+
+
+
+            /*val connectivityManager: ConnectivityManager = activity!!.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+            val activeNetworkInfo = connectivityManager.activeNetworkInfo
+
+            if(activeNetworkInfo != null){
+
+                doAsync {
+
+                    try {
+                        val urlc: HttpURLConnection = (URL("http://clients3.google.com/generate_204").openConnection()) as HttpURLConnection
+                        urlc.setRequestProperty("User-Agent", "Android")
+                        urlc.setRequestProperty("Connection", "close")
+                        urlc.connectTimeout = 1500
+                        urlc.connect()
+                        if(urlc.responseCode == 204 && urlc.contentLength == 0){
+                            Log.d(TAG, "Positivo!!!")
+                        }else{
+                            Log.d(TAG, "Negativo!!!")
+                        }
+
+
+                        val p1 = java.lang.Runtime.getRuntime().exec("ping -c 1 www.google.com")
+                        val returnVal: Int = p1.waitFor()
+                        val reachable = (returnVal==0)
+                        if(reachable){
+                            Log.d(TAG, "Positivo!!!")
+                        }else{
+                            Log.d(TAG, "Negativo!!!")
+                        }
+
+
+                    } catch (ex: Exception) {
+                        ex.printStackTrace()
+                    }
+
+                }
+
+
+
+            }else{
+                Log.d(TAG, "No tiene ninguna red")
+            }*/
+
+
+            /*it.isEnabled = false
             it.postDelayed({
                 presenter.isConnected()
                 it.isEnabled = true
-            }, 100L)
+            }, 100L)*/
         }
 
         //showProgress()
@@ -338,8 +420,8 @@ class MyScoreFragment : BaseServiceFragment(), MyScoreView, HomeActivity.StartLi
         handler.removeCallbacks(runnable)
 
         //SDK
-        showLoading()
-        (activity as HomeActivity).startLiveData()
+        //showLoading()
+        //(activity as HomeActivity).startLiveData()
         //(activity as HomeActivity).simulateSpeed()
         //navigator.navigateToCollectData(fragmentManager, R.id.content)
 
@@ -349,8 +431,8 @@ class MyScoreFragment : BaseServiceFragment(), MyScoreView, HomeActivity.StartLi
         //DEMO
         /*startCollectDataService()
         (activity as HomeActivity).simulateSpeed()
-        Global.cancelValidated = false
-        navigator.navigateToCollectData(fragmentManager, R.id.content)*/
+        Global.cancelValidated = false*/
+        navigator.navigateToCollectData(fragmentManager, R.id.content)
     }
 
     override fun onDestroy() {

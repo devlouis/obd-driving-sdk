@@ -29,18 +29,18 @@ class MyScoreInteractor {
     }
 
     fun isConnected(listener: OnMyScoreFinishedListener) {
-        /*var isConnected = true
+        var isConnected = true
         if (isConnected)  listener.onDeviceConnected()
-        else listener.onDeviceNoConnected()*/
+        else listener.onDeviceNoConnected()
 
-        var result = ConnectOBD.verifyMacOBD()
+        /*var result = ConnectOBD.verifyMacOBD()
         Log.i("macBluetooth:", result.macBluetooth)
         Log.i("result:", result.result.toString())
         if(result.result){
             listener.onDeviceConnected()
         }else{
             listener.onDeviceNoConnected()
-        }
+        }*/
     }
 
     fun getScore(listener: OnMyScoreFinishedListener, VIN: String, tripId: String) {
