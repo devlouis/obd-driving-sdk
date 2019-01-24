@@ -230,7 +230,7 @@ class LocationUpdatesService : Service() {
         return mBinder
     }
 
-    /**
+    /**loui
      * Se llama cuando un cliente ()
      * vuelve al primer plano y se enlaza nuevamente con este servicio.
      * El servicio debe dejar de ser un servicio de primer plano cuando eso sucede.

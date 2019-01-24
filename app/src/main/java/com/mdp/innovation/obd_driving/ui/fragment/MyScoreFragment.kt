@@ -1,9 +1,12 @@
 package com.mdp.innovation.obd_driving.ui.fragment
 
 import android.bluetooth.BluetoothAdapter
+
+import android.content.BroadcastReceiver
 import android.content.Context
-import android.net.ConnectivityManager
-import android.net.wifi.WifiManager
+import android.content.Intent
+import android.content.IntentFilter
+
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -16,6 +19,8 @@ import android.support.v7.widget.Toolbar
 import com.mdp.innovation.obd_driving.ui.MyScoreView
 import kotlinx.android.synthetic.main.fragment_my_score.*
 import android.support.annotation.Nullable
+import android.support.v4.content.LocalBroadcastManager
+import android.support.v7.app.AlertDialog
 import com.mdp.innovation.obd_driving.interactor.MyScoreInteractor
 import com.mdp.innovation.obd_driving.presenter.MyScorePresenter
 import com.mdp.innovation.obd_driving.ui.activity.HomeActivity
@@ -58,6 +63,9 @@ class MyScoreFragment : BaseServiceFragment(), MyScoreView, HomeActivity.StartLi
     private var tripId = ""
     private var userId = ""
 
+    private lateinit var myReceiver: MyReceiver
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         //validateConsultScore(true)
@@ -90,6 +98,7 @@ class MyScoreFragment : BaseServiceFragment(), MyScoreView, HomeActivity.StartLi
 
     override fun onActivityCreated(@Nullable savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
+        myReceiver = MyReceiver()
         initUI()
 
         /*if(isActiveCollectDataService()){
@@ -185,17 +194,62 @@ class MyScoreFragment : BaseServiceFragment(), MyScoreView, HomeActivity.StartLi
 
     }
 
-    override fun errorConnect(message: String){
-        //hideProgress()
-        //Message.toastLong(message,context)
-
+/*    override fun errorConnect(message: String){
         Log.i("[INFO]","ACTIVITY errorConnect: $message")
         activity!!.runOnUiThread {
             hideLoading()
             Message.toastLong(message,activity!!.applicationContext)
-            //navigator.navigateToCollectData(fragmentManager, R.id.content)
 
         }
+    }*/
+
+    val OBD_LOST = 404
+    val OBD_ERROR = 401
+    val OBD_NO_PAIRED = 301
+    private inner class MyReceiver : BroadcastReceiver() {
+        override fun onReceive(context: Context, intent: Intent) {
+            val extras = intent.extras
+            val speed = extras.getString(ConnectOBD.EXTRA_SPEED)
+            val typeError = extras.getInt(ConnectOBD.EXTRA_ERROR_TYPE)
+            val messageError = extras.getString(ConnectOBD.EXTRA_ERROR_MSG)
+
+           if (typeError != 0){
+               hideLoading()
+                when (typeError) {
+                    /**
+                     * Se dejo de recibir informacion de OBD
+                     */
+                    OBD_LOST -> {
+
+                    }
+                    OBD_ERROR -> {
+                        LogUtils().v("CollDataFrag ", " errorConnect: $messageError")
+                        //Message.toastLong(messageError,context)
+                        showDialodAlert("${messageError}")
+                    }
+                    OBD_NO_PAIRED -> {
+                        LogUtils().v("CollDataFrag ", " errorConnect: $messageError")
+                        //Message.toastLong(messageError,context)
+                        showDialodAlert("${messageError}")
+                    }
+                    else -> {
+                        showDialodAlert("${messageError}")
+                    }
+                }
+            }
+        }
+    }
+
+
+    private fun showDialodAlert(msg: String) {
+        val builderAlertDialog = AlertDialog.Builder(requireActivity())
+        builderAlertDialog.setTitle("Driving OBD")
+        builderAlertDialog.setMessage(msg)
+        builderAlertDialog.setPositiveButton("Ok") { dialog, which ->
+            dialog.dismiss()
+        }
+        var dialog = builderAlertDialog.create()
+        dialog.show()
     }
 
     /*override fun onStop() {
@@ -261,56 +315,6 @@ class MyScoreFragment : BaseServiceFragment(), MyScoreView, HomeActivity.StartLi
 
             }, 100L)
 
-
-
-            /*val connectivityManager: ConnectivityManager = activity!!.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-            val activeNetworkInfo = connectivityManager.activeNetworkInfo
-
-            if(activeNetworkInfo != null){
-
-                doAsync {
-
-                    try {
-                        val urlc: HttpURLConnection = (URL("http://clients3.google.com/generate_204").openConnection()) as HttpURLConnection
-                        urlc.setRequestProperty("User-Agent", "Android")
-                        urlc.setRequestProperty("Connection", "close")
-                        urlc.connectTimeout = 1500
-                        urlc.connect()
-                        if(urlc.responseCode == 204 && urlc.contentLength == 0){
-                            Log.d(TAG, "Positivo!!!")
-                        }else{
-                            Log.d(TAG, "Negativo!!!")
-                        }
-
-
-                        val p1 = java.lang.Runtime.getRuntime().exec("ping -c 1 www.google.com")
-                        val returnVal: Int = p1.waitFor()
-                        val reachable = (returnVal==0)
-                        if(reachable){
-                            Log.d(TAG, "Positivo!!!")
-                        }else{
-                            Log.d(TAG, "Negativo!!!")
-                        }
-
-
-                    } catch (ex: Exception) {
-                        ex.printStackTrace()
-                    }
-
-                }
-
-
-
-            }else{
-                Log.d(TAG, "No tiene ninguna red")
-            }*/
-
-
-            /*it.isEnabled = false
-            it.postDelayed({
-                presenter.isConnected()
-                it.isEnabled = true
-            }, 100L)*/
         }
 
         //showProgress()
@@ -365,10 +369,14 @@ class MyScoreFragment : BaseServiceFragment(), MyScoreView, HomeActivity.StartLi
 
     override fun onResume() {
         super.onResume()
+        LocalBroadcastManager.getInstance(requireActivity()).registerReceiver(
+            myReceiver, IntentFilter(ConnectOBD.ACTION_BROADCAST)
+        )
         (activity as HomeActivity).setOnStartLiveDataListener(this)
     }
 
     override fun onPause() {
+        LocalBroadcastManager.getInstance(requireActivity()).unregisterReceiver(myReceiver)
         super.onPause()
         (activity as HomeActivity).setOnStartLiveDataListener(null)
     }
@@ -420,8 +428,8 @@ class MyScoreFragment : BaseServiceFragment(), MyScoreView, HomeActivity.StartLi
         handler.removeCallbacks(runnable)
 
         //SDK
-        //showLoading()
-        //(activity as HomeActivity).startLiveData()
+        showLoading()
+        (activity as HomeActivity).startLiveData()
         //(activity as HomeActivity).simulateSpeed()
         //navigator.navigateToCollectData(fragmentManager, R.id.content)
 
@@ -432,7 +440,7 @@ class MyScoreFragment : BaseServiceFragment(), MyScoreView, HomeActivity.StartLi
         /*startCollectDataService()
         (activity as HomeActivity).simulateSpeed()
         Global.cancelValidated = false*/
-        navigator.navigateToCollectData(fragmentManager, R.id.content)
+        //navigator.navigateToCollectData(fragmentManager, R.id.content)
     }
 
     override fun onDestroy() {

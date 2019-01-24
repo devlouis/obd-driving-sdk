@@ -246,6 +246,11 @@ public class SendDataOBD {
             Integer i = (Integer) context;
             System.out.println("IoT Hub responded to message " + i.toString()
                     + " with status " + status.name());
+            if((status == IotHubStatusCode.OK) || (status == IotHubStatusCode.OK_EMPTY)){
+
+            }else{
+
+            }
         }
     }
 

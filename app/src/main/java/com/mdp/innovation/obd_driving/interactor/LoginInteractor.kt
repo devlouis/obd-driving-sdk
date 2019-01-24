@@ -4,6 +4,7 @@ import android.util.Log
 import com.mdp.innovation.obd_driving.service.WSService
 import com.mdp.innovation.obd_driving.service.model.LoginResponse
 import com.mdp.innovation.obd_driving.service.model.MyTripsResponse
+import com.mdp.innovation.obd_driving_api.app.utils.LogUtils
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.uiThread
 import retrofit2.Call
@@ -29,11 +30,11 @@ class LoginInteractor {
             uiThread{
                 call.enqueue(object : Callback<LoginResponse> {
                     override fun onResponse(call: Call<LoginResponse>, response: Response<LoginResponse>) {
-                        Log.i(TAG, response.body().toString())
                         if(response.isSuccessful){
 
                             if(response.body()!!.success){
                                 listener.onGetLoginSuccess(response.body()!!)
+                                LogUtils().v(TAG, response.body().toString())
                             }else{
                                 listener.onGetLoginError(response.body()!!.message)
                             }

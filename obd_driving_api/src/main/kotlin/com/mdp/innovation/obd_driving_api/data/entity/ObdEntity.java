@@ -14,6 +14,7 @@ public class ObdEntity implements Serializable {
     @NonNull
     @ColumnInfo(name = "id")
     private Long id;
+    private String userId = "";
     private String id_trip = "";
     private String vin = "";
     private String rpm = "";
@@ -36,6 +37,14 @@ public class ObdEntity implements Serializable {
 
     public void setId(@NonNull Long id) {
         this.id = id;
+    }
+
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
     }
 
     public String getId_trip() {
@@ -122,6 +131,7 @@ public class ObdEntity implements Serializable {
     public String toString() {
         return "ObdEntity{" +
                 "id=" + id +
+                ", userId='" + userId + '\'' +
                 ", id_trip='" + id_trip + '\'' +
                 ", vin='" + vin + '\'' +
                 ", rpm='" + rpm + '\'' +
@@ -129,9 +139,9 @@ public class ObdEntity implements Serializable {
                 ", status='" + status + '\'' +
                 ", dataNew='" + dataNew + '\'' +
                 ", dataUdate='" + dataUdate + '\'' +
-                ", ax='" + ax + '\'' +
-                ", ay='" + ay + '\'' +
-                ", az='" + az + '\'' +
+                ", ax=" + ax +
+                ", ay=" + ay +
+                ", az=" + az +
                 '}';
     }
 }
