@@ -1,25 +1,17 @@
 package com.mdp.innovation.obd_driving
 
-import android.app.Activity
-import android.app.PendingIntent.getActivity
 import android.content.*
 import android.os.*
-import android.preference.PreferenceManager
 import android.support.v4.content.LocalBroadcastManager
 import android.support.v7.app.AlertDialog
 import android.util.Log
 import android.widget.Toast
-import com.airbnb.lottie.utils.Utils
 import com.mdp.innovation.obd_driving_api.app.`interface`.ObdGatewayVin
 import com.mdp.innovation.obd_driving_api.app.core.BaseAppCompat
 import com.mdp.innovation.obd_driving_api.app.core.ConnectOBD
 import com.mdp.innovation.obd_driving_api.app.core.service.LocationUpdatesService
 import com.mdp.innovation.obd_driving_api.app.ui.activity.PairObdActivity
-import com.mdp.innovation.obd_driving_api.app.utils.JSONUtils
 import com.mdp.innovation.obd_driving_api.app.utils.LogUtils
-import com.mdp.innovation.obd_driving_api.data.IoTHub.SendDataOBD
-import com.mdp.innovation.obd_driving_api.data.entity.ObdEntity
-import com.mdp.innovation.obd_driving_api.data.entity.TripDrivingEntity
 import com.mdp.innovation.obd_driving_api.data.entity.TripEntity
 import com.mdp.innovation.obd_driving_api.data.store.TripRepository
 import com.mdp.innovation.obd_driving_api.data.store.repository.LocationRepository
@@ -30,7 +22,6 @@ import java.io.FileInputStream
 import java.io.FileOutputStream
 import java.io.IOException
 import java.nio.channels.FileChannel
-import android.content.Intent.getIntent
 import android.os.Bundle
 
 
@@ -42,7 +33,7 @@ class TestMainActivity : BaseAppCompat(), ObdGatewayVin {
     private var mLocationUpdatesService: LocationUpdatesService? = null
     private var isServiceBoundLocation: Boolean = false
 
-    //var sendata = SendDataOBD()
+    //var sendata = SendDataIoTHub()
     private lateinit var myReceiver: MyReceiver
 
     override fun onCreate(savedInstanceState: Bundle?) {

@@ -3,12 +3,10 @@ package com.mdp.innovation.obd_driving_api.app.core
 import android.annotation.SuppressLint
 import android.app.Application
 import android.content.*
-import android.hardware.Sensor
 import android.hardware.SensorEvent
-import android.hardware.SensorEventListener
-import android.hardware.SensorManager
 import android.location.Location
 import android.os.CountDownTimer
+import android.os.Environment
 import android.os.Handler
 import android.os.IBinder
 import android.support.v4.content.LocalBroadcastManager
@@ -24,7 +22,7 @@ import com.mdp.innovation.obd_driving_api.app.utils.UtilsLocationService
 import com.mdp.innovation.obd_driving_api.commands.SpeedCommand
 import com.mdp.innovation.obd_driving_api.commands.control.VinCommand
 import com.mdp.innovation.obd_driving_api.commands.engine.RPMCommand
-import com.mdp.innovation.obd_driving_api.data.IoTHub.SendDataOBD
+import com.mdp.innovation.obd_driving_api.data.IoTHub.SendDataIoTHub
 import com.mdp.innovation.obd_driving_api.data.entity.TripEntity
 import com.mdp.innovation.obd_driving_api.data.store.SharedPreference
 import com.mdp.innovation.obd_driving_api.enums.AvailableCommandNames
@@ -32,12 +30,18 @@ import java.io.IOException
 import java.util.*
 
 import com.mdp.innovation.obd_driving_api.app.utils.JSONUtils
+import com.mdp.innovation.obd_driving_api.data.entity.FailuresTripValuesEntity
 import com.mdp.innovation.obd_driving_api.data.entity.LocationEntity
 import com.mdp.innovation.obd_driving_api.data.entity.ObdEntity
 import com.mdp.innovation.obd_driving_api.data.store.TripRepository
+import com.mdp.innovation.obd_driving_api.data.store.repository.FailuresTripValuesRepository
 import com.mdp.innovation.obd_driving_api.data.store.repository.LocationRepository
 import com.mdp.innovation.obd_driving_api.data.store.repository.ObdRepository
+import java.io.File
+import java.io.FileInputStream
+import java.io.FileOutputStream
 import java.lang.Exception
+import java.nio.channels.FileChannel
 import java.text.SimpleDateFormat
 
 
@@ -47,7 +51,7 @@ object ConnectOBD{
     val TAG_BD = " BD_LOCAL"
     val TAG_GET = " TAG_GET"
 
-    val LIMIT = 30
+    val LIMIT = 15
 
     val OBD_LOST = 404
     val OBD_ERROR = 401
@@ -80,7 +84,7 @@ object ConnectOBD{
     var handler = Handler()
     private var macDevice = ""
     var VIN = ""
-    val sendDataOBD = SendDataOBD()
+    val sendDataIoTHub = SendDataIoTHub()
 
     var statusContinueTrip = false
 
@@ -109,11 +113,28 @@ object ConnectOBD{
         LogUtils().v(TAG, " macDevice:: $macDevice")
         LogUtils().v(TAG, " obdGatewayVin:: $obdGatewayVin")
 
+        exportDB()
+
+
+
+
+
+        Handler().postDelayed({
+            SendDataIoTHub().InitClient()
+            SendDataIoTHub().resetCount()
+            Handler().postDelayed({
+                getAllFailures()
+            },4000)
+        },2000)
 
 
     }
 
-    private val initClientIotHub = Runnable { sendDataOBD.InitClient() }
+    private val initClientIotHub = Runnable {
+        sendDataIoTHub.InitClient()
+        sendDataIoTHub.resetCount()
+
+    }
 
     /**
      * Verificar si la mac del OBD esta guardado.
@@ -159,6 +180,7 @@ object ConnectOBD{
             sendBroadcasrReceiver("", OBD_NO_PAIRED, context!!.getString(R.string.mac_bluetooh_empty))
 
         }
+
 
         UtilsNetwork().isOnline(context!!)
     }
@@ -251,18 +273,6 @@ object ConnectOBD{
             try {
                 service!!.startService()
                 mLocationUpdatesService!!.requestLocationUpdates()
-
-
-           /*     Log.d(TAG_BD, " isServiceBoundLocation: ${isServiceBoundLocation}")
-                if (!isServiceBoundLocation){
-                    LogUtils().v(TAG, " Binding LOCATION Service")
-                    context!!.bindService(Intent(context!!.applicationContext, LocationUpdatesService::class.java), mServiceConnection, Context.BIND_AUTO_CREATE)
-                    //else
-
-                }else{
-                    mLocationUpdatesService!!.requestLocationUpdates()
-                }*/
-
                 if (preRequisites)
                     btStatus = context!!.getString(R.string.status_bluetooth_connected)
             } catch (ioe: IOException) {
@@ -457,7 +467,7 @@ object ConnectOBD{
 
         val obdEntity = ObdEntity()
         obdEntity.userId = USER_ID
-        obdEntity.id_trip = sendDataOBD.getIDTrip(context, vin)
+        obdEntity.id_trip = sendDataIoTHub.getIDTrip(context, vin)
         obdEntity.vin = vin
         obdEntity.kmh = kmh
         obdEntity.rpm = rpm
@@ -483,7 +493,7 @@ object ConnectOBD{
 
         val locationEntity = LocationEntity()
         locationEntity.userId = USER_ID
-        locationEntity.id_trip = sendDataOBD.getIDTrip(context, VIN)
+        locationEntity.id_trip = sendDataIoTHub.getIDTrip(context, VIN)
         locationEntity.longitud = location.longitude.toString()
         locationEntity.latitudd = location.latitude.toString()
         locationEntity.bearing = location.bearing.toString()
@@ -603,7 +613,7 @@ object ConnectOBD{
                 getFirst20OBD()
 
             }
-            handler.postDelayed(this, 30000)
+            handler.postDelayed(this, 15000)
             start = true
         }
     }
@@ -775,6 +785,7 @@ object ConnectOBD{
                 if (tripEntityList.size == 0){
                     handler.removeCallbacks(mSyncronizarBDtoIothub)
                     LogUtils().v(TAG_BD, "##### Termina la sincronizacion a la BD #####")
+                    //exportDB()
                 }else{
                     limit = (limit2 - (LIMIT - tripEntityList.size))
                     limit2 = limit + LIMIT
@@ -782,11 +793,70 @@ object ConnectOBD{
                     if (OBD_DISCONNECT){
                         OBD_DISCONNECT = false
                         tripEntityList[tripEntityList.size-1].status = "2"
-                        LogUtils().v(TAG_BD, " CHANGE ${tripEntityList[tripEntityList.size-1].toString()}")
+                        TripRepository(Application()).update(tripEntityList[tripEntityList.size-1])
+                        LogUtils().v(TAG_BD, " CHANGE ${tripEntityList[tripEntityList.size-1]}")
+                    }
+                    countTotalTrip++
+
+                    sendDataIoTHub.sendDataJsonString(tripEntityList[0].tripId, JSONUtils.generateJSONArray(tripEntityList).toString(), context, "")
+                  /*  if (statusTrip == "2")
+                        getFailuresTripValues(tripEntityList = tripEntityList)
+                    else
+                        sendDataIoTHub.sendDataJsonString(tripEntityList[0].tripId, JSONUtils.generateJSONArray(tripEntityList).toString(), context, "")*/
+
+                    getAllTrip()
+                }
+            }
+            override fun onFailure(e: Exception?) {
+
+            }
+        })
+    }
+
+    fun getFailuresTripValues(tripEntityList: MutableList<TripEntity>){
+        FailuresTripValuesRepository(Application()).getAll(object : FailuresTripValuesRepository.PopulateCallback{
+            override fun onSuccess(failuresTripValuesEntityList: MutableList<FailuresTripValuesEntity>) {
+                LogUtils().v(TAG_BD, message = " Failures totales : ${failuresTripValuesEntityList.size}")
+                if (failuresTripValuesEntityList.size == 0){
+                    LogUtils().v(TAG_BD, message = " NO HAY FAILURES")
+                    sendDataIoTHub.sendDataJsonString(tripEntityList[0].tripId, JSONUtils.generateJSONArray(tripEntityList).toString(), context,"")
+                }else{
+                    LogUtils().v(TAG_BD, message = " SI HAY FAILURES")
+                    if (UtilsNetwork().isOnline(context!!)){
+                        var cont = 0
+                        for (failures in failuresTripValuesEntityList){
+                            cont++
+                            sendDataIoTHub.sendDataJsonString(failures.id_trip,failures.json_value, context, failures.id_trip_values)
+                            if (cont == failuresTripValuesEntityList.size)
+                                sendDataIoTHub.sendDataJsonString(tripEntityList[0].tripId, JSONUtils.generateJSONArray(tripEntityList).toString(), context, failures.id_trip_values)
+                        }
+                    }else {
+                        sendDataIoTHub.sendDataJsonString(tripEntityList[0].tripId, JSONUtils.generateJSONArray(tripEntityList).toString(), context,"")
+                    }
+                }
+            }
+
+            override fun onFailure(e: Exception?) {
+
+            }
+        })
+    }
+
+    fun getAllFailures(){
+        sendDataIoTHub.InitClient()
+        sendDataIoTHub.resetCount()
+        FailuresTripValuesRepository(Application()).getAll(object : FailuresTripValuesRepository.PopulateCallback{
+            override fun onSuccess(failuresTripValuesEntityList: MutableList<FailuresTripValuesEntity>) {
+                LogUtils().v(TAG_BD, message = " Failures totales : ${failuresTripValuesEntityList.size}")
+                LogUtils().v(TAG_BD, message = " Failures totales : ${failuresTripValuesEntityList.toString()}")
+                if (failuresTripValuesEntityList.size == 0){
+                    LogUtils().v(TAG_BD, message = " NO HAY FAILURES")
+                }else{
+                    LogUtils().v(TAG_BD, message = " SI HAY FAILURES, enviando...")
+                    for (failures in failuresTripValuesEntityList){
+                        sendDataIoTHub.sendDataJsonString(failures.id_trip,failures.json_value, context, failures.id_trip_values)
                     }
 
-                    sendDataOBD.sendDataJsonString(JSONUtils.generateJSONArray(tripEntityList).toString())
-                    getAllTrip()
                 }
             }
             override fun onFailure(e: Exception?) {
@@ -800,7 +870,7 @@ object ConnectOBD{
         TripRepository(Application()).getAllNotes(object : TripRepository.PopulateCallback {
             override fun onSuccess(tripEntityList: MutableList<TripEntity>) {
                 count = tripEntityList.size
-                LogUtils().v(TAG_BD, " Datos restantes : ${count}")
+                LogUtils().v(TAG_BD, " Datos totales : ${count}")
                 LogUtils().v(TAG_BD, " Datos tripEntityList : ${tripEntityList.toString()}")
                 LogUtils().v(TAG_BD, " Datos tripEntityList ultimo: ${tripEntityList[count-1]}")
                 Toast.makeText(context, "ULTIMO STATUS ${tripEntityList[count-1].status} -- HORA ${tripEntityList[count-1].time}", Toast.LENGTH_LONG).show()
@@ -855,7 +925,7 @@ object ConnectOBD{
 
 
                 Handler().postDelayed(sendTripIotHub,3000)
-
+                //exportDB()
             }
             override fun onFailure(e: Exception?) {
 
@@ -874,5 +944,31 @@ object ConnectOBD{
 
 
 
+
+    val SAMPLE_DB_NAME = "BDRoomTrip"
+    //val SAMPLE_DB_NAME = sendDataIoTHub.getIDTrip(context, VIN)
+    private fun exportDB() {
+        val sd = Environment.getExternalStorageDirectory()
+        val data = Environment.getDataDirectory()
+        var source: FileChannel? = null
+        var destination: FileChannel? = null
+        val currentDBPath = "/data/com.mdp.innovation.obd_driving/databases/$SAMPLE_DB_NAME"
+        val backupDBPath = "$SAMPLE_DB_NAME.db"
+        val currentDB = File(data, currentDBPath)
+        val backupDB = File(sd, backupDBPath)
+        try {
+            source = FileInputStream(currentDB).channel
+            destination = FileOutputStream(backupDB).channel
+            destination!!.transferFrom(source, 0, source!!.size())
+            source.close()
+            destination.close()
+            Toast.makeText(context, "DB Exported!", Toast.LENGTH_LONG).show()
+            //tripRepository!!.deleteAll()
+        } catch (e: IOException) {
+            e.printStackTrace()
+            Toast.makeText(context, "DB Exported! ${e.message}", Toast.LENGTH_LONG).show()
+        }
+
+    }
 
 }

@@ -6,19 +6,22 @@ import android.arch.persistence.room.Room;
 import android.arch.persistence.room.RoomDatabase;
 import android.content.Context;
 import android.support.annotation.NonNull;
+import com.mdp.innovation.obd_driving_api.data.entity.FailuresTripValuesEntity;
 import com.mdp.innovation.obd_driving_api.data.entity.LocationEntity;
 import com.mdp.innovation.obd_driving_api.data.entity.ObdEntity;
 import com.mdp.innovation.obd_driving_api.data.entity.TripEntity;
+import com.mdp.innovation.obd_driving_api.data.store.daoBD.FailuresTripValuesDao;
 import com.mdp.innovation.obd_driving_api.data.store.daoBD.LocationDao;
 import com.mdp.innovation.obd_driving_api.data.store.daoBD.ObdDao;
 import com.mdp.innovation.obd_driving_api.data.store.daoBD.TripDao;
 
 
-@Database(entities = {TripEntity.class, ObdEntity.class, LocationEntity.class}, version = 16)
+@Database(entities = {TripEntity.class, ObdEntity.class, LocationEntity.class, FailuresTripValuesEntity.class}, version = 18)
 public  abstract class TripDataBase extends RoomDatabase {
     public abstract TripDao tripDao();
     public abstract ObdDao obdDao();
     public abstract LocationDao locationDao();
+    public abstract FailuresTripValuesDao failuresTripValuesDao();
     private static TripDataBase INSTANCE;
 
     public static TripDataBase getDatabase(final Context context) {

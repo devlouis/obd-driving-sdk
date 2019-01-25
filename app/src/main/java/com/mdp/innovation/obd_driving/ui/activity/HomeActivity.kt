@@ -28,7 +28,6 @@ import com.mdp.innovation.obd_driving.util.Preferences
 import com.mdp.innovation.obd_driving_api.app.`interface`.ObdGatewayVin
 import com.mdp.innovation.obd_driving_api.app.core.ConnectOBD
 import com.mdp.innovation.obd_driving_api.app.ui.activity.PairObdActivity
-import com.mdp.innovation.obd_driving_api.data.IoTHub.SendDataOBD
 import org.koin.android.ext.android.inject
 
 
@@ -44,7 +43,7 @@ class HomeActivity : BaseServiceActivity(), HomeView, ObdGatewayVin {
 
     private var startLiveDataInterface: StartLiveDataInterface? = null
 
-    //var sabe = SendDataOBD()
+    //var sabe = SendDataIoTHub()
     lateinit var dataUser: DataUserModel
 
     override fun onCreate(savedInstanceState: Bundle?) {

@@ -2,8 +2,13 @@ package com.mdp.innovation.obd_driving_api.data.IoTHub;
 
 import android.app.Application;
 import android.content.Context;
+import com.mdp.innovation.obd_driving_api.app.core.UtilsNetwork;
+import com.mdp.innovation.obd_driving_api.app.utils.LogUtils;
 import com.mdp.innovation.obd_driving_api.app.utils.UtilsLocationService;
+import com.mdp.innovation.obd_driving_api.data.entity.FailuresEntity;
+import com.mdp.innovation.obd_driving_api.data.entity.FailuresTripValuesEntity;
 import com.mdp.innovation.obd_driving_api.data.store.SharedPreference;
+import com.mdp.innovation.obd_driving_api.data.store.repository.FailuresTripValuesRepository;
 import com.microsoft.azure.sdk.iot.device.*;
 import com.microsoft.azure.sdk.iot.device.DeviceTwin.DeviceMethodData;
 import com.microsoft.azure.sdk.iot.device.DeviceTwin.Pair;
@@ -12,11 +17,13 @@ import com.microsoft.azure.sdk.iot.device.DeviceTwin.TwinPropertyCallBack;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-public class SendDataOBD {
+public class SendDataIoTHub {
 
     private final String connString = "HostName=digitalCar.azure-devices.net;DeviceId=prueba;SharedAccessKey=nPh5ND6bMSw20CQwb3PfnCfL4hVP+2dcC6/KLrlGqU0=";
     private final String deviceId = "MyAndroidDevice";
@@ -25,6 +32,10 @@ public class SendDataOBD {
 
     private static final int METHOD_SUCCESS = 200;
     private static final int METHOD_NOT_DEFINED = 404;
+
+    private static int posTrip = 0;
+
+    SharedPreference appSharedPreference;
 
     private static int method_command(Object command)
     {
@@ -239,84 +250,65 @@ public class SendDataOBD {
     /**
      * Datos para el envio
      */
-    static class EventCallback implements IotHubEventCallback
-    {
+
+
+    private static Integer msgSentCount  = 0;
+    private static Integer receiptsConfirmedCount = 0;
+    private static Integer sendFailuresCount  = 0;
+    private static Integer noSendCount  = 0;
+
+    class EventCallback implements IotHubEventCallback {
         public void execute(IotHubStatusCode status, Object context)
         {
             Integer i = (Integer) context;
             System.out.println("IoT Hub responded to message " + i.toString()
                     + " with status " + status.name());
             if((status == IotHubStatusCode.OK) || (status == IotHubStatusCode.OK_EMPTY)){
+                receiptsConfirmedCount++;
+                //setRecordTrip("","",receiptsConfirmedCount.toString(),"","","");
 
+                new FailuresTripValuesRepository(new Application()).deleteValue(i.toString());
             }else{
-
+                sendFailuresCount++;
+                //setRecordTrip("","","",sendFailuresCount.toString(),"","");
+                System.out.println("NO SE confirmo " + sendFailuresCount
+                );
             }
+            System.out.println("msgSentCount " + msgSentCount
+                    + " receiptsConfirmedCount " + receiptsConfirmedCount
+                    + " sendFailuresCount " + sendFailuresCount);
         }
     }
 
     UtilsLocationService utilsLocationService = new UtilsLocationService();
-    public void sendData(Context context, String deviceId, String rpm, String kmh, Integer count){
-        String msgStr = "{\"ID_TRIP\":\"" + getIDTrip(context, deviceId) + "\",\"FECHA\":\"" + utilsLocationService.getDateToDay() + "\",\"RPM\":" + rpm + ",\"KMH\":" + kmh + ",\"COUNT\":" + count + "}";
-        //String msgStr   = "{\"VIN     \":\"" + deviceId + "\",\"COUNT\":" + count + ",\"RPM\":" + rpm + ",\"KM/H\":" + kmh + "}";
-        try
-        {
-            Message msg = new Message(msgStr);
-            //msg.setProperty("temperatureAlert", temperature > 28 ? "true" : "false");
-            msg.setMessageId(java.util.UUID.randomUUID().toString());
-            System.out.println(msgStr);
-            EventCallback eventCallback = new EventCallback();
-            client.sendEventAsync(msg, eventCallback, 1);
-        }
-        catch (Exception e)
-        {
-            System.err.println("Exception while sending event: " + e.getMessage());
-        }
-    }
 
-    public void sendData2(Integer count){
-        double temperature = 20.0 + Math.random() * 10;
-        double humidity = 30.0 + Math.random() * 20;
 
-        String msgStr = "{\"deviceId\":\"" + deviceId + ",\"COUNT\":" + count + ",\"temperature\":" + temperature + ",\"humidity\":" + humidity + "}";
-        try
-        {
-            Message msg = new Message(msgStr);
-            //msg.setProperty("temperatureAlert", temperature > 28 ? "true" : "false");
-            msg.setMessageId(java.util.UUID.randomUUID().toString());
-            System.out.println(msgStr);
-            EventCallback eventCallback = new EventCallback();
-            client.sendEventAsync(msg, eventCallback, 1);
-        }
-        catch (Exception e)
-        {
-            System.err.println("Exception while sending event: " + e.getMessage());
-        }
-    }
+    Context mcontext;
+    public void sendDataJsonString(String idTrip, String msgStr, Context mContext, String id_trip_values){
+        //appSharedPreference = new SharedPreference(mContext);
 
-    public void sendLocation(Context context, String deviceId, String longitud, String latitud, Integer count){
-        String msgStr = "{\"ID_TRIP\":\""  + getIDTrip(context, deviceId) + "\",\"FECHA\":\"" + utilsLocationService.getDateToDay() + "\",\"LONGITUD\":" + longitud + ",\"LATITUD\":" + latitud + ",\"COUNT\":" + count + "}";
-        //String msgStr   = "{\"VIN     \":\"" + deviceId + "\",\"COUNT\":" + count + ",\"RPM\":" + rpm + ",\"KM/H\":" + kmh + "}";
-        try
-        {
-            Message msg = new Message(msgStr);
-            //msg.setProperty("temperatureAlert", temperature > 28 ? "true" : "false");
-            msg.setMessageId(java.util.UUID.randomUUID().toString());
-            System.out.println(msgStr);
-            EventCallback eventCallback = new EventCallback();
-            client.sendEventAsync(msg, eventCallback, 1);
-        }
-        catch (Exception e) {
-            System.err.println("Exception while sending event: " + e.getMessage());
-        }
-    }
-
-    public void sendDataJsonString(String msgStr){
+        this.mcontext = mContext;
         String msgStrsss = "[{" +
                 "\"tripId\":\""  + deviceId + "\",\"FECHA\":\"" + utilsLocationService.getDateToDay() + "\",\"LONGITUD\":" + "999999969" + ",\"LATITUD\":" + "5858858" + ",\"COUNT\":" + "58" +
                 "}," +
                 "{\"tripId\":\""  + deviceId + "\",\"FECHA\":\"" + utilsLocationService.getDateToDay() + "\",\"LONGITUD\":" + "999999969" + ",\"LATITUD\":" + "5858858" + ",\"COUNT\":" + "58" +
                 "}" +
                 "]";
+        msgSentCount ++;
+//        setRecordTrip(idTrip,"","","","","");
+
+
+        FailuresTripValuesEntity failuresTripValuesEntity = new FailuresTripValuesEntity();
+        failuresTripValuesEntity.setId_trip(idTrip);
+
+        if (id_trip_values.isEmpty()){
+            failuresTripValuesEntity.setId_trip_values(msgSentCount.toString());
+        }else{
+            failuresTripValuesEntity.setId_trip_values(id_trip_values);
+        }
+
+        failuresTripValuesEntity.setJson_value(msgStr);
+        new FailuresTripValuesRepository(new Application()).addFailuresTripValue(failuresTripValuesEntity);
 
         try
         {
@@ -324,11 +316,28 @@ public class SendDataOBD {
             msg.setMessageId(java.util.UUID.randomUUID().toString());
             System.out.println(msgStr);
             EventCallback eventCallback = new EventCallback();
-            client.sendEventAsync(msg, eventCallback, 1);
+
+            failuresTripValuesEntity.setId_trip(idTrip);
+            if (id_trip_values.isEmpty()){
+                client.sendEventAsync(msg, eventCallback, msgSentCount);
+            }else{
+                client.sendEventAsync(msg, eventCallback, id_trip_values);
+            }
+
         }
-        catch (Exception e)
-        {
+        catch (Exception e) {
+            noSendCount++;
             System.err.println("Exception while sending event: " + e.getMessage());
+                if (new UtilsNetwork().isOnline(mContext)){
+                    try {
+                        client.open();
+                    } catch (IOException e1) {
+                        e1.printStackTrace();
+                    }
+                }else{
+                    System.err.println(" SIN INTERNET ");
+                }
+
         }
     }
 
@@ -336,6 +345,52 @@ public class SendDataOBD {
     public String getIDTrip(Context context, String deviceId){
         SharedPreference appSharedPreference = new SharedPreference(context);
         HashMap<String, String> idTrip = appSharedPreference.getIdTrip();
+
         return  deviceId + "-" + idTrip.get(appSharedPreference.getID_TRIP());
+    }
+
+    public void resetCount(){
+        msgSentCount  = 0;
+        receiptsConfirmedCount = 0;
+        sendFailuresCount  = 0;
+    }
+
+    public void setRecordTrip(String id_trip, String cantidad, String confirmados, String denegados, String no_enviados, String sincronizados) {
+        SharedPreference appSharedPreference = new SharedPreference(new Application());
+        if (msgSentCount == 1) {
+            appSharedPreference = new SharedPreference(new Application());
+        }
+
+        appSharedPreference.saveRecordTrip(new FailuresEntity());
+        FailuresEntity failuresEntity = appSharedPreference.getRecordTrip();
+
+        if (!id_trip.isEmpty())
+            failuresEntity.setId_trip(id_trip);
+        if (!cantidad.isEmpty())
+            failuresEntity.setCantidad(Integer.parseInt(cantidad));
+        if (!confirmados.isEmpty())
+            failuresEntity.setCantidad(Integer.parseInt(confirmados));
+        if (!denegados.isEmpty())
+            failuresEntity.setCantidad(Integer.parseInt(denegados));
+        if (!no_enviados.isEmpty())
+            failuresEntity.setCantidad(Integer.parseInt(no_enviados));
+        if (!sincronizados.isEmpty())
+            failuresEntity.setCantidad(Integer.parseInt(sincronizados));
+
+        new LogUtils().v(" failuresEntity ", failuresEntity.toString());
+
+       
+    }
+
+    public void curretToday(){
+        SimpleDateFormat sdf6 = new SimpleDateFormat("H:mm:ss");
+        String currentDateandTime = sdf6.format(new Date());
+
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy:MM:dd");
+        String currentToDay = sdf6.format(new Date());
+
+
+
+
     }
 }

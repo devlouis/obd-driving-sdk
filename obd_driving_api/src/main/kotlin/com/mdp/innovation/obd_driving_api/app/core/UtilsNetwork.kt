@@ -1,9 +1,7 @@
 package com.mdp.innovation.obd_driving_api.app.core
 
-import android.app.Application
 import android.content.Context
 import android.net.ConnectivityManager
-import android.net.NetworkInfo
 import android.os.Build
 import com.mdp.innovation.obd_driving_api.app.utils.LogUtils
 
@@ -18,7 +16,7 @@ class UtilsNetwork {
     private var isWifiConn: Boolean = false
     private var isMobileConn: Boolean = false
 
-    fun isOnline(context: Context){
+    fun isOnline(context: Context): Boolean {
         val connMgr = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             connMgr.allNetworks.forEach { network ->
@@ -31,6 +29,12 @@ class UtilsNetwork {
                     }
                 }
             }
+        }
+
+        if (!isWifiConn && !isMobileConn){
+            return false
+        }else {
+            return true
         }
 
         LogUtils().v(TAG, "Wifi connected: $isWifiConn")

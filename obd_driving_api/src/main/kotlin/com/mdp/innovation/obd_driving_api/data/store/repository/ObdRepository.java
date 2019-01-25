@@ -3,7 +3,6 @@ package com.mdp.innovation.obd_driving_api.data.store.repository;
 import android.app.Application;
 import android.os.AsyncTask;
 import com.mdp.innovation.obd_driving_api.data.entity.ObdEntity;
-import com.mdp.innovation.obd_driving_api.data.store.ObdDataBase;
 import com.mdp.innovation.obd_driving_api.data.store.TripDataBase;
 import com.mdp.innovation.obd_driving_api.data.store.daoBD.ObdDao;
 

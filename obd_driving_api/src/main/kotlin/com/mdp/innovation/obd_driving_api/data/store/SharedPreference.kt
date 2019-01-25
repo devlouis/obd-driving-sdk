@@ -2,6 +2,9 @@ package com.mdp.innovation.obd_driving_api.data.store
 
 import android.content.Context
 import android.content.SharedPreferences
+import com.google.gson.GsonBuilder
+import com.mdp.innovation.obd_driving_api.app.utils.JSONUtils
+import com.mdp.innovation.obd_driving_api.data.entity.FailuresEntity
 
 class SharedPreference {
     var pref: SharedPreferences? = null
@@ -14,6 +17,7 @@ class SharedPreference {
     var VIN_CAR = "VIN_CAR"
     var ID_TRIP = "ID_TRIP"
     var ID_RAW_BD = "ID_RAW_BD"
+    var FAILURES = "FAILURES"
 
     constructor(context: Context?) {
         this.context = context
@@ -61,5 +65,18 @@ class SharedPreference {
         id[ID_RAW_BD] = pref!!.getString(ID_RAW_BD, "")
         return id
     }
+
+    fun saveRecordTrip(failuresEntity: FailuresEntity){
+        editor!!.putString(FAILURES, JSONUtils.generateJSONObject(failuresEntity).toString())
+        editor!!.commit()
+    }
+
+    fun getRecordTrip():FailuresEntity {
+        var gsonb = GsonBuilder()
+        var gson = gsonb.create()
+        return  gson.fromJson(pref!!.getString(FAILURES, ""), FailuresEntity::class.java) as FailuresEntity
+    }
+
+
 
 }

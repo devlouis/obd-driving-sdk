@@ -263,7 +263,7 @@ public class ObdGatewayService extends AbstractGatewayService  {
             }
 
             if (job != null) {
-            /*    SendDataOBD send = new SendDataOBD();
+            /*    SendDataIoTHub send = new SendDataIoTHub();
                 try {
                     send.InitClient();
                 } catch (URISyntaxException e) {
