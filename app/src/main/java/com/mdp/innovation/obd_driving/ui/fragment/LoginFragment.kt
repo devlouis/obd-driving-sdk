@@ -53,7 +53,7 @@ class LoginFragment : BaseFragment(), LoginView {
                         "getInstanceId failed: No error to show"
                     }
                     Log.w(TAG, message, task.exception)
-                    Message.toastLong(message, context)
+                    Message.toastLong("Hay problemas con su Google Play Service. No recibirá las notificaciones.", context)
                     return
                 }
 
@@ -63,7 +63,7 @@ class LoginFragment : BaseFragment(), LoginView {
                 // Log and toast
                 Log.d(TAG, token)
                 //Message.toastLong(token, context)
-                firebaseToken = token
+                //firebaseToken = token
             }
         })
 
@@ -102,6 +102,12 @@ class LoginFragment : BaseFragment(), LoginView {
                 val username = et_username.text.toString().trim()
                 val password = et_password.text.toString().trim()
 
+                var tokenPush = preferences.getTokenPush(context)
+                if(tokenPush == "-"){
+                    tokenPush = FirebaseInstanceId.getInstance().token!!
+                    preferences.setTokenPush(context, tokenPush)
+                }
+                firebaseToken = tokenPush
                 presenter.getLogin(username, password, firebaseToken)
             }
 

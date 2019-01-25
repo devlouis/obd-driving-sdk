@@ -7,7 +7,10 @@ import android.view.ViewGroup
 
 import com.mdp.innovation.obd_driving.R
 import android.support.annotation.Nullable
+import android.util.Log
 import com.google.firebase.iid.FirebaseInstanceId
+import com.mdp.innovation.obd_driving.interactor.TokenInteractor
+import com.mdp.innovation.obd_driving.service.model.DeleteTokenResponse
 import com.mdp.innovation.obd_driving.ui.navigation.Navigator
 import com.mdp.innovation.obd_driving.util.CustomAnimate
 import com.mdp.innovation.obd_driving.util.Preferences
@@ -17,6 +20,8 @@ import org.koin.android.ext.android.inject
 
 
 class LogoutDialogFragment : BaseDialogFragment() {
+
+    val TAG = javaClass.simpleName
 
     companion object {
         fun newInstance(): LogoutDialogFragment{
@@ -53,6 +58,19 @@ class LogoutDialogFragment : BaseDialogFragment() {
                 doAsync {
                     FirebaseInstanceId.getInstance().deleteInstanceId()
                 }
+
+                /*val dataUser = preferences.getDataUser(context)
+
+                val interactor = TokenInteractor()
+                interactor.deleteToken(object: TokenInteractor.OnDeleteTokenFinishedListener{
+                    override fun onDeleteTokenSuccess(response: DeleteTokenResponse) {
+                        Log.d(TAG,"El token se eliminó correctamente.")
+                    }
+
+                    override fun onDeleteTokenError(message: String) {
+                        Log.d(TAG,"Error: $message")
+                    }
+                }, dataUser!!.userId!!, dataUser!!.token!!)*/
 
                 preferences.removeAll(context)
                 navigator.navigateToInitial(activity)

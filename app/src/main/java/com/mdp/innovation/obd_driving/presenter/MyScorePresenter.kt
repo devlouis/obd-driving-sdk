@@ -23,21 +23,6 @@ class MyScorePresenter(var myScoreView: MyScoreView?, val myScoreInteractor: MyS
         myScoreView?.onDeviceNoConnected()
     }
 
-    fun getScore(vin: String, tripId: String) {
-        //myScoreView?.showProgress()
-        myScoreInteractor.getScore( this, vin, tripId)
-    }
-
-    override fun onGetScoreSuccess(response: ScoreResponse) {
-        //myScoreView?.hideProgress()
-        myScoreView?.onGetScoreSuccess(response)
-    }
-
-    override fun onGetScoreError(message: String) {
-        //myScoreView?.hideProgress()
-        myScoreView?.onGetScoreError(message)
-    }
-
     fun getMyScore(userId: String) {
         //myScoreView?.showLoading()
         myScoreInteractor.getMyScore( this, userId)
@@ -53,18 +38,4 @@ class MyScorePresenter(var myScoreView: MyScoreView?, val myScoreInteractor: MyS
         myScoreView?.onGetMyScoreError(message)
     }
 
-    /*fun updateVin(userId: String, vin: String) {
-        //myScoreView?.showLoading()
-        myScoreInteractor.updateVin( this, userId, vin)
-    }
-
-    override fun onUpdateVinSuccess(response: UpdateVinResponse) {
-        //myScoreView?.hideLoading()
-        myScoreView?.onUpdateVinSuccess(response)
-    }
-
-    override fun onUpdateVinError(message: String) {
-        //myScoreView?.hideLoading()
-        myScoreView?.onUpdateVinError(message)
-    }*/
 }

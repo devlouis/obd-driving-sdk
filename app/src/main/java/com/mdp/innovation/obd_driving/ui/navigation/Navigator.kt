@@ -26,7 +26,7 @@ class Navigator {
         val ft = fragmentManager.beginTransaction()
         val myTripsFragment = MyTripsFragment.newInstance()
         ft.replace(containerId, myTripsFragment)
-        //ft.addToBackStack(null)
+        ft.addToBackStack(null)
         ft.commit()
         return myTripsFragment
     }
@@ -44,7 +44,7 @@ class Navigator {
         val ft = fragmentManager.beginTransaction()
         val configurationFragment = ConfigurationFragment.newInstance()
         ft.replace(containerId, configurationFragment)
-        //ft.addToBackStack(null)
+        ft.addToBackStack(null)
         ft.commit()
         return configurationFragment
     }

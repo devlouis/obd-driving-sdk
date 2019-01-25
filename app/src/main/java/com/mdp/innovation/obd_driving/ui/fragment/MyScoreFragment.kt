@@ -1,10 +1,12 @@
 package com.mdp.innovation.obd_driving.ui.fragment
 
 import android.bluetooth.BluetoothAdapter
+
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -15,7 +17,6 @@ import android.view.ViewGroup
 import com.mdp.innovation.obd_driving.R
 import android.support.v7.widget.Toolbar
 import com.mdp.innovation.obd_driving.ui.MyScoreView
-import com.mdp.innovation.obd_driving.util.Message
 import kotlinx.android.synthetic.main.fragment_my_score.*
 import android.support.annotation.Nullable
 import android.support.v4.content.LocalBroadcastManager
@@ -24,18 +25,22 @@ import com.mdp.innovation.obd_driving.interactor.MyScoreInteractor
 import com.mdp.innovation.obd_driving.presenter.MyScorePresenter
 import com.mdp.innovation.obd_driving.ui.activity.HomeActivity
 import com.mdp.innovation.obd_driving.ui.navigation.Navigator
-import com.mdp.innovation.obd_driving.util.CustomAnimate
 import android.util.Log
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
+import com.google.firebase.iid.FirebaseInstanceId
+import com.mdp.innovation.obd_driving.interactor.TokenInteractor
 import com.mdp.innovation.obd_driving.service.model.MyScoreResponse
 import com.mdp.innovation.obd_driving.service.model.ScoreResponse
+import com.mdp.innovation.obd_driving.service.model.UpdateTokenResponse
+import com.mdp.innovation.obd_driving.util.*
 import org.koin.android.ext.android.inject
-import com.mdp.innovation.obd_driving.util.Global
-import com.mdp.innovation.obd_driving.util.Preferences
 import com.mdp.innovation.obd_driving_api.app.core.ConnectOBD
 import com.mdp.innovation.obd_driving_api.app.utils.LogUtils
+import org.jetbrains.anko.doAsync
 import java.lang.Exception
+import java.net.HttpURLConnection
+import java.net.URL
 
 
 class MyScoreFragment : BaseServiceFragment(), MyScoreView, HomeActivity.StartLiveDataInterface {
@@ -62,6 +67,7 @@ class MyScoreFragment : BaseServiceFragment(), MyScoreView, HomeActivity.StartLi
     private var userId = ""
 
     private lateinit var myReceiver: MyReceiver
+    private lateinit var myReceiverPush: MyReceiverPush
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -97,6 +103,7 @@ class MyScoreFragment : BaseServiceFragment(), MyScoreView, HomeActivity.StartLi
     override fun onActivityCreated(@Nullable savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         myReceiver = MyReceiver()
+        myReceiverPush = MyReceiverPush()
         initUI()
 
         /*if(isActiveCollectDataService()){
@@ -104,79 +111,6 @@ class MyScoreFragment : BaseServiceFragment(), MyScoreView, HomeActivity.StartLi
             Global.cancelValidated = false
         }*/
     }
-
-    private fun validateConsultScore(isFirstTimeInput: Boolean){
-
-        var isFirstTime = isFirstTimeInput
-
-        if(preferences.getScorePending(context)){
-            showScorePending = true
-            if(!isFirstTime){
-                isFirstTime = false
-                showScorePendingProgress()
-            }
-            //consultScore()
-
-
-            runnable = Runnable {
-
-                if(preferences.getScorePending(context)){
-                    consultScore()
-                    handler.postDelayed(runnable, 5000)
-                }else{
-                    handler.removeCallbacks(runnable)
-                    showScorePending = false
-                    if(!isFirstTime) {
-                        isFirstTime = false
-                        hideScorePendingProgress()
-                    }
-                }
-
-            }
-            handler.postDelayed(runnable, 5000)
-        }else{
-            showScorePending = false
-            if(!isFirstTime) {
-                isFirstTime = false
-                hideScorePendingProgress()
-            }
-        }
-
-    }
-
-    private fun consultScore(){
-
-        VIN = "D12"
-        tripId = "0caacd33-1626-4767-93d1-5cbd3ce0217a"
-        presenter.getScore(VIN, tripId)
-
-    }
-
-    override fun onGetScoreSuccess(response: ScoreResponse) {
-        if(response != null && response.VIN != null && response.VIN.aceleracion != null && response.VIN.frenado != null){
-            val accelerationScore = response.VIN.aceleracion
-            val brakingScore = response.VIN.frenado
-            val penality = (accelerationScore.toFloat()) + (brakingScore.toFloat())
-            val newScore = 10 + penality
-            val lastTripCalculed = preferences.getLastTripCalculed(context)
-            if(tripId != lastTripCalculed){
-                preferences.setLastTripCalculed(context, tripId)
-                preferences.setMyScore(context, newScore.toString())
-                preferences.setScorePending(context, false)
-                tv_home_prom.text = newScore.toString()
-                hideScorePendingProgress()
-
-                var dialog = EndTripDialogFragment()
-                dialog.show(fragmentManager,"end_trip")
-            }
-        }
-    }
-
-    override fun onGetScoreError(message: String) {
-        Message.toastLong("Ha ocurrido un error: $message", context)
-    }
-
-
 
     override fun getVin(vin: String){
         Log.i("[INFO]","ACTIVITY getVin: $vin")
@@ -238,6 +172,20 @@ class MyScoreFragment : BaseServiceFragment(), MyScoreView, HomeActivity.StartLi
         }
     }
 
+    private inner class MyReceiverPush : BroadcastReceiver() {
+        override fun onReceive(context: Context, intent: Intent) {
+            val extras = intent.extras
+            val type = extras.getString(Constants.ACTION_TYPE_PUSH)
+
+            when(type){
+                Constants.TYPE_TRIP_FINISHED -> {
+                    showMyScore()
+                }
+            }
+
+        }
+    }
+
 
     private fun showDialodAlert(msg: String) {
         val builderAlertDialog = AlertDialog.Builder(requireActivity())
@@ -271,26 +219,76 @@ class MyScoreFragment : BaseServiceFragment(), MyScoreView, HomeActivity.StartLi
 
         if(ConnectOBD.CheckConecction()){
             navigator.navigateToCollectData(fragmentManager, R.id.content)
+            return
+        }
+
+        var tokenPush = preferences.getTokenPush(context)
+        if(tokenPush == "-"){
+            tokenPush = FirebaseInstanceId.getInstance().token!!
+            preferences.setTokenPush(context, tokenPush)
+            //ENDPOINT ADD TOKEN PUSH
+
+            /*val dataUser = preferences.getDataUser(context)
+
+            val interactor = TokenInteractor()
+            interactor.updateToken(object: TokenInteractor.OnUpdateTokenFinishedListener{
+                override fun onUpdateTokenSuccess(response: UpdateTokenResponse) {
+                    Log.d(TAG,"El token se actualizó correctamente.")
+                }
+
+                override fun onUpdateTokenError(message: String) {
+                    Log.d(TAG,"Error: $message")
+                }
+            }, dataUser!!.userId!!, tokenPush, "-")*/
+
         }
 
         CustomAnimate.setButtonAnimation(btnStartTrip)
 
         btnStartTrip.setOnClickListener {
-            //nextActivity(PairObdActivity::class.java, true)
-            //navigator.navigateToCollectData(fragmentManager, R.id.content)
 
+            val token = preferences.getTokenPush(context)
+            Log.d(TAG, token)
+
+            /*showLoading()
             it.isEnabled = false
             it.postDelayed({
-                presenter.isConnected()
-                it.isEnabled = true
-            }, 100L)
+
+                Connection.validate(activity!!, object : Connection.OnConnectionFinishedListener{
+                    override fun onConnectionFinished(code: Int) {
+                        when(code){
+                            Connection.OK ->{
+                                hideLoading()
+                                presenter.isConnected()
+                                it.isEnabled = true
+                            }
+                            Connection.NO_NETWORK ->{
+                                hideLoading()
+                                Message.toastLong("Debe conectarse a una red.", context)
+                                it.isEnabled = true
+                            }
+                            Connection.NO_CONNECTION ->{
+                                hideLoading()
+                                Message.toastLong("Hay problemas con su señal de internet. Inténtelo nuevamente.", context)
+                                it.isEnabled = true
+                            }
+                            Connection.EXCEPTION ->{
+                                hideLoading()
+                                Message.toastLong("Ocurrió un problema. Inténtelo en unos minutos.", context)
+                                it.isEnabled = true
+                            }
+                        }
+                    }
+                })
+
+
+            }, 100L)*/
+
         }
 
         //showProgress()
 
-        var myScore = preferences.getMyScore(context)
-        if(myScore == "null") myScore = "-"
-        tv_home_prom.text = myScore
+        showMyScore()
 
         userId = preferences.getDataUser(context)!!.userId!!
 
@@ -306,6 +304,12 @@ class MyScoreFragment : BaseServiceFragment(), MyScoreView, HomeActivity.StartLi
 
         }
 
+    }
+
+    private fun showMyScore(){
+        var myScore = preferences.getMyScore(context)
+        if(myScore == "null") myScore = "-"
+        tv_home_prom.text = myScore
     }
 
     override fun onGetMyScoreSuccess(response: MyScoreResponse) {
@@ -338,14 +342,21 @@ class MyScoreFragment : BaseServiceFragment(), MyScoreView, HomeActivity.StartLi
 
     override fun onResume() {
         super.onResume()
+
+        showMyScore()
+
         LocalBroadcastManager.getInstance(requireActivity()).registerReceiver(
             myReceiver, IntentFilter(ConnectOBD.ACTION_BROADCAST)
+        )
+        LocalBroadcastManager.getInstance(requireActivity()).registerReceiver(
+            myReceiverPush, IntentFilter(Constants.ACTION_BROADCAST_PUSH)
         )
         (activity as HomeActivity).setOnStartLiveDataListener(this)
     }
 
     override fun onPause() {
         LocalBroadcastManager.getInstance(requireActivity()).unregisterReceiver(myReceiver)
+        LocalBroadcastManager.getInstance(requireActivity()).unregisterReceiver(myReceiverPush)
         super.onPause()
         (activity as HomeActivity).setOnStartLiveDataListener(null)
     }
@@ -382,7 +393,7 @@ class MyScoreFragment : BaseServiceFragment(), MyScoreView, HomeActivity.StartLi
 
     override fun onDeviceNoConnected(){
         (activity as HomeActivity).goToPairObd()
-        Message.toastShort("Su OBD ha perdido la conexión. Por favor vuélvalo a conectar.", activity?.applicationContext)
+        Message.toastLong("Su OBD ha perdido la conexión. Por favor vuélvalo a conectar.", activity?.applicationContext)
     }
 
     override fun showLoading(){
@@ -408,8 +419,8 @@ class MyScoreFragment : BaseServiceFragment(), MyScoreView, HomeActivity.StartLi
         //DEMO
         /*startCollectDataService()
         (activity as HomeActivity).simulateSpeed()
-        Global.cancelValidated = false
-        navigator.navigateToCollectData(fragmentManager, R.id.content)*/
+        Global.cancelValidated = false*/
+        //navigator.navigateToCollectData(fragmentManager, R.id.content)
     }
 
     override fun onDestroy() {

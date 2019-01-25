@@ -45,7 +45,7 @@ class SplashActivity : BaseAppCompat() {
             //overridePendingTransition(R.anim.slidedown,  R.anim.slideup)
         }
         handler = Handler(Looper.getMainLooper())
-        handler.postDelayed(runnable, 5000)
+        handler.postDelayed(runnable, 3000)
     }
 
     override fun onBackPressed() {

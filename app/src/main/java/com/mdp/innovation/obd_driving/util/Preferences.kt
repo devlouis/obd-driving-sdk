@@ -12,6 +12,7 @@ class Preferences {
     val MY_SCORE = "my_score"
     val MY_VIN = "my_vin"
     val DATA_USER = "data_user"
+    val TOKEN_PUSH = "token_push"
 
     val gson = Gson()
 
@@ -78,6 +79,17 @@ class Preferences {
     fun removeAll(context: Context?){
         var prefs = context!!.getSharedPreferences(PREFS_FILENAME, 0)
         prefs.edit().clear().commit()
+    }
+
+    fun setTokenPush(context: Context?, token: String){
+        var prefs = context!!.getSharedPreferences(PREFS_FILENAME, 0)
+        val editor = prefs!!.edit()
+        editor.putString(TOKEN_PUSH, token)
+        editor.apply()
+    }
+    fun getTokenPush(context: Context?) : String {
+        var prefs = context!!.getSharedPreferences(PREFS_FILENAME, 0)
+        return prefs.getString(TOKEN_PUSH, "-")
     }
 
 }

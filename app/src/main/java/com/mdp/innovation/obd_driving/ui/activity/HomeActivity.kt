@@ -15,14 +15,13 @@ import com.mdp.innovation.obd_driving.ui.navigation.Navigator
 import android.os.Handler
 import android.os.Looper
 import android.support.v4.app.ActivityCompat
+import android.support.v4.app.FragmentManager
 import android.support.v4.content.ContextCompat
 import android.util.Log
 import android.widget.TextView
 import com.mdp.innovation.obd_driving.model.DataUserModel
 import com.mdp.innovation.obd_driving.ui.InterfaceView
-import com.mdp.innovation.obd_driving.ui.fragment.CancelCollectDialogFragment
-import com.mdp.innovation.obd_driving.ui.fragment.LogoutDialogFragment
-import com.mdp.innovation.obd_driving.ui.fragment.MyScoreFragment
+import com.mdp.innovation.obd_driving.ui.fragment.*
 import com.mdp.innovation.obd_driving.util.Global
 import com.mdp.innovation.obd_driving.util.Preferences
 import com.mdp.innovation.obd_driving_api.app.`interface`.ObdGatewayVin
@@ -32,6 +31,8 @@ import org.koin.android.ext.android.inject
 
 
 class HomeActivity : BaseServiceActivity(), HomeView, ObdGatewayVin {
+
+    private val TAG = javaClass.simpleName
 
     var serviceClass = CollectTripDataService::class.java
     lateinit var myIntent : Intent
@@ -144,14 +145,34 @@ class HomeActivity : BaseServiceActivity(), HomeView, ObdGatewayVin {
     private fun setDrawerConfig(){
 
         navigation_view.setNavigationItemSelectedListener{
+
+            val fragmentCount = supportFragmentManager.backStackEntryCount
+            Log.d(TAG, "getBackStackEntryCount in Menu: $fragmentCount")
+
+            val currentFragment = supportFragmentManager.findFragmentById(R.id.content)
+
             when (it.itemId){
                 R.id.action_1 -> {
+                    supportFragmentManager.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE)
+
                     myScoreFragment = navigator.navigateToMyScore(supportFragmentManager, R.id.content)
                 }
                 R.id.action_2 -> {
+
+                    if(currentFragment != null && currentFragment !is MyScoreFragment){
+                        supportFragmentManager.beginTransaction().remove(currentFragment).commit()
+                        supportFragmentManager.popBackStack()
+                    }
+
                     navigator.navigateToMyTrips(supportFragmentManager, R.id.content)
                 }
                 R.id.action_3 -> {
+
+                    if(currentFragment != null && currentFragment !is MyScoreFragment){
+                        supportFragmentManager.beginTransaction().remove(currentFragment).commit()
+                        supportFragmentManager.popBackStack()
+                    }
+
                     navigator.navigateToConfiguration(supportFragmentManager, R.id.content)
                 }
                 R.id.action_4 -> {
@@ -182,8 +203,10 @@ class HomeActivity : BaseServiceActivity(), HomeView, ObdGatewayVin {
     override fun onBackPressed() {
 
         val fragmentCount = supportFragmentManager.backStackEntryCount
-        Log.d("SABEE", "getBackStackEntryCount: $fragmentCount")
-        if(fragmentCount == 0){
+        Log.d(TAG, "getBackStackEntryCount in BackPressed: $fragmentCount")
+
+
+        /*if(fragmentCount == 0){
             if(drawer_layout.isDrawerOpen(Gravity.START)) drawer_layout.closeDrawer(GravityCompat.START)
             else super.onBackPressed()
         }else if(fragmentCount == 1){
@@ -200,6 +223,22 @@ class HomeActivity : BaseServiceActivity(), HomeView, ObdGatewayVin {
                 super.onBackPressed()
             }
 
+        }else{
+            super.onBackPressed()
+        }*/
+
+
+        if(drawer_layout.isDrawerOpen(Gravity.START)) drawer_layout.closeDrawer(GravityCompat.START)
+        else{
+
+            val currentFragment = supportFragmentManager.findFragmentById(R.id.content)
+            if(currentFragment != null && currentFragment is CollectDataFragment){
+                var dialog = CancelCollectDialogFragment.newInstance(customInterface)
+                Global.cancelValidated = false
+                dialog.show(supportFragmentManager,"cancel_collect")
+            }else{
+                super.onBackPressed()
+            }
 
         }
 

@@ -20,12 +20,8 @@ class MyScoreInteractor {
     interface OnMyScoreFinishedListener {
         fun onDeviceConnected()
         fun onDeviceNoConnected()
-        fun onGetScoreSuccess(response: ScoreResponse)
-        fun onGetScoreError(message: String)
         fun onGetMyScoreSuccess(response: MyScoreResponse)
         fun onGetMyScoreError(message: String)
-        //fun onUpdateVinSuccess(response: UpdateVinResponse)
-        //fun onUpdateVinError(message: String)
     }
 
     fun isConnected(listener: OnMyScoreFinishedListener) {
@@ -41,40 +37,6 @@ class MyScoreInteractor {
         }else{
             listener.onDeviceNoConnected()
         }
-    }
-
-    fun getScore(listener: OnMyScoreFinishedListener, VIN: String, tripId: String) {
-
-        doAsync{
-
-            val service = WSService()
-            val call = service.getScore(VIN, tripId)
-            uiThread{
-                call.enqueue(object : Callback<ScoreResponse> {
-                    override fun onResponse(call: Call<ScoreResponse>, response: Response<ScoreResponse>) {
-                        Log.i(TAG, response.body().toString())
-                        if(response.isSuccessful){
-                            listener.onGetScoreSuccess(response.body()!!)
-                        }else{
-                            var message = if(response.errorBody() != null){
-                                response.message() + " | " + response.errorBody()!!.string()
-                            }else{
-                                "Error does not supplied."
-                            }
-                            listener.onGetScoreError(message)
-                        }
-                    }
-
-                    override fun onFailure(call: Call<ScoreResponse>, t: Throwable) {
-                        Log.e(TAG, t.message)
-                        Log.e(TAG, t.cause.toString())
-                        listener.onGetScoreError(t.message!!)
-                    }
-                })
-            }
-
-        }
-
     }
 
     fun getMyScore(listener: OnMyScoreFinishedListener, userId: String) {

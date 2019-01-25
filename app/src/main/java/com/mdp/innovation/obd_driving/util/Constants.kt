@@ -13,6 +13,10 @@ class Constants {
         val ET_TAKING_CURVES = 3
         val ET_SPEEDING = 4
         val ET_DURATION = 5
+        val ACTION_BROADCAST_PUSH = "ACTION_BROADCAST_TRIP_FINISHED"
+        val ACTION_TYPE_PUSH = "ACTION_TYPE_PUSH"
+        val TYPE_TRIP_FINISHED = "1"
+        val DATA_NEW_SCORE = "NEW_SCORE"
     }
 
 

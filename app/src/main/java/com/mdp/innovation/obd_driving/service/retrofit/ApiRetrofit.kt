@@ -20,6 +20,10 @@ interface ApiRetrofit {
     open fun getRegister(@Body request: RegisterRequest): Call<RegisterResponse>
     @POST("scoreHistorico")
     open fun getMyScore(@Body request: MyScoreRequest): Call<MyScoreResponse>
+    @POST("deleteToken")
+    open fun getDeleteToken(@Body request: DeleteTokenRequest): Call<DeleteTokenResponse>
+    @POST("updateToken")
+    open fun getUpdateToken(@Body request: UpdateTokenRequest): Call<UpdateTokenResponse>
     @POST("updateVin")
     open fun updateVin(@Body request: UpdateVinRequest): Call<UpdateVinResponse>
 
