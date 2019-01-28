@@ -25,7 +25,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 public class SendDataIoTHub {
 
-    private final String connString = "HostName=digitalCar.azure-devices.net;DeviceId=prueba;SharedAccessKey=nPh5ND6bMSw20CQwb3PfnCfL4hVP+2dcC6/KLrlGqU0=";
+    /*private final String connString = "HostName=digitalCar.azure-devices.net;DeviceId=prueba;SharedAccessKey=nPh5ND6bMSw20CQwb3PfnCfL4hVP+2dcC6/KLrlGqU0=";*/
+    private final String connString = "HostName=DCP-test.azure-devices.net;DeviceId=lois-android;SharedAccessKey=Q37BFPZONbrYKFsaxkpF1nLsgXERPdc6/T+QNhC/HIE=";
     private final String deviceId = "MyAndroidDevice";
     private DeviceClient client;
     IotHubClientProtocol protocol = IotHubClientProtocol.MQTT;
@@ -284,7 +285,7 @@ public class SendDataIoTHub {
 
 
     Context mcontext;
-    public void sendDataJsonString(String idTrip, String msgStr, Context mContext, String id_trip_values){
+    public void sendDataJsonString(String idTrip, String msgStr, Context mContext, String time){
         //appSharedPreference = new SharedPreference(mContext);
 
         this.mcontext = mContext;
@@ -300,13 +301,17 @@ public class SendDataIoTHub {
 
         FailuresTripValuesEntity failuresTripValuesEntity = new FailuresTripValuesEntity();
         failuresTripValuesEntity.setId_trip(idTrip);
+        //failuresTripValuesEntity.setId_trip_values(msgSentCount.toString());
 
-        if (id_trip_values.isEmpty()){
-            failuresTripValuesEntity.setId_trip_values(msgSentCount.toString());
+        String curretNow = curretToday();;
+      /*  if (time.isEmpty()){
+            curretNow = curretToday();
+            failuresTripValuesEntity.setTimeCurret(curretNow);
         }else{
-            failuresTripValuesEntity.setId_trip_values(id_trip_values);
+            failuresTripValuesEntity.setTimeCurret(time);
         }
-
+*/
+        failuresTripValuesEntity.setTimeCurret(curretNow);
         failuresTripValuesEntity.setJson_value(msgStr);
         new FailuresTripValuesRepository(new Application()).addFailuresTripValue(failuresTripValuesEntity);
 
@@ -314,16 +319,16 @@ public class SendDataIoTHub {
         {
             Message msg = new Message(msgStr);
             msg.setMessageId(java.util.UUID.randomUUID().toString());
-            System.out.println(msgStr);
+            System.out.println(curretNow + " : " + msgStr);
             EventCallback eventCallback = new EventCallback();
+            //client.sendEventAsync(msg, eventCallback, curretNow);
+            client.sendEventAsync(msg, eventCallback, msgSentCount);
 
-            failuresTripValuesEntity.setId_trip(idTrip);
-            if (id_trip_values.isEmpty()){
-                client.sendEventAsync(msg, eventCallback, msgSentCount);
+           /* if (time.isEmpty()){
+                client.sendEventAsync(msg, eventCallback, curretNow);
             }else{
-                client.sendEventAsync(msg, eventCallback, id_trip_values);
-            }
-
+                client.sendEventAsync(msg, eventCallback, time);
+            }*/
         }
         catch (Exception e) {
             noSendCount++;
@@ -382,15 +387,13 @@ public class SendDataIoTHub {
        
     }
 
-    public void curretToday(){
+    public String curretToday(){
         SimpleDateFormat sdf6 = new SimpleDateFormat("H:mm:ss");
         String currentDateandTime = sdf6.format(new Date());
 
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy:MM:dd");
         String currentToDay = sdf6.format(new Date());
 
-
-
-
+        return currentToDay +" "+ currentDateandTime;
     }
 }

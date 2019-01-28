@@ -11,10 +11,11 @@ public class FailuresTripValuesEntity {
     @NonNull
     @ColumnInfo(name = "id")
     private Long id;
+    private String timeCurret = "";
     private String id_trip = "";
     private String id_trip_values = "";
     private String json_value = "";
-    private String time = "";
+
 
     @NonNull
     public Long getId() {
@@ -49,22 +50,22 @@ public class FailuresTripValuesEntity {
         this.json_value = json_value;
     }
 
-    public String getTime() {
-        return time;
+    public String getTimeCurret() {
+        return timeCurret;
     }
 
-    public void setTime(String time) {
-        this.time = time;
+    public void setTimeCurret(String timeCurret) {
+        this.timeCurret = timeCurret;
     }
 
     @Override
     public String toString() {
         return "FailuresTripValuesEntity{" +
                 "id=" + id +
+                ", timeCurret='" + timeCurret + '\'' +
                 ", id_trip='" + id_trip + '\'' +
                 ", id_trip_values='" + id_trip_values + '\'' +
                 ", json_value='" + json_value + '\'' +
-                ", time='" + time + '\'' +
                 '}';
     }
 }

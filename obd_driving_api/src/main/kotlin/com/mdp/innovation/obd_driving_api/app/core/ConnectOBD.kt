@@ -120,11 +120,11 @@ object ConnectOBD{
 
 
         Handler().postDelayed({
-            SendDataIoTHub().InitClient()
-            SendDataIoTHub().resetCount()
+            sendDataIoTHub.InitClient()
+            sendDataIoTHub.resetCount()
             Handler().postDelayed({
                 getAllFailures()
-            },4000)
+            },5000)
         },2000)
 
 
@@ -157,9 +157,12 @@ object ConnectOBD{
 
         limit = 0
         limit2 = LIMIT
+
         TripRepository(Application()).deleteAll()
         ObdRepository(Application()).deleteAll()
         LocationRepository(Application()).deleteAll()
+        FailuresTripValuesRepository(Application()).deleteAll()
+
         start = false
 
         contadorTotalLocation = 0
@@ -826,9 +829,9 @@ object ConnectOBD{
                         var cont = 0
                         for (failures in failuresTripValuesEntityList){
                             cont++
-                            sendDataIoTHub.sendDataJsonString(failures.id_trip,failures.json_value, context, failures.id_trip_values)
+                            sendDataIoTHub.sendDataJsonString(failures.id_trip,failures.json_value, context, failures.timeCurret)
                             if (cont == failuresTripValuesEntityList.size)
-                                sendDataIoTHub.sendDataJsonString(tripEntityList[0].tripId, JSONUtils.generateJSONArray(tripEntityList).toString(), context, failures.id_trip_values)
+                                sendDataIoTHub.sendDataJsonString(tripEntityList[0].tripId, JSONUtils.generateJSONArray(tripEntityList).toString(), context, failures.timeCurret)
                         }
                     }else {
                         sendDataIoTHub.sendDataJsonString(tripEntityList[0].tripId, JSONUtils.generateJSONArray(tripEntityList).toString(), context,"")
@@ -843,26 +846,27 @@ object ConnectOBD{
     }
 
     fun getAllFailures(){
-        sendDataIoTHub.InitClient()
-        sendDataIoTHub.resetCount()
-        FailuresTripValuesRepository(Application()).getAll(object : FailuresTripValuesRepository.PopulateCallback{
-            override fun onSuccess(failuresTripValuesEntityList: MutableList<FailuresTripValuesEntity>) {
-                LogUtils().v(TAG_BD, message = " Failures totales : ${failuresTripValuesEntityList.size}")
-                LogUtils().v(TAG_BD, message = " Failures totales : ${failuresTripValuesEntityList.toString()}")
-                if (failuresTripValuesEntityList.size == 0){
-                    LogUtils().v(TAG_BD, message = " NO HAY FAILURES")
-                }else{
-                    LogUtils().v(TAG_BD, message = " SI HAY FAILURES, enviando...")
-                    for (failures in failuresTripValuesEntityList){
-                        sendDataIoTHub.sendDataJsonString(failures.id_trip,failures.json_value, context, failures.id_trip_values)
+        Handler().postDelayed({
+            FailuresTripValuesRepository(Application()).getAll(object : FailuresTripValuesRepository.PopulateCallback{
+                override fun onSuccess(failuresTripValuesEntityList: MutableList<FailuresTripValuesEntity>) {
+                    LogUtils().v(TAG_BD, message = " Failures totales : ${failuresTripValuesEntityList.size}")
+                    LogUtils().v(TAG_BD, message = " Failures totales : ${failuresTripValuesEntityList.toString()}")
+                    if (failuresTripValuesEntityList.size == 0){
+                        LogUtils().v(TAG_BD, message = " NO HAY FAILURES")
+                    }else{
+                        LogUtils().v(TAG_BD, message = " SI HAY FAILURES, enviando...")
+                        for (failures in failuresTripValuesEntityList){
+                            sendDataIoTHub.sendDataJsonString(failures.id_trip,failures.json_value, context, failures.id_trip_values)
+                        }
+
                     }
+                }
+                override fun onFailure(e: Exception?) {
 
                 }
-            }
-            override fun onFailure(e: Exception?) {
+            })
+        }, 10000)
 
-            }
-        })
     }
 
     fun getAllTrip(){

@@ -247,10 +247,10 @@ class MyScoreFragment : BaseServiceFragment(), MyScoreView, HomeActivity.StartLi
 
         btnStartTrip.setOnClickListener {
 
-            val token = preferences.getTokenPush(context)
-            Log.d(TAG, token)
+            /*val token = preferences.getTokenPush(context)
+            Log.d(TAG, token)*/
 
-            /*showLoading()
+            showLoading()
             it.isEnabled = false
             it.postDelayed({
 
@@ -282,7 +282,7 @@ class MyScoreFragment : BaseServiceFragment(), MyScoreView, HomeActivity.StartLi
                 })
 
 
-            }, 100L)*/
+            }, 100L)
 
         }
 
