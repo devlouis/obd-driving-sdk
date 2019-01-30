@@ -77,6 +77,7 @@ class HomeActivity : BaseServiceActivity(), HomeView, ObdGatewayVin {
     }
 
     fun startLiveData(){
+        val connectionString = dataUser.connectionString
         ConnectOBD.startLiveData(this, dataUser.userId!!)
     }
 
