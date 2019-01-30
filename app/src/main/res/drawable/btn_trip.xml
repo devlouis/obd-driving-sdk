@@ -2,7 +2,7 @@
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
   <item android:state_pressed="false">
     <shape android:shape="oval">
-      <solid android:color="@color/colorToolbar"/>
+      <solid android:color="@color/colorMDP"/>
       <stroke
               android:width="4dip"
               android:color="#FFF" />

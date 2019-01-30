@@ -39,7 +39,7 @@
     <string name="username">Email</string>
     <string name="password">Contraseña</string>
     <string name="btnLogin">Iniciar sesión</string>
-    <string name="login_register">¿No tienes una cuenta?. Registrate ahora.</string>
+    <string name="login_register">¿No tienes una cuenta? Registrate ahora.</string>
 
 
     <string name="name">Nombres</string>
@@ -51,7 +51,7 @@
     <string name="message_passwords_repeat">Las contraseñas deben ser iguales.</string>
     <string name="message_email_valid">Debe ingresar un correo válido.</string>
 
-    <string name="alert_logout">¿Estás seguro que deseas salir?.</string>
+    <string name="alert_logout">¿Estás seguro que deseas salir?</string>
 
     <string name="notifications_admin_channel_id">01</string>
     <string name="notifications_admin_channel_name">Canal 01</string>
