@@ -11,7 +11,7 @@ public class FailuresTripValuesEntity {
     @NonNull
     @ColumnInfo(name = "id")
     private Long id;
-    private String timeCurret = "";
+    private Integer timeCurret = 0;
     private String id_trip = "";
     private String id_trip_values = "";
     private String json_value = "";
@@ -50,11 +50,11 @@ public class FailuresTripValuesEntity {
         this.json_value = json_value;
     }
 
-    public String getTimeCurret() {
+    public Integer getTimeCurret() {
         return timeCurret;
     }
 
-    public void setTimeCurret(String timeCurret) {
+    public void setTimeCurret(Integer timeCurret) {
         this.timeCurret = timeCurret;
     }
 

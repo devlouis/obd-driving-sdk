@@ -31,11 +31,7 @@ class UtilsNetwork {
             }
         }
 
-        if (!isWifiConn && !isMobileConn){
-            return false
-        }else {
-            return true
-        }
+        return !(!isWifiConn && !isMobileConn)
 
         LogUtils().v(TAG, "Wifi connected: $isWifiConn")
         LogUtils().v(TAG, "Mobile connected: $isMobileConn")

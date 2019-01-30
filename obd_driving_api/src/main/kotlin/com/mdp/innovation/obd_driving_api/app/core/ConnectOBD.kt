@@ -37,6 +37,7 @@ import com.mdp.innovation.obd_driving_api.data.store.TripRepository
 import com.mdp.innovation.obd_driving_api.data.store.repository.FailuresTripValuesRepository
 import com.mdp.innovation.obd_driving_api.data.store.repository.LocationRepository
 import com.mdp.innovation.obd_driving_api.data.store.repository.ObdRepository
+import jnr.posix.HANDLE
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
@@ -82,6 +83,7 @@ object ConnectOBD{
     var statusTrip = "0"
 
     var handler = Handler()
+    var handlerSyncronizarNetwork = Handler()
     private var macDevice = ""
     var VIN = ""
     val sendDataIoTHub = SendDataIoTHub()
@@ -122,9 +124,9 @@ object ConnectOBD{
         Handler().postDelayed({
             sendDataIoTHub.InitClient()
             sendDataIoTHub.resetCount()
-            Handler().postDelayed({
+           /* Handler().postDelayed({
                 getAllFailures()
-            },5000)
+            },5000)*/
         },2000)
 
 
@@ -146,7 +148,7 @@ object ConnectOBD{
         return Result(macDevice.isNotEmpty(), macDevice)
     }
 
-    fun startLiveData(mObdGatewayVin: ObdGatewayVin, idUser: String) {
+    fun startLiveData(mObdGatewayVin: ObdGatewayVin, idUser: String, connectionString: String) {
         /**
          *
          */
@@ -161,7 +163,7 @@ object ConnectOBD{
         TripRepository(Application()).deleteAll()
         ObdRepository(Application()).deleteAll()
         LocationRepository(Application()).deleteAll()
-        FailuresTripValuesRepository(Application()).deleteAll()
+        //FailuresTripValuesRepository(Application()).deleteAll()
 
         start = false
 
@@ -705,7 +707,9 @@ object ConnectOBD{
                       }
                       trip.rpm = value.rpm.toInt()
                       trip.dataUdate = value.dataNew
-                      trip.status = value.status
+                      if (trip.status != "2")
+                          trip.status = value.status
+
                       trip.ax = value.ax
                       trip.ay = value.ay
                       trip.az = value.az
@@ -722,7 +726,8 @@ object ConnectOBD{
                       trip.lon = value.longitud.toFloat()
                       trip.bearing = value.bearing.toFloat()
                       trip.dataUdate = value.dataNew
-                      trip.status = value.status
+                      if (trip.status != "2")
+                          trip.status = value.status
                       TripRepository(Application()).update(trip)
                       LogUtils().v(TAG_BD, " LOCATION BD update : ${trip.toString()}")
                   }
@@ -801,11 +806,11 @@ object ConnectOBD{
                     }
                     countTotalTrip++
 
-                    sendDataIoTHub.sendDataJsonString(tripEntityList[0].tripId, JSONUtils.generateJSONArray(tripEntityList).toString(), context, "")
-                  /*  if (statusTrip == "2")
+                    //sendDataIoTHub.sendDataJsonString(tripEntityList[0].tripId, JSONUtils.generateJSONArray(tripEntityList).toString(), context, "")
+                    if (statusTrip == "2")
                         getFailuresTripValues(tripEntityList = tripEntityList)
                     else
-                        sendDataIoTHub.sendDataJsonString(tripEntityList[0].tripId, JSONUtils.generateJSONArray(tripEntityList).toString(), context, "")*/
+                        sendDataIoTHub.sendDataJsonString(tripEntityList[0].tripId, JSONUtils.generateJSONArray(tripEntityList).toString(), context, 0)
 
                     getAllTrip()
                 }
@@ -822,19 +827,26 @@ object ConnectOBD{
                 LogUtils().v(TAG_BD, message = " Failures totales : ${failuresTripValuesEntityList.size}")
                 if (failuresTripValuesEntityList.size == 0){
                     LogUtils().v(TAG_BD, message = " NO HAY FAILURES")
-                    sendDataIoTHub.sendDataJsonString(tripEntityList[0].tripId, JSONUtils.generateJSONArray(tripEntityList).toString(), context,"")
+                    sendDataIoTHub.sendDataJsonString(tripEntityList[0].tripId, JSONUtils.generateJSONArray(tripEntityList).toString(), context,0)
                 }else{
                     LogUtils().v(TAG_BD, message = " SI HAY FAILURES")
                     if (UtilsNetwork().isOnline(context!!)){
                         var cont = 0
                         for (failures in failuresTripValuesEntityList){
                             cont++
+                            LogUtils().v(TAG_BD, message = " cont $cont")
                             sendDataIoTHub.sendDataJsonString(failures.id_trip,failures.json_value, context, failures.timeCurret)
                             if (cont == failuresTripValuesEntityList.size)
                                 sendDataIoTHub.sendDataJsonString(tripEntityList[0].tripId, JSONUtils.generateJSONArray(tripEntityList).toString(), context, failures.timeCurret)
                         }
                     }else {
-                        sendDataIoTHub.sendDataJsonString(tripEntityList[0].tripId, JSONUtils.generateJSONArray(tripEntityList).toString(), context,"")
+                        //sendDataIoTHub.sendDataJsonString(tripEntityList[0].tripId, JSONUtils.generateJSONArray(tripEntityList).toString(), context, 0)
+                        //Insertar ultima trama Failures
+                        insertTBFailures(tripEntityList)
+                        /**
+                         * Volver a intentar mas tarde.
+                         */
+                        handlerSyncronizarNetwork.post(mSyncronizarNetwork)
                     }
                 }
             }
@@ -856,7 +868,7 @@ object ConnectOBD{
                     }else{
                         LogUtils().v(TAG_BD, message = " SI HAY FAILURES, enviando...")
                         for (failures in failuresTripValuesEntityList){
-                            sendDataIoTHub.sendDataJsonString(failures.id_trip,failures.json_value, context, failures.id_trip_values)
+                            sendDataIoTHub.sendDataJsonString(failures.id_trip,failures.json_value, context, failures.timeCurret)
                         }
 
                     }
@@ -920,7 +932,7 @@ object ConnectOBD{
                 }
                 firstLocation = 0
                 LocationRepository(Application()).deleteFirstLocation(locationEntityList.size)
-                LogUtils().v(TAG_BD, "SE BORRO LOS ${locationEntityList.size} DEL OBD...")
+                LogUtils().v(TAG_BD, "SE BORRO LOS ${locationEntityList.size} DEL LOCATION...")
                 LogUtils().v(TAG_BD, "######################### F I N   U L T I M A ######################################")
 
                 /**
@@ -971,8 +983,78 @@ object ConnectOBD{
         } catch (e: IOException) {
             e.printStackTrace()
             Toast.makeText(context, "DB Exported! ${e.message}", Toast.LENGTH_LONG).show()
+
         }
 
+    }
+
+    /**
+     * Reitento
+     */
+    var retry = true
+    private var mSyncronizarNetwork = object : Runnable {
+        override fun run() {
+            LogUtils().v(TAG_BD, message = " 5 seg - retry")
+            if (UtilsNetwork().isOnline(context!!)){
+                sendDataIoTHub.InitClient()
+                sendDataIoTHub.resetCount()
+                LogUtils().v(TAG_BD, message = " NETWORK OK - retry")
+                FailuresTripValuesRepository(Application()).getAll(object : FailuresTripValuesRepository.PopulateCallback{
+                    override fun onSuccess(failuresTripValuesEntityList: MutableList<FailuresTripValuesEntity>) {
+                        LogUtils().v(TAG_BD, message = " Failures totales : ${failuresTripValuesEntityList.size}")
+                        if (failuresTripValuesEntityList.size == 0){
+                            retry = false
+                            LogUtils().v(TAG_BD, message = " NO HAY FAILURES - retry = $retry")
+                            RemovehandlerSyncronizarNetwork()
+                            //sendDataIoTHub.sendDataJsonString(tripEntityList[0].tripId, JSONUtils.generateJSONArray(tripEntityList).toString(), context,0)
+                        }else{
+                            LogUtils().v(TAG_BD, message = " SI HAY FAILURES - retry = $retry")
+                            if (UtilsNetwork().isOnline(context!!)){
+                                var cont = 0
+                                for (failures in failuresTripValuesEntityList){
+                                    cont++
+                                    LogUtils().v(TAG_BD, message = " cont $cont")
+                                    sendDataIoTHub.sendDataJsonString(failures.id_trip,failures.json_value, context, failures.timeCurret)
+                                }
+                            }else {
+                                /**
+                                 * Volver a intentar mas tarde.
+                                 */
+
+
+                            }
+                        }
+                    }
+                    override fun onFailure(e: Exception?) {
+                    }
+                })
+            }else{
+
+                LogUtils().v(TAG_BD, message = " NETWORK FAIL - retry = $retry")
+
+            }
+            handlerSyncronizarNetwork.postDelayed(this, 5000)
+        }
+    }
+
+    fun insertTBFailures(tripEntityList: MutableList<TripEntity>){
+        val failuresTripValuesEntity = FailuresTripValuesEntity()
+        failuresTripValuesEntity.id_trip = tripEntityList[0].tripId
+        failuresTripValuesEntity.json_value = JSONUtils.generateJSONArray(tripEntityList).toString()
+        val curretNow: Int? = SendDataIoTHub().curretToday()
+        failuresTripValuesEntity.timeCurret = curretNow
+        // GUARDANDO BD
+        LogUtils().v("System  ADD faile", failuresTripValuesEntity.toString())
+        FailuresTripValuesRepository(Application()).addFailuresTripValue(failuresTripValuesEntity)
+    }
+    fun RemovehandlerSyncronizarNetwork(){
+        LogUtils().v(TAG_BD, message = " CANCEL - retry = $retry")
+        handlerSyncronizarNetwork.removeCallbacks(mSyncronizarNetwork)
+    }
+
+
+    fun validateFailure(){
+        handlerSyncronizarNetwork.post(mSyncronizarNetwork)
     }
 
 }

@@ -72,10 +72,12 @@ class TestMainActivity : BaseAppCompat(), ObdGatewayVin {
     }
 
     fun onClickListener() {
+        val connString =
+            "HostName=DCP-test.azure-devices.net;DeviceId=lois-android;SharedAccessKey=Q37BFPZONbrYKFsaxkpF1nLsgXERPdc6/T+QNhC/HIE="
 
         button.setOnClickListener {
             if (!ConnectOBD.CheckConecction())
-                ConnectOBD.startLiveData(this,"5c460df4387a710934beb1e7")
+                ConnectOBD.startLiveData(this,"5c460df4387a710934beb1e7", connString)
             else
                 ConnectOBD.stopLiveData()
 

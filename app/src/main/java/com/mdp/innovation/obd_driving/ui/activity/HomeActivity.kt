@@ -74,11 +74,13 @@ class HomeActivity : BaseServiceActivity(), HomeView, ObdGatewayVin {
             }
         }
 
+        ConnectOBD.validateFailure()
+
     }
 
     fun startLiveData(){
         val connectionString = dataUser.connectionString
-        ConnectOBD.startLiveData(this, dataUser.userId!!)
+        ConnectOBD.startLiveData(this, dataUser.userId!!, connectionString!!)
     }
 
     fun simulateSpeed(){

@@ -27,6 +27,6 @@ public interface FailuresTripValuesDao {
     @Query("SELECT * FROM tb_failures_trip_values")
     List<FailuresTripValuesEntity> getAll();
 
-    @Query("DELETE FROM tb_failures_trip_values WHERE id_trip_values = :value")
+    @Query("DELETE FROM tb_failures_trip_values WHERE timeCurret = :value")
     void deleteValue(String value);
 }

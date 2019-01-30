@@ -16,7 +16,7 @@ import com.mdp.innovation.obd_driving_api.data.store.daoBD.ObdDao;
 import com.mdp.innovation.obd_driving_api.data.store.daoBD.TripDao;
 
 
-@Database(entities = {TripEntity.class, ObdEntity.class, LocationEntity.class, FailuresTripValuesEntity.class}, version = 19)
+@Database(entities = {TripEntity.class, ObdEntity.class, LocationEntity.class, FailuresTripValuesEntity.class}, version = 20)
 public  abstract class TripDataBase extends RoomDatabase {
     public abstract TripDao tripDao();
     public abstract ObdDao obdDao();

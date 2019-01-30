@@ -266,12 +266,9 @@ public class SendDataIoTHub {
                     + " with status " + status.name());
             if((status == IotHubStatusCode.OK) || (status == IotHubStatusCode.OK_EMPTY)){
                 receiptsConfirmedCount++;
-                //setRecordTrip("","",receiptsConfirmedCount.toString(),"","","");
-
                 new FailuresTripValuesRepository(new Application()).deleteValue(i.toString());
             }else{
                 sendFailuresCount++;
-                //setRecordTrip("","","",sendFailuresCount.toString(),"","");
                 System.out.println("NO SE confirmo " + sendFailuresCount
                 );
             }
@@ -285,7 +282,7 @@ public class SendDataIoTHub {
 
 
     Context mcontext;
-    public void sendDataJsonString(String idTrip, String msgStr, Context mContext, String time){
+    public void sendDataJsonString(String idTrip, String msgStr, Context mContext, Integer time){
         //appSharedPreference = new SharedPreference(mContext);
 
         this.mcontext = mContext;
@@ -301,34 +298,32 @@ public class SendDataIoTHub {
 
         FailuresTripValuesEntity failuresTripValuesEntity = new FailuresTripValuesEntity();
         failuresTripValuesEntity.setId_trip(idTrip);
-        //failuresTripValuesEntity.setId_trip_values(msgSentCount.toString());
-
-        String curretNow = curretToday();;
-      /*  if (time.isEmpty()){
-            curretNow = curretToday();
-            failuresTripValuesEntity.setTimeCurret(curretNow);
-        }else{
-            failuresTripValuesEntity.setTimeCurret(time);
-        }
-*/
-        failuresTripValuesEntity.setTimeCurret(curretNow);
         failuresTripValuesEntity.setJson_value(msgStr);
-        new FailuresTripValuesRepository(new Application()).addFailuresTripValue(failuresTripValuesEntity);
+        Integer curretNow = curretToday();
+        if (time == 0){
+            failuresTripValuesEntity.setTimeCurret(curretNow);
+            // GUARDANDO BD
+            new LogUtils().v( "System  ADD faile", failuresTripValuesEntity.toString());
+            new FailuresTripValuesRepository(new Application()).addFailuresTripValue(failuresTripValuesEntity);
+        }else{
+            failuresTripValuesEntity.setTimeCurret(Integer.valueOf(time));
+        }
+
 
         try
         {
             Message msg = new Message(msgStr);
             msg.setMessageId(java.util.UUID.randomUUID().toString());
-            System.out.println(curretNow + " : " + msgStr);
+
             EventCallback eventCallback = new EventCallback();
             //client.sendEventAsync(msg, eventCallback, curretNow);
-            client.sendEventAsync(msg, eventCallback, msgSentCount);
-
-           /* if (time.isEmpty()){
-                client.sendEventAsync(msg, eventCallback, curretNow);
+            if (time == 0){
+                System.out.println(curretNow + " : " + msgStr);
+                client.sendEventAsync(msg, eventCallback,curretNow);
             }else{
-                client.sendEventAsync(msg, eventCallback, time);
-            }*/
+                System.out.println(time + " : " + msgStr);
+                client.sendEventAsync(msg, eventCallback, Integer.valueOf(time));
+            }
         }
         catch (Exception e) {
             noSendCount++;
@@ -344,6 +339,8 @@ public class SendDataIoTHub {
                 }
 
         }
+
+
     }
 
 
@@ -387,13 +384,14 @@ public class SendDataIoTHub {
        
     }
 
-    public String curretToday(){
+    public Integer curretToday(){
         SimpleDateFormat sdf6 = new SimpleDateFormat("H:mm:ss");
         String currentDateandTime = sdf6.format(new Date());
 
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy:MM:dd");
-        String currentToDay = sdf6.format(new Date());
+        SimpleDateFormat sdf = new SimpleDateFormat("MM:dd");
+        String currentToDay = sdf.format(new Date());
 
-        return currentToDay +" "+ currentDateandTime;
+        new LogUtils().v( "System", currentToDay.trim().replace(":","") + currentDateandTime.trim().replace(":",""));
+        return Integer.valueOf(currentToDay.trim().replace(":","")+currentDateandTime.trim().replace(":",""));
     }
 }

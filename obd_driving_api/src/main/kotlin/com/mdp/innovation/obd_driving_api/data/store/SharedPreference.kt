@@ -18,11 +18,23 @@ class SharedPreference {
     var ID_TRIP = "ID_TRIP"
     var ID_RAW_BD = "ID_RAW_BD"
     var FAILURES = "FAILURES"
+    var CONNIOTHUB = "CONNIOTHUB"
 
     constructor(context: Context?) {
         this.context = context
         pref = this.context!!.getSharedPreferences(PREF_NAME, PRIVATE_MODE)
         editor = pref!!.edit()
+    }
+
+    fun saveConnStringIoTHub(connString: String){
+        editor!!.putString(CONNIOTHUB, connString)
+        editor!!.commit()
+    }
+
+    fun getConnStringIoTHub(): HashMap<String, String>{
+        val macdevice = java.util.HashMap<String, String>()
+        macdevice[CONNIOTHUB] = pref!!.getString(CONNIOTHUB, "")
+        return macdevice
     }
 
     fun saveMacBluetooth(remoteDevice: String){
