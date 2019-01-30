@@ -160,6 +160,7 @@ class LoginFragment : BaseFragment(), LoginView {
         dataUser.score = response.data.score
         dataUser.vin = response.data.vin
         dataUser.token = firebaseToken
+        dataUser.connectionString = response.data.connectionString
 
         var myScore = "-"
         try{
