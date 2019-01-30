@@ -10,5 +10,6 @@ class DataUserModel {
     var score: Float? = null
     var vin: String? = null
     var token: String? = null
+    var connectionString: String? = null
 
 }
