@@ -1,5 +1,6 @@
 package com.mdp.innovation.obd_driving.ui.fragment
 
+import android.app.Activity
 import android.bluetooth.BluetoothAdapter
 
 import android.content.BroadcastReceiver
@@ -28,6 +29,7 @@ import com.mdp.innovation.obd_driving.ui.navigation.Navigator
 import android.util.Log
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
+import com.google.android.gms.common.api.Status
 import com.google.firebase.iid.FirebaseInstanceId
 import com.mdp.innovation.obd_driving.interactor.TokenInteractor
 import com.mdp.innovation.obd_driving.service.model.MyScoreResponse
@@ -247,42 +249,18 @@ class MyScoreFragment : BaseServiceFragment(), MyScoreView, HomeActivity.StartLi
 
         btnStartTrip.setOnClickListener {
 
-            val token = preferences.getTokenPush(context)
-            Log.d(TAG, token)
+            /*val token = preferences.getTokenPush(context)
+            Log.d(TAG, token)*/
 
-            /*showLoading()
-            it.isEnabled = false
+            showLoading()
             it.postDelayed({
 
-                Connection.validate(activity!!, object : Connection.OnConnectionFinishedListener{
-                    override fun onConnectionFinished(code: Int) {
-                        when(code){
-                            Connection.OK ->{
-                                hideLoading()
-                                presenter.isConnected()
-                                it.isEnabled = true
-                            }
-                            Connection.NO_NETWORK ->{
-                                hideLoading()
-                                Message.toastLong("Debe conectarse a una red.", context)
-                                it.isEnabled = true
-                            }
-                            Connection.NO_CONNECTION ->{
-                                hideLoading()
-                                Message.toastLong("Hay problemas con su señal de internet. Inténtelo nuevamente.", context)
-                                it.isEnabled = true
-                            }
-                            Connection.EXCEPTION ->{
-                                hideLoading()
-                                Message.toastLong("Ocurrió un problema. Inténtelo en unos minutos.", context)
-                                it.isEnabled = true
-                            }
-                        }
-                    }
-                })
+                validateBluetooth(it)
 
+                /*val data = preferences.getDataUser(context)
+                Log.d(TAG, data!!.connectionString!!)*/
 
-            }, 100L)*/
+            }, 100L)
 
         }
 
@@ -362,38 +340,92 @@ class MyScoreFragment : BaseServiceFragment(), MyScoreView, HomeActivity.StartLi
     }
 
     override fun onDeviceConnected(){
-        //nextActivity(HomeActivity::class.java, false)
-        //Message.toastShort("Preparando para iniciar el viaje.", activity?.applicationContext)
-
-        /*val manager = (activity?.getSystemService( Context.LOCATION_SERVICE ) as LocationManager)
-
-        if ( !manager.isProviderEnabled( LocationManager.GPS_PROVIDER ) ) {
-            Log.d("GPSx", "NOOOOOOOO")
-        }else{
-            Log.d("GPSx", "SIIIIIIIII")
-        }*/
-
-
-        val mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter()
-        if (mBluetoothAdapter == null) {
-            // Device does not support Bluetooth
-            Message.toastLong("Lo sentimos. Su dispositivo no cuenta con Bluetooth.", activity?.applicationContext)
-        } else {
-            if (!mBluetoothAdapter.isEnabled) {
-                // Bluetooth is not enable :)
-                //Message.toastShort("Debe encender su Bluetooth.", activity?.applicationContext)
-                mBluetoothAdapter.enable()
-            }
-            goToStartTrip()
-        }
-
-
-
+        goToStartTrip()
     }
 
     override fun onDeviceNoConnected(){
         (activity as HomeActivity).goToPairObd()
         Message.toastLong("Su OBD ha perdido la conexión. Por favor vuélvalo a conectar.", activity?.applicationContext)
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent) {
+        if (requestCode == GPS.REQUEST_LOCATION) {
+            if(resultCode == Activity.RESULT_OK){
+                //Message.toastLong("El GPS está activo ahora!!!!.", context)
+                validateInternet(btnStartTrip)
+            }else if (resultCode == Activity.RESULT_CANCELED) {
+                hideLoading()
+                Message.toastLong("Debe activar el GPS para continuar.", context)
+            }
+        }
+    }
+
+    private fun validateBluetooth(v: View){
+        val mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter()
+        if (mBluetoothAdapter == null) {
+            hideLoading()
+            Message.toastLong("Lo sentimos. Su dispositivo no cuenta con Bluetooth.", activity?.applicationContext)
+        } else {
+            if (!mBluetoothAdapter.isEnabled) {
+                mBluetoothAdapter.enable()
+            }
+            validateGPS(v)
+        }
+    }
+
+    private fun validateGPS(it: View){
+        GPS.validate(activity!!, object : GPS.OnConnectionFinishedListener{
+            override fun onGPSConnection(code: Int) {
+                when(code){
+                    GPS.OK ->{
+                        //hideLoading()
+                        //Message.toastLong("El GPS está activo.", context)
+                        validateInternet(it)
+                    }
+                    GPS.NO_ENABLED ->{
+                        //hideLoading()
+                        Message.toastLong("El GPS está apagado.", context)
+                    }
+                    GPS.NO_SUPPORTED ->{
+                        hideLoading()
+                        Message.toastLong("Su equipo no cuenta con GPS.", context)
+                    }
+                    GPS.ERROR ->{
+                        hideLoading()
+                        Message.toastLong("Ocurrió un problema. Inténtelo en unos minutos.", context)
+                    }
+                }
+            }
+
+            override fun onStartResolution(status: Status) {
+                startIntentSenderForResult(status.resolution.intentSender, GPS.REQUEST_LOCATION, null, 0, 0, 0, null)
+            }
+        })
+    }
+
+    private fun validateInternet(it: View){
+        Connection.validate(activity!!, object : Connection.OnConnectionFinishedListener{
+            override fun onConnectionFinished(code: Int) {
+                when(code){
+                    Connection.OK ->{
+                        //hideLoading()
+                        presenter.isConnected()
+                    }
+                    Connection.NO_NETWORK ->{
+                        hideLoading()
+                        Message.toastLong("Debe conectarse a una red.", context)
+                    }
+                    Connection.NO_CONNECTION ->{
+                        hideLoading()
+                        Message.toastLong("Hay problemas con su señal de internet. Inténtelo nuevamente.", context)
+                    }
+                    Connection.EXCEPTION ->{
+                        hideLoading()
+                        Message.toastLong("Ocurrió un problema. Inténtelo en unos minutos.", context)
+                    }
+                }
+            }
+        })
     }
 
     override fun showLoading(){

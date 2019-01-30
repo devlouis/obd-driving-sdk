@@ -10,8 +10,8 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 class WSService {
     private val TAG = javaClass.simpleName
-    private val WS_URL_SCORE = "https://1ae4befc.ngrok.io"
-    //private val WS_URL_SCORE = "https://dcp-api.azurewebsites.net"
+    //private val WS_URL_SCORE = "https://1ae4befc.ngrok.io"
+    private val WS_URL_SCORE = "https://dcp-api.azurewebsites.net"
     //private val WS_URL_LOCAL = "http://192.168.137.1:8080"
 
     private val gson = Gson()
