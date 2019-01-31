@@ -86,6 +86,7 @@ object ConnectOBD{
     var handlerSyncronizarNetwork = Handler()
     private var macDevice = ""
     var VIN = ""
+    var CONNECT_STRING = ""
     val sendDataIoTHub = SendDataIoTHub()
 
     var statusContinueTrip = false
@@ -110,6 +111,7 @@ object ConnectOBD{
         appSharedPreference = SharedPreference(context)
         macDevice = appSharedPreference.getMacBluetooth()[appSharedPreference.MAC_DEVICE]!!
         VIN =  appSharedPreference.getVinCar()[appSharedPreference.VIN_CAR]!!
+        CONNECT_STRING =  appSharedPreference.getConnStringIoTHub()[appSharedPreference.CONNIOTHUB]!!
         //Handler().postDelayed(initClientIotHub, 5500)
         //send.sendDataJsonString("")
         LogUtils().v(TAG, " macDevice:: $macDevice")
@@ -122,7 +124,7 @@ object ConnectOBD{
 
 
         Handler().postDelayed({
-            sendDataIoTHub.InitClient()
+            sendDataIoTHub.InitClient(CONNECT_STRING)
             sendDataIoTHub.resetCount()
            /* Handler().postDelayed({
                 getAllFailures()
@@ -133,7 +135,7 @@ object ConnectOBD{
     }
 
     private val initClientIotHub = Runnable {
-        sendDataIoTHub.InitClient()
+        sendDataIoTHub.InitClient(CONNECT_STRING)
         sendDataIoTHub.resetCount()
 
     }
@@ -148,10 +150,24 @@ object ConnectOBD{
         return Result(macDevice.isNotEmpty(), macDevice)
     }
 
-    fun startLiveData(mObdGatewayVin: ObdGatewayVin, idUser: String, connectionString: String) {
+    fun saveConnectionString(connectionString: String){
+        var getConnectionString = appSharedPreference.getConnStringIoTHub()[appSharedPreference.CONNIOTHUB]!!
+        LogUtils().v(TAG, " get ConnectionString:: $getConnectionString")
+
+        if (getConnectionString != connectionString){
+            appSharedPreference.saveConnStringIoTHub(connectionString)
+            LogUtils().v(TAG, " new ConnectionString:: $connectionString")
+        }
+    }
+
+    fun startLiveData(mObdGatewayVin: ObdGatewayVin, idUser: String) {
         /**
          *
          */
+        var getConnectionString = appSharedPreference.getConnStringIoTHub()[appSharedPreference.CONNIOTHUB]!!
+        LogUtils().v(TAG, " get ConnectionString:: $getConnectionString")
+
+
         USER_ID = idUser
         Handler().postDelayed(initClientIotHub, 100)
 
@@ -996,7 +1012,7 @@ object ConnectOBD{
         override fun run() {
             LogUtils().v(TAG_BD, message = " 5 seg - retry")
             if (UtilsNetwork().isOnline(context!!)){
-                sendDataIoTHub.InitClient()
+                sendDataIoTHub.InitClient(CONNECT_STRING)
                 sendDataIoTHub.resetCount()
                 LogUtils().v(TAG_BD, message = " NETWORK OK - retry")
                 FailuresTripValuesRepository(Application()).getAll(object : FailuresTripValuesRepository.PopulateCallback{

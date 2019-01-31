@@ -77,7 +77,7 @@ class TestMainActivity : BaseAppCompat(), ObdGatewayVin {
 
         button.setOnClickListener {
             if (!ConnectOBD.CheckConecction())
-                ConnectOBD.startLiveData(this,"5c460df4387a710934beb1e7", connString)
+                ConnectOBD.startLiveData(this,"5c460df4387a710934beb1e7")
             else
                 ConnectOBD.stopLiveData()
 

@@ -24,6 +24,7 @@ import kotlinx.android.synthetic.main.fragment_login.*
 import org.koin.android.ext.android.inject
 import java.lang.Exception
 import com.google.android.gms.tasks.Task
+import com.mdp.innovation.obd_driving_api.app.core.ConnectOBD
 
 
 class LoginFragment : BaseFragment(), LoginView {
@@ -169,6 +170,8 @@ class LoginFragment : BaseFragment(), LoginView {
 
         preferences.setDataUser(context, dataUser)
         preferences.setMyScore(context, myScore)
+
+        ConnectOBD.saveConnectionString(dataUser.connectionString!!)
 
         navigator.navigateToHome(activity)
         activity!!.finish()

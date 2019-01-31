@@ -26,7 +26,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class SendDataIoTHub {
 
     /*private final String connString = "HostName=digitalCar.azure-devices.net;DeviceId=prueba;SharedAccessKey=nPh5ND6bMSw20CQwb3PfnCfL4hVP+2dcC6/KLrlGqU0=";*/
-    private final String connString = "HostName=DCP-test.azure-devices.net;DeviceId=lois-android;SharedAccessKey=Q37BFPZONbrYKFsaxkpF1nLsgXERPdc6/T+QNhC/HIE=";
+   // private final String connString = "HostName=DCP-test.azure-devices.net;DeviceId=lois-android;SharedAccessKey=Q37BFPZONbrYKFsaxkpF1nLsgXERPdc6/T+QNhC/HIE=";
     private final String deviceId = "MyAndroidDevice";
     private DeviceClient client;
     IotHubClientProtocol protocol = IotHubClientProtocol.MQTT;
@@ -118,9 +118,16 @@ public class SendDataIoTHub {
         }
     }
 
-    public void InitClient() throws URISyntaxException, IOException
+    public void InitClient(String connString) throws URISyntaxException, IOException
     {
+
+        //client = new DeviceClient(connString, protocol);
+
+       /* HashMap<String, String> mapConnString = appSharedPreference.getConnStringIoTHub();
+        final String connString = mapConnString.get(appSharedPreference.getCONNIOTHUB());*/
+        new LogUtils().v( " connString ", connString);
         client = new DeviceClient(connString, protocol);
+
         //client = new DeviceClient(connString, protocol, publicKeyCertificateString, false, privateKeyString, false);
 
         try
