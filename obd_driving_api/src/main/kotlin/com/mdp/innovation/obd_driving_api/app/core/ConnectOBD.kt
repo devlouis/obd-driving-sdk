@@ -111,7 +111,7 @@ object ConnectOBD{
         appSharedPreference = SharedPreference(context)
         macDevice = appSharedPreference.getMacBluetooth()[appSharedPreference.MAC_DEVICE]!!
         VIN =  appSharedPreference.getVinCar()[appSharedPreference.VIN_CAR]!!
-        CONNECT_STRING =  appSharedPreference.getConnStringIoTHub()[appSharedPreference.CONNIOTHUB]!!
+        //CONNECT_STRING =  appSharedPreference.getConnStringIoTHub()[appSharedPreference.CONNIOTHUB]!!
         //Handler().postDelayed(initClientIotHub, 5500)
         //send.sendDataJsonString("")
         LogUtils().v(TAG, " macDevice:: $macDevice")
@@ -122,20 +122,21 @@ object ConnectOBD{
 
 
 
-
-        Handler().postDelayed({
-            sendDataIoTHub.InitClient(CONNECT_STRING)
-            sendDataIoTHub.resetCount()
-           /* Handler().postDelayed({
+        if (appSharedPreference.getConnStringIoTHub()[appSharedPreference.CONNIOTHUB]!!.isNotEmpty()) {
+            Handler().postDelayed({
+                sendDataIoTHub.InitClient(appSharedPreference.getConnStringIoTHub()[appSharedPreference.CONNIOTHUB]!!)
+                sendDataIoTHub.resetCount()
+                /* Handler().postDelayed({
                 getAllFailures()
             },5000)*/
-        },2000)
+            }, 2000)
+        }
 
 
     }
 
     private val initClientIotHub = Runnable {
-        sendDataIoTHub.InitClient(CONNECT_STRING)
+        sendDataIoTHub.InitClient(appSharedPreference.getConnStringIoTHub()[appSharedPreference.CONNIOTHUB]!!)
         sendDataIoTHub.resetCount()
 
     }
@@ -1012,7 +1013,7 @@ object ConnectOBD{
         override fun run() {
             LogUtils().v(TAG_BD, message = " 5 seg - retry")
             if (UtilsNetwork().isOnline(context!!)){
-                sendDataIoTHub.InitClient(CONNECT_STRING)
+                sendDataIoTHub.InitClient(appSharedPreference.getConnStringIoTHub()[appSharedPreference.CONNIOTHUB]!!)
                 sendDataIoTHub.resetCount()
                 LogUtils().v(TAG_BD, message = " NETWORK OK - retry")
                 FailuresTripValuesRepository(Application()).getAll(object : FailuresTripValuesRepository.PopulateCallback{

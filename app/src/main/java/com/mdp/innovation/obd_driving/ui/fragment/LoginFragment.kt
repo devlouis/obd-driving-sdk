@@ -168,10 +168,12 @@ class LoginFragment : BaseFragment(), LoginView {
             myScore = dataUser.score.toString()
         }catch (ex: Exception){}
 
+        ConnectOBD.saveConnectionString(dataUser.connectionString!!)
+
         preferences.setDataUser(context, dataUser)
         preferences.setMyScore(context, myScore)
 
-        ConnectOBD.saveConnectionString(dataUser.connectionString!!)
+
 
         navigator.navigateToHome(activity)
         activity!!.finish()

@@ -74,6 +74,7 @@ class HomeActivity : BaseServiceActivity(), HomeView, ObdGatewayVin {
             }
         }
 
+
         ConnectOBD.validateFailure()
 
     }
