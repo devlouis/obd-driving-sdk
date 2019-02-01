@@ -180,7 +180,7 @@ object ConnectOBD{
         TripRepository(Application()).deleteAll()
         ObdRepository(Application()).deleteAll()
         LocationRepository(Application()).deleteAll()
-        //FailuresTripValuesRepository(Application()).deleteAll()
+        FailuresTripValuesRepository(Application()).deleteAll()
 
         start = false
 
