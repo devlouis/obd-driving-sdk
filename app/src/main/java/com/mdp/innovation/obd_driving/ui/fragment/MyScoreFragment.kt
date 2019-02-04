@@ -295,7 +295,7 @@ class MyScoreFragment : BaseServiceFragment(), MyScoreView, HomeActivity.StartLi
 
     override fun onGetMyScoreSuccess(response: MyScoreResponse) {
 
-        if(context == null) return
+        if(context == null || img_refresh == null) return
 
         img_refresh.clearAnimation()
         img_refresh.isEnabled = true
