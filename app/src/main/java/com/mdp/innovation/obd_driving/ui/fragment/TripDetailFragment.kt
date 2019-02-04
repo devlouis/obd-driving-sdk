@@ -215,16 +215,16 @@ class TripDetailFragment : BaseFragment(), TripDetailView, OnMapReadyCallback {
             tv_events_title.textAlignment = View.TEXT_ALIGNMENT_CENTER
         }else{
             if(!events.acceleration.isEmpty())
-                addEvent("Aceleración", events.acceleration, R.drawable.ic_acceleration,
+                addEvent("Aceleración", events.acceleration, R.drawable.ic_acceleration_96,
                     scores.acceleration, ll_trip_detail_bottom)
             if(!events.braking.isEmpty())
-                addEvent("Frenado", events.braking, R.drawable.ic_braking,
+                addEvent("Frenado", events.braking, R.drawable.ic_braking_96,
                     scores.braking, ll_trip_detail_bottom)
             if(!events.takingCurves.isEmpty())
-                addEvent("Toma de Curvas", events.takingCurves, R.drawable.ic_taking_curves,
+                addEvent("Toma de Curvas", events.takingCurves, R.drawable.ic_taking_curves_96,
                     scores.takingCurves, ll_trip_detail_bottom)
             if(!events.speeding.isEmpty())
-                addEvent("Exceso de Velocidad", events.speeding, R.drawable.ic_speeding,
+                addEvent("Exceso de Velocidad", events.speeding, R.drawable.ic_speeding_96,
                     scores.speeding, ll_trip_detail_bottom)
         }
 
@@ -232,8 +232,8 @@ class TripDetailFragment : BaseFragment(), TripDetailView, OnMapReadyCallback {
 
         val iconHeight = 65
         val iconWidth = 65
-        val bitmapDrawStart = ResourcesCompat.getDrawable(resources, R.drawable.ic_start_point, null) as BitmapDrawable
-        val bitmapDrawEnd = ResourcesCompat.getDrawable(resources, R.drawable.ic_end_point, null) as BitmapDrawable
+        val bitmapDrawStart = ResourcesCompat.getDrawable(resources, R.drawable.ic_start_point_96, null) as BitmapDrawable
+        val bitmapDrawEnd = ResourcesCompat.getDrawable(resources, R.drawable.ic_end_point_96, null) as BitmapDrawable
         val bitmapStart = bitmapDrawStart.bitmap
         val bitmapEnd = bitmapDrawEnd.bitmap
         val smallMarkerStart = Bitmap.createScaledBitmap(bitmapStart, iconWidth, iconHeight, false)

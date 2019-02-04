@@ -125,10 +125,10 @@ class MyFirebaseMessagingService : FirebaseMessagingService()  {
     override fun onNewToken(token: String) {
         Log.d(TAG, "Refreshed token: $token")
 
-        if(preferences.getDataUser(applicationContext) != null){
+        /*if(preferences.getDataUser(applicationContext) != null){
             //ENDPOINT ADD TOKEN PUSH
 
-            /*val dataUser = preferences.getDataUser(applicationContext)
+            val dataUser = preferences.getDataUser(applicationContext)
 
             val interactor = TokenInteractor()
             interactor.updateToken(object: TokenInteractor.OnUpdateTokenFinishedListener{
@@ -139,8 +139,8 @@ class MyFirebaseMessagingService : FirebaseMessagingService()  {
                 override fun onUpdateTokenError(message: String) {
                     Log.d(TAG,"Error: $message")
                 }
-            }, dataUser!!.userId!!, token, dataUser!!.token!!)*/
-        }
+            }, dataUser!!.userId!!, token, dataUser!!.token!!)
+        }*/
 
         preferences.setTokenPush(applicationContext, token)
     }

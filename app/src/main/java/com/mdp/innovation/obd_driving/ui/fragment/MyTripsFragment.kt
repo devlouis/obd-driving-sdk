@@ -202,9 +202,9 @@ class MyTripsFragment : BaseFragment(), MyTripsView {
         Message.toastLong("Ocurrió un error: "+message+". \n Vuelva a intentarlo en unos segundos.", context)
 
         if(!isFirstLoad){
-            itemMyTripsModelList.removeAt(itemMyTripsModelList.size - 1)
+            /*itemMyTripsModelList.removeAt(itemMyTripsModelList.size - 1)
             adapter.notifyItemRemoved(itemMyTripsModelList.size)
-            adapter.stopScroll()
+            adapter.stopScroll()*/
         }
     }
 

@@ -227,13 +227,13 @@ class MyScoreFragment : BaseServiceFragment(), MyScoreView, HomeActivity.StartLi
             return
         }
 
-        var tokenPush = preferences.getTokenPush(context)
+        /*var tokenPush = preferences.getTokenPush(context)
         if(tokenPush == "-"){
             tokenPush = FirebaseInstanceId.getInstance().token!!
             preferences.setTokenPush(context, tokenPush)
             //ENDPOINT ADD TOKEN PUSH
 
-            /*val dataUser = preferences.getDataUser(context)
+            val dataUser = preferences.getDataUser(context)
 
             val interactor = TokenInteractor()
             interactor.updateToken(object: TokenInteractor.OnUpdateTokenFinishedListener{
@@ -244,9 +244,9 @@ class MyScoreFragment : BaseServiceFragment(), MyScoreView, HomeActivity.StartLi
                 override fun onUpdateTokenError(message: String) {
                     Log.d(TAG,"Error: $message")
                 }
-            }, dataUser!!.userId!!, tokenPush, "-")*/
+            }, dataUser!!.userId!!, tokenPush, "-")
 
-        }
+        }*/
 
         CustomAnimate.setButtonAnimation(btnStartTrip)
 
@@ -289,7 +289,8 @@ class MyScoreFragment : BaseServiceFragment(), MyScoreView, HomeActivity.StartLi
 
     private fun showMyScore(){
         var myScore = preferences.getMyScore(context)
-        if(myScore == "null") myScore = "-"
+        if(myScore == null || myScore == "null") myScore = "-"
+        if(myScore.endsWith(".0")) myScore = myScore.replace(".0","")
         tv_home_prom.text = myScore
     }
 
@@ -310,7 +311,7 @@ class MyScoreFragment : BaseServiceFragment(), MyScoreView, HomeActivity.StartLi
             }
 
             preferences.setMyScore(context, scoreStr)
-            tv_home_prom.text = scoreStr
+            showMyScore()
 
         }
     }
