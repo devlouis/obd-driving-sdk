@@ -364,32 +364,6 @@ public class SendDataIoTHub {
         sendFailuresCount  = 0;
     }
 
-    public void setRecordTrip(String id_trip, String cantidad, String confirmados, String denegados, String no_enviados, String sincronizados) {
-        SharedPreference appSharedPreference = new SharedPreference(new Application());
-        if (msgSentCount == 1) {
-            appSharedPreference = new SharedPreference(new Application());
-        }
-
-        appSharedPreference.saveRecordTrip(new FailuresEntity());
-        FailuresEntity failuresEntity = appSharedPreference.getRecordTrip();
-
-        if (!id_trip.isEmpty())
-            failuresEntity.setId_trip(id_trip);
-        if (!cantidad.isEmpty())
-            failuresEntity.setCantidad(Integer.parseInt(cantidad));
-        if (!confirmados.isEmpty())
-            failuresEntity.setCantidad(Integer.parseInt(confirmados));
-        if (!denegados.isEmpty())
-            failuresEntity.setCantidad(Integer.parseInt(denegados));
-        if (!no_enviados.isEmpty())
-            failuresEntity.setCantidad(Integer.parseInt(no_enviados));
-        if (!sincronizados.isEmpty())
-            failuresEntity.setCantidad(Integer.parseInt(sincronizados));
-
-        new LogUtils().v(" failuresEntity ", failuresEntity.toString());
-
-       
-    }
 
     public Integer curretToday(){
         SimpleDateFormat sdf6 = new SimpleDateFormat("H:mm:ss");

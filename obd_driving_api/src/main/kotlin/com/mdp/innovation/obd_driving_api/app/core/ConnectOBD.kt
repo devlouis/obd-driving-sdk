@@ -13,7 +13,6 @@ import android.support.v4.content.LocalBroadcastManager
 import android.util.Log
 import android.widget.Toast
 import com.mdp.innovation.obd_driving_api.R
-import com.mdp.innovation.obd_driving_api.app.`interface`.ObdGatewayVin
 import com.mdp.innovation.obd_driving_api.app.core.service.LocationUpdatesService
 import com.mdp.innovation.obd_driving_api.app.ui.config.ObdConfig
 import com.mdp.innovation.obd_driving_api.app.ui.io.*
@@ -65,7 +64,7 @@ object ConnectOBD{
     var isServiceBoundLocation: Boolean = false
     private var preRequisites = true
 
-    var obdGatewayVin: ObdGatewayVin? = null
+    //var obdGatewayVin: ObdGatewayVin? = null
     lateinit var appSharedPreference: SharedPreference
     var btStatus = ""
     var context: Context? = null
@@ -92,6 +91,7 @@ object ConnectOBD{
     var statusContinueTrip = false
 
     val PACKAGE_NAME = "com.mdp.innovation.obd_driving_api.app.core"
+    val EXTRA_VIN = "${PACKAGE_NAME}.vin"
     val EXTRA_SPEED = "${PACKAGE_NAME}.speed"
     val EXTRA_ERROR_TYPE = "${PACKAGE_NAME}.error"
     val EXTRA_ERROR_MSG = "${PACKAGE_NAME}.message"
@@ -115,7 +115,9 @@ object ConnectOBD{
         //Handler().postDelayed(initClientIotHub, 5500)
         //send.sendDataJsonString("")
         LogUtils().v(TAG, " macDevice:: $macDevice")
-        LogUtils().v(TAG, " obdGatewayVin:: $obdGatewayVin")
+
+
+        LogUtils().v(TAG_BD," limit: $limit  - limit2: $limit2")
 
         exportDB()
 
@@ -161,7 +163,7 @@ object ConnectOBD{
         }
     }
 
-    fun startLiveData(mObdGatewayVin: ObdGatewayVin, idUser: String) {
+    fun startLiveData(idUser: String) {
         /**
          *
          */
@@ -190,7 +192,7 @@ object ConnectOBD{
 
         appSharedPreference.saveIdRawBD("0")
         Log.d(TAG, "Starting live data...")
-        this.obdGatewayVin = mObdGatewayVin
+
         if (macDevice.isNotEmpty()) {
             appSharedPreference.saveIdTrip(generateIDTrip())
             doBindService()
@@ -199,7 +201,7 @@ object ConnectOBD{
             handler.post(mSyncronizarBDtoIothub)
         }else{
             //obdGatewayVin!!.errorConnect(context!!.getString(R.string.mac_bluetooh_empty), OBD_NO_PAIRED)
-            sendBroadcasrReceiver("", OBD_NO_PAIRED, context!!.getString(R.string.mac_bluetooh_empty))
+            sendBroadcasrReceiver("","", OBD_NO_PAIRED, context!!.getString(R.string.mac_bluetooh_empty))
 
         }
 
@@ -257,7 +259,7 @@ object ConnectOBD{
             intent.putExtra(EXTRA_ERROR_MSG, "Se perdio conexion al OBD")
             LocalBroadcastManager.getInstance(Application()).sendBroadcast(intent)*/
 
-            sendBroadcasrReceiver("", OBD_LOST, "Se perdio conexion al OBD")
+            sendBroadcasrReceiver("","", OBD_LOST, "Se perdio conexion al OBD")
         }
 
         override fun onTick(millisUntilFinished: Long) {
@@ -303,7 +305,7 @@ object ConnectOBD{
 
                 doUnbindService()
                 //obdGatewayVin!!.errorConnect(context!!.getString(R.string.status_bluetooth_error_connecting), OBD_ERROR)
-                sendBroadcasrReceiver("", OBD_ERROR, context!!.getString(R.string.status_bluetooth_error_connecting))
+                sendBroadcasrReceiver("", "", OBD_ERROR, context!!.getString(R.string.status_bluetooth_error_connecting))
             }
         }
 
@@ -413,7 +415,7 @@ object ConnectOBD{
                     intent.putExtra(EXTRA_ERROR_MSG, "")
                     LocalBroadcastManager.getInstance(Application()).sendBroadcast(intent)*/
 
-                    sendBroadcasrReceiver(KMH, 0, "")
+                    sendBroadcasrReceiver("", KMH, 0, "")
 
 
                 }
@@ -441,7 +443,10 @@ object ConnectOBD{
                         }else
                             Log.v(TAG, " VAR VIN: $VIN ")
                     }
-                    obdGatewayVin!!.getVin(VIN)
+                    //obdGatewayVin!!.getVin(VIN)
+                    sendBroadcasrReceiver(VIN, "", 0, "")
+
+
 
                     statusTrip = "0"
                     initSendDataBD = true
@@ -967,8 +972,9 @@ object ConnectOBD{
 
     }
 
-    fun sendBroadcasrReceiver(_EXTRA_SPEED: String, _EXTRA_ERROR_TYPE: Int, _EXTRA_ERROR_MSG: String){
+    fun sendBroadcasrReceiver(_EXTRA_VIN: String, _EXTRA_SPEED: String, _EXTRA_ERROR_TYPE: Int, _EXTRA_ERROR_MSG: String){
         val intent = Intent(ACTION_BROADCAST)
+        intent.putExtra(EXTRA_VIN, _EXTRA_VIN)
         intent.putExtra(EXTRA_SPEED, _EXTRA_SPEED)
         intent.putExtra(EXTRA_ERROR_TYPE, _EXTRA_ERROR_TYPE)
         intent.putExtra(EXTRA_ERROR_MSG, _EXTRA_ERROR_MSG)

@@ -6,7 +6,6 @@ import android.support.v4.content.LocalBroadcastManager
 import android.support.v7.app.AlertDialog
 import android.util.Log
 import android.widget.Toast
-import com.mdp.innovation.obd_driving_api.app.`interface`.ObdGatewayVin
 import com.mdp.innovation.obd_driving_api.app.core.BaseAppCompat
 import com.mdp.innovation.obd_driving_api.app.core.ConnectOBD
 import com.mdp.innovation.obd_driving_api.app.core.service.LocationUpdatesService
@@ -26,7 +25,7 @@ import android.os.Bundle
 
 
 
-class TestMainActivity : BaseAppCompat(), ObdGatewayVin {
+class TestMainActivity : BaseAppCompat() {
 
     val TAG = javaClass.simpleName
     //GPS Service
@@ -77,7 +76,7 @@ class TestMainActivity : BaseAppCompat(), ObdGatewayVin {
 
         button.setOnClickListener {
             if (!ConnectOBD.CheckConecction())
-                ConnectOBD.startLiveData(this,"5c460df4387a710934beb1e7")
+                ConnectOBD.startLiveData("5c460df4387a710934beb1e7")
             else
                 ConnectOBD.stopLiveData()
 
@@ -151,7 +150,7 @@ class TestMainActivity : BaseAppCompat(), ObdGatewayVin {
     }
 
 
-    override fun getVin(vin: String) {
+    fun getVin(vin: String) {
         Log.v(TAG, " VIN___: $vin")
         runOnUiThread {
             button.text = "Detener viaje"
@@ -268,11 +267,14 @@ class TestMainActivity : BaseAppCompat(), ObdGatewayVin {
     private inner class MyReceiver : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
             val extras = intent.extras
+            val vin = extras.getString(ConnectOBD.EXTRA_VIN)
             val speed = extras.getString(ConnectOBD.EXTRA_SPEED)
             val typeError = extras.getInt(ConnectOBD.EXTRA_ERROR_TYPE)
             val messageError = extras.getString(ConnectOBD.EXTRA_ERROR_MSG)
 
-            if (speed.isNotEmpty()){
+            if (vin.isNotEmpty()) {
+                getVin(vin)
+            }else if (speed.isNotEmpty()){
                 Log.v(TAG, " getSpeedKm: onReceive  ${speed} km/h")
                 tviSpeed.text = "${speed} ::: km/h"
             }else if (typeError != 0){

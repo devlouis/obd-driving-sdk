@@ -192,8 +192,7 @@ class CollectDataFragment : BaseServiceFragment(), CollectDataView, HomeActivity
 
     }*/
 
-    override fun getVin(vin: String){
-
+    fun getVin(vin: String){
         if(!vinUpdated){
 
             var dataUser = preferences.getDataUser(context)
@@ -207,18 +206,6 @@ class CollectDataFragment : BaseServiceFragment(), CollectDataView, HomeActivity
         }
 
         vinUpdated = true
-
-        /*Log.i("[INFO]","ACTIVITY getVin: $vin")
-        activity!!.runOnUiThread {
-            //hideProgress()
-
-            Global.myVIN = vin
-            preferences.setVIN(context,vin)
-            //ConnectOBD.stopLiveData()
-            //navigator.navigateToCollectData(fragmentManager, R.id.content)
-            Global.cancelValidated = false
-        }*/
-
     }
 
     override fun onUpdateVinSuccess(response: UpdateVinResponse) {
@@ -246,15 +233,21 @@ class CollectDataFragment : BaseServiceFragment(), CollectDataView, HomeActivity
     private inner class MyReceiver : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
             val extras = intent.extras
+            val vin = extras.getString(ConnectOBD.EXTRA_VIN)
             val speed = extras.getString(ConnectOBD.EXTRA_SPEED)
             val typeError = extras.getInt(ConnectOBD.EXTRA_ERROR_TYPE)
             val messageError = extras.getString(ConnectOBD.EXTRA_ERROR_MSG)
 
-            if (speed.isNotEmpty()){
-                LogUtils().v("CollDataFrag ", " getSpeedKm: onReceive  ${speed} km/h")
-                speedometer.speedTo(speed.toFloat())
-            }else if (typeError != 0){
-                when (typeError) {
+            when {
+                vin.isNotEmpty() -> getVin(vin)
+                speed.isNotEmpty() -> {
+                    LogUtils().v("CollDataFrag ", " getSpeedKm: onReceive  ${speed} km/h")
+                    speedometer.speedTo(speed.toFloat())
+                }
+                typeError != 0 -> when (typeError) {
+                    /**
+                     * Se dejo de recibir informacion de OBD
+                     */
                     /**
                      * Se dejo de recibir informacion de OBD
                      */
@@ -264,7 +257,7 @@ class CollectDataFragment : BaseServiceFragment(), CollectDataView, HomeActivity
 
                         vLoading.visibility = View.VISIBLE
                         tviIsotipo.text = "Se detecto que al auto se apago...\n" +
-                                         "Un momento por favor"
+                                "Un momento por favor"
                         btnEndTrip.isEnabled = false
                         Handler().postDelayed({
                             Global.cancelValidated = true

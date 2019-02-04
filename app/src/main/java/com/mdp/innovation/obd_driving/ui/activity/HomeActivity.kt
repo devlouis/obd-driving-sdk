@@ -24,13 +24,12 @@ import com.mdp.innovation.obd_driving.ui.InterfaceView
 import com.mdp.innovation.obd_driving.ui.fragment.*
 import com.mdp.innovation.obd_driving.util.Global
 import com.mdp.innovation.obd_driving.util.Preferences
-import com.mdp.innovation.obd_driving_api.app.`interface`.ObdGatewayVin
 import com.mdp.innovation.obd_driving_api.app.core.ConnectOBD
 import com.mdp.innovation.obd_driving_api.app.ui.activity.PairObdActivity
 import org.koin.android.ext.android.inject
 
 
-class HomeActivity : BaseServiceActivity(), HomeView, ObdGatewayVin {
+class HomeActivity : BaseServiceActivity(), HomeView {
 
     private val TAG = javaClass.simpleName
 
@@ -81,7 +80,7 @@ class HomeActivity : BaseServiceActivity(), HomeView, ObdGatewayVin {
 
     fun startLiveData(){
         val connectionString = dataUser.connectionString
-        ConnectOBD.startLiveData(this, dataUser.userId!!)
+        ConnectOBD.startLiveData(dataUser.userId!!)
     }
 
     fun simulateSpeed(){
@@ -120,20 +119,9 @@ class HomeActivity : BaseServiceActivity(), HomeView, ObdGatewayVin {
         this.startLiveDataInterface = startLiveDataInterface
     }
 
-    override fun getVin(vin: String){
-        /*Log.i("[INFO]","ACTIVITY getVin: $vin")
-        runOnUiThread {
-            hideProgress()
-
-            Global.myVIN = vin
-            preferences.setVIN(applicationContext,vin)
-            //ConnectOBD.stopLiveData()
-            navigator.navigateToCollectData(supportFragmentManager, R.id.content)
-            Global.cancelValidated = false
-        }*/
+    /*override fun getVin(vin: String){
         startLiveDataInterface?.getVin(vin)
-
-    }
+    }*/
 
 /*    override fun getSpeedKm(kmh: String) {
         startLiveDataInterface?.getSpeedKm(kmh)
@@ -275,7 +263,7 @@ class HomeActivity : BaseServiceActivity(), HomeView, ObdGatewayVin {
     }*/
 
     interface StartLiveDataInterface {
-        fun getVin(vin: String)
+        //fun getVin(vin: String)
     }
 
 

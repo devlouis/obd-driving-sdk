@@ -114,9 +114,9 @@ class MyScoreFragment : BaseServiceFragment(), MyScoreView, HomeActivity.StartLi
         }*/
     }
 
-    override fun getVin(vin: String){
+    fun getVin(vin: String){
         Log.i("[INFO]","ACTIVITY getVin: $vin")
-        activity!!.runOnUiThread {
+        //activity!!.runOnUiThread {
             hideLoading()
 
             Global.myVIN = vin
@@ -124,7 +124,7 @@ class MyScoreFragment : BaseServiceFragment(), MyScoreView, HomeActivity.StartLi
             //ConnectOBD.stopLiveData()
             navigator.navigateToCollectData(fragmentManager, R.id.content)
             Global.cancelValidated = false
-        }
+        //}
 
     }
 
@@ -143,11 +143,14 @@ class MyScoreFragment : BaseServiceFragment(), MyScoreView, HomeActivity.StartLi
     private inner class MyReceiver : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
             val extras = intent.extras
+            val vin = extras.getString(ConnectOBD.EXTRA_VIN)
             val speed = extras.getString(ConnectOBD.EXTRA_SPEED)
             val typeError = extras.getInt(ConnectOBD.EXTRA_ERROR_TYPE)
             val messageError = extras.getString(ConnectOBD.EXTRA_ERROR_MSG)
 
-           if (typeError != 0){
+            if (vin.isNotEmpty()){
+                getVin(vin)
+            }else if (typeError != 0){
                hideLoading()
                 when (typeError) {
                     /**
