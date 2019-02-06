@@ -1,47 +1,41 @@
-package com.mdp.innovation.obd_driving.ui.fragment
+package com.mdp.innovation.obd_driving.ui.activity
 
-import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
-
-import com.mdp.innovation.obd_driving.R
-import android.support.v7.widget.Toolbar
-import kotlinx.android.synthetic.main.fragment_trip_detail.*
-import android.support.annotation.Nullable
-import android.util.Log
-import android.widget.LinearLayout
-import android.widget.TextView
-import com.google.android.gms.maps.*
-import com.mdp.innovation.obd_driving.interactor.TripDetailInteractor
-import com.mdp.innovation.obd_driving.model.ItemMyTripsModel
-import com.mdp.innovation.obd_driving.presenter.TripDetailPresenter
-import com.mdp.innovation.obd_driving.service.model.TripDetailResponse
-import com.mdp.innovation.obd_driving.ui.TripDetailView
-import com.mdp.innovation.obd_driving.util.Message
-import java.text.SimpleDateFormat
+import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.Color
 import android.graphics.drawable.BitmapDrawable
+import android.os.Bundle
+import com.mdp.innovation.obd_driving_api.commands.ObdCommand
+import com.mdp.innovation.obd_driving_api.commands.control.ModuleVoltageCommand
+import android.support.v4.app.FragmentManager
 import android.support.v4.content.res.ResourcesCompat
+import android.support.v7.widget.Toolbar
+import android.util.Log
+import android.view.LayoutInflater
 import android.view.MotionEvent
+import android.view.View
 import android.view.animation.AnimationUtils
 import android.widget.ImageView
+import android.widget.LinearLayout
+import android.widget.TextView
+import com.google.android.gms.maps.*
 import com.google.android.gms.maps.model.*
-import com.mdp.innovation.obd_driving_api.app.core.ConnectOBD
+import com.google.gson.Gson
+import com.mdp.innovation.obd_driving.R
+import com.mdp.innovation.obd_driving.model.ItemMyTripsModel
+import com.mdp.innovation.obd_driving.service.model.TripDetailResponse
+import com.mdp.innovation.obd_driving.ui.HomeView
+import com.mdp.innovation.obd_driving.ui.navigation.Navigator
+import com.mdp.innovation.obd_driving.util.Global
+import com.mdp.innovation.obd_driving.util.Message
+import com.mdp.innovation.obd_driving_api.app.core.BaseAppCompat
+import kotlinx.android.synthetic.main.fragment_trip_detail.*
+import org.koin.android.ext.android.inject
+import java.text.SimpleDateFormat
 
+class TripDetailActivity : BaseAppCompat(), OnMapReadyCallback {
 
-class TripDetailFragment : BaseFragment(), TripDetailView, OnMapReadyCallback {
     val TAG =  javaClass.simpleName
-    companion object {
-        fun newInstance(model : ItemMyTripsModel, modelDetail: TripDetailResponse): TripDetailFragment{
-            val fragment = TripDetailFragment()
-            fragment.model = model
-            fragment.modelDetail = modelDetail
-
-            return fragment
-        }
-    }
 
     private val sdfDateTime = SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
     private val sdfTime = SimpleDateFormat("HH:mm:ss")
@@ -52,35 +46,32 @@ class TripDetailFragment : BaseFragment(), TripDetailView, OnMapReadyCallback {
     private var model : ItemMyTripsModel? = null
     private var modelDetail : TripDetailResponse? = null
 
-    private var latLngBounds: LatLngBounds? = null
-    private var cameraUpdate: CameraUpdate? = null
+    private val navigator by inject<Navigator>()
 
-    private var polygonOptions: PolygonOptions? = null
-    private var polyline: Polyline? = null
+    val gson = Gson()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-    }
+        setContentView(R.layout.fragment_trip_detail)
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,savedInstanceState: Bundle?): View? {
-        var view = inflater.inflate(R.layout.fragment_trip_detail, container, false)
+        val modelStr = intent.getStringExtra("TRIP")
+        val modelDetailStr = intent.getStringExtra("DETAIL")
+        model = gson.fromJson(modelStr, ItemMyTripsModel::class.java)
+        modelDetail = gson.fromJson(modelDetailStr, TripDetailResponse::class.java)
 
-        //val mapFragment = fragmentManager?.findFragmentById(R.id.fr_map) as? SupportMapFragment
-        //mapFragment?.getMapAsync(this)
+        initUI()
 
-        myMapView =  view.findViewById(R.id.map_dashBoard) as MapView
+        myMapView =  findViewById(R.id.map_dashBoard) as MapView
         myMapView!!.onCreate(savedInstanceState)
         myMapView!!.onResume()
 
         try {
-            MapsInitializer.initialize(activity!!.applicationContext)
+            MapsInitializer.initialize(applicationContext)
         } catch (ex: java.lang.Exception) {
             ex.printStackTrace()
         }
 
         myMapView!!.getMapAsync(this)
-
-        return view
     }
 
     override fun onMapReady(googleMap: GoogleMap) {
@@ -88,35 +79,6 @@ class TripDetailFragment : BaseFragment(), TripDetailView, OnMapReadyCallback {
         myMap!!.uiSettings.isMapToolbarEnabled = false
 
         fillTripDetailData()
-
-        // Add a marker in Sydney and move the camera
-        /*val sydney = LatLng(-34.0, 151.0)
-        mMap.addMarker(MarkerOptions().position(sydney).title("Marker in Sydney"))
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney))*/
-
-        /*myMap.mapType = GoogleMap.MAP_TYPE_NORMAL
-
-        myMap.addMarker(
-            MarkerOptions()
-                .position(LatLng(37.4233438, -122.0728817))
-                .title("LinkedIn")
-                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN))
-        )
-
-        myMap.addMarker(
-            MarkerOptions()
-                .position(LatLng(37.4629101, -122.2449094))
-                .title("Facebook")
-                .snippet("Facebook HQ: Menlo Park")
-        )
-
-        myMap.addMarker(
-            MarkerOptions()
-                .position(LatLng(37.3092293, -122.1136845))
-                .title("Apple")
-        )
-
-        myMap.animateCamera(CameraUpdateFactory.newLatLngZoom(LatLng(37.4233438, -122.0728817), 10f))*/
     }
 
     private fun decodePolygon(encoded: String): List<LatLng> {
@@ -160,18 +122,6 @@ class TripDetailFragment : BaseFragment(), TripDetailView, OnMapReadyCallback {
         return poly
     }
 
-    override fun onActivityCreated(@Nullable savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
-
-        // Obtain the SupportMapFragment and get notified when the map is ready to be used.
-        /*if (activity != null) {
-            val mapFragment = activity!!.supportFragmentManager.findFragmentById(R.id.fr_map) as SupportMapFragment
-            mapFragment?.getMapAsync(this)
-        }*/
-
-        initUI()
-    }
-
     private fun initUI(){
 
         val toolbar = includeToolbar as Toolbar
@@ -186,7 +136,7 @@ class TripDetailFragment : BaseFragment(), TripDetailView, OnMapReadyCallback {
         fillTripData()
         //presenter.getTripDetail(model.tripId!!)
 
-        transparent_image.setOnTouchListener{v: View, event: MotionEvent ->
+        transparent_image.setOnTouchListener{ v: View, event: MotionEvent ->
             when (event.action) {
                 MotionEvent.ACTION_DOWN -> {
                     // Disallow ScrollView to intercept touch events.
@@ -197,7 +147,7 @@ class TripDetailFragment : BaseFragment(), TripDetailView, OnMapReadyCallback {
                 MotionEvent.ACTION_UP -> {
                     // Allow ScrollView to intercept touch events.
                     sv_trip_detail.requestDisallowInterceptTouchEvent(false)
-                     true
+                    true
                 }
                 MotionEvent.ACTION_MOVE -> {
                     sv_trip_detail.requestDisallowInterceptTouchEvent(true)
@@ -211,82 +161,11 @@ class TripDetailFragment : BaseFragment(), TripDetailView, OnMapReadyCallback {
 
     }
 
-    /*override fun onGetTripDetailSuccess(response: TripDetailResponse) {
-
-        if(context == null) return
-
-        var events = response.events
-        var scores = response.scores
-        if(events.acceleration.isEmpty() && events.braking.isEmpty() &&
-            events.takingCurves.isEmpty() && events.speeding.isEmpty()){
-            Message.toastLong("En este viaje no ocurrieron eventos.", context)
-            tv_events_title.text = "En este viaje no ocurrieron eventos"
-            tv_events_title.textAlignment = View.TEXT_ALIGNMENT_CENTER
-        }else{
-            if(!events.acceleration.isEmpty())
-                addEvent("Aceleración", events.acceleration, R.drawable.ic_acceleration_96,
-                    scores.acceleration, ll_trip_detail_bottom)
-            if(!events.braking.isEmpty())
-                addEvent("Frenado", events.braking, R.drawable.ic_braking_96,
-                    scores.braking, ll_trip_detail_bottom)
-            if(!events.takingCurves.isEmpty())
-                addEvent("Toma de Curvas", events.takingCurves, R.drawable.ic_taking_curves_96,
-                    scores.takingCurves, ll_trip_detail_bottom)
-            if(!events.speeding.isEmpty())
-                addEvent("Exceso de Velocidad", events.speeding, R.drawable.ic_speeding_96,
-                    scores.speeding, ll_trip_detail_bottom)
-        }
-
-        val latLon = decodePolygon(response.polygon)
-
-        val iconHeight = 65
-        val iconWidth = 65
-        val bitmapDrawStart = ResourcesCompat.getDrawable(resources, R.drawable.ic_start_point_96, null) as BitmapDrawable
-        val bitmapDrawEnd = ResourcesCompat.getDrawable(resources, R.drawable.ic_end_point_96, null) as BitmapDrawable
-        val bitmapStart = bitmapDrawStart.bitmap
-        val bitmapEnd = bitmapDrawEnd.bitmap
-        val smallMarkerStart = Bitmap.createScaledBitmap(bitmapStart, iconWidth, iconHeight, false)
-        val smallMarkerEnd = Bitmap.createScaledBitmap(bitmapEnd, iconWidth, iconHeight, false)
-
-        myMap.addMarker(
-            MarkerOptions().position(latLon.first()).title("Inicio").anchor(0.5f, 0.85f)
-                //.icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_start_point_32))
-                .icon(BitmapDescriptorFactory.fromBitmap(smallMarkerStart))
-        )
-        myMap.addMarker(
-            MarkerOptions().position(latLon.last()).title("Fin").anchor(0.5f, 0.85f)
-                //.icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_start_point_32))
-                .icon(BitmapDescriptorFactory.fromBitmap(smallMarkerEnd))
-        )
-
-        val polyline1 = myMap.addPolyline(
-            PolylineOptions()
-                .clickable(true)
-                .addAll(latLon)
-                .width(6f)
-                .color(Color.BLACK)
-        )
-
-        val builder = LatLngBounds.Builder()
-        for(item in latLon){
-            builder.include(item)
-        }
-        val bounds = builder.build()
-        myMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, 20))
-
-
-    }
-
-    override fun onGetTripDetailError(message: String) {
-        if(context == null)  return
-
-        Message.toastLong("Ocurrió un error: "+message+". \n Vuelva a intentarlo en unos segundos.", context)
-    }*/
-
     private fun addEvent(eventType: String, events: List<TripDetailResponse.EventItem>, icon: Int,
-                         score: Float, container: LinearLayout){
+                         score: Float, container: LinearLayout
+    ){
 
-        var eventTypeContainer = LayoutInflater.from(context).inflate(R.layout.item_trip_detail_event_type, null)
+        var eventTypeContainer = LayoutInflater.from(applicationContext).inflate(R.layout.item_trip_detail_event_type, null)
         var tvEventType = eventTypeContainer.findViewById<TextView>(R.id.tv_event_type)
         var tvEventScore = eventTypeContainer.findViewById<TextView>(R.id.tv_event_score)
         var llHeader = eventTypeContainer.findViewById<LinearLayout>(R.id.ll_header)
@@ -302,7 +181,7 @@ class TripDetailFragment : BaseFragment(), TripDetailView, OnMapReadyCallback {
 
         for (item in events){
 
-            var eventTypeItem = LayoutInflater.from(context).inflate(R.layout.item_trip_detail_event, null)
+            var eventTypeItem = LayoutInflater.from(applicationContext).inflate(R.layout.item_trip_detail_event, null)
             var tvSpeed = eventTypeItem.findViewById<TextView>(R.id.tv_speed)
             var tvDuration = eventTypeItem.findViewById<TextView>(R.id.tv_duration)
             var tvTime = eventTypeItem.findViewById<TextView>(R.id.tv_time)
@@ -334,7 +213,7 @@ class TripDetailFragment : BaseFragment(), TripDetailView, OnMapReadyCallback {
     }
 
     private fun fillTripData(){
-        if(context == null || model == null) return
+        if(applicationContext == null || model == null) return
 
         var scoreStr = " - "
         var timeStartStr = " - "
@@ -362,7 +241,7 @@ class TripDetailFragment : BaseFragment(), TripDetailView, OnMapReadyCallback {
             tv_start_value.text = model!!.timeStart
             tv_end_value.text = model!!.timeEnd
         }catch (ex: Exception){
-            Message.toastLong("Hubo un problema al cargar el viaje. Vuelva a intentarlo.", context)
+            Message.toastLong("Hubo un problema al cargar el viaje. Vuelva a intentarlo.", applicationContext)
             fragmentManager!!.popBackStack()
         }
 
@@ -372,13 +251,13 @@ class TripDetailFragment : BaseFragment(), TripDetailView, OnMapReadyCallback {
 
     private fun fillTripDetailData() {
 
-        if(context == null || modelDetail == null) return
+        if(applicationContext == null || modelDetail == null) return
 
         var events = modelDetail!!.events
         var scores = modelDetail!!.scores
         if(events.acceleration.isEmpty() && events.braking.isEmpty() &&
             events.takingCurves.isEmpty() && events.speeding.isEmpty()){
-            Message.toastLong("En este viaje no ocurrieron eventos.", context)
+            Message.toastLong("En este viaje no ocurrieron eventos.", applicationContext)
             tv_events_title.text = "En este viaje no ocurrieron eventos"
             tv_events_title.textAlignment = View.TEXT_ALIGNMENT_CENTER
         }else{
@@ -418,30 +297,21 @@ class TripDetailFragment : BaseFragment(), TripDetailView, OnMapReadyCallback {
                 .icon(BitmapDescriptorFactory.fromBitmap(smallMarkerEnd))
         )
 
-        polyline = myMap!!.addPolyline(
+        /*myMap!!.addPolyline(
             PolylineOptions()
                 .clickable(true)
                 .addAll(latLon)
                 .width(6f)
                 .color(Color.BLACK)
-        )
-
-
+        )*/
 
         val builder = LatLngBounds.Builder()
-        /*for(item in latLon){
+        for(item in latLon){
             builder.include(item)
-        }*/
-
-        builder.include(latLon.first())
-        builder.include(latLon.last())
-
+        }
         val bounds = builder.build()
         //myMap!!.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, 20))
 
-        /*latLngBounds = builder.build()
-        cameraUpdate = CameraUpdateFactory.newLatLngBounds(latLngBounds, 20)
-        myMap!!.animateCamera(cameraUpdate)*/
 
     }
 
@@ -450,8 +320,8 @@ class TripDetailFragment : BaseFragment(), TripDetailView, OnMapReadyCallback {
         val line = header.findViewById<TextView>(R.id.tv_line_2)
         val arrow = header.findViewById<ImageView>(R.id.img_arrow)
 
-        val slideDown = AnimationUtils.loadAnimation(context, R.anim.slidedown_events)
-        val slideUp = AnimationUtils.loadAnimation(context, R.anim.slideup_events)
+        val slideDown = AnimationUtils.loadAnimation(applicationContext, R.anim.slidedown_events)
+        val slideUp = AnimationUtils.loadAnimation(applicationContext, R.anim.slideup_events)
 
         body.visibility = View.GONE
         //body.startAnimation(slideDown)
@@ -494,25 +364,7 @@ class TripDetailFragment : BaseFragment(), TripDetailView, OnMapReadyCallback {
 
     }
 
-    override fun showLoading() {
-        if(loading != null) loading.visibility = View.VISIBLE
-    }
-
-    override fun hideLoading() {
-        if(loading != null) loading.visibility = View.GONE
-    }
-
-    override fun onStop() {
-        if (ConnectOBD.isServiceBoundLocation) {
-            // Desconectarse del servicio.
-            // Esto le indica al servicio que esta actividad ya no está en primer plano
-            // y que el servicio puede responder promoviéndose a sí mismo a un servicio en primer plano.
-            ConnectOBD.doUnbindServiceLocation()
-        }
-        super.onStop()
-    }
-
-    override fun onDestroyView() {
+    override fun onDestroy() {
         if(myMap != null) {
             myMap!!.clear()
             myMap = null
@@ -521,10 +373,7 @@ class TripDetailFragment : BaseFragment(), TripDetailView, OnMapReadyCallback {
             myMapView!!.onDestroy()
             myMapView = null
         }
-        latLngBounds = null
-        cameraUpdate = null
-        polyline = null
-        super.onDestroyView()
+        super.onDestroy()
     }
 
     override fun onResume() {
@@ -541,5 +390,4 @@ class TripDetailFragment : BaseFragment(), TripDetailView, OnMapReadyCallback {
         super.onLowMemory()
         myMapView!!.onLowMemory()
     }
-
 }

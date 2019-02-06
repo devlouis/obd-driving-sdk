@@ -24,6 +24,7 @@ import kotlinx.android.synthetic.main.fragment_login.*
 import org.koin.android.ext.android.inject
 import java.lang.Exception
 import com.google.android.gms.tasks.Task
+import com.mdp.innovation.obd_driving.util.Connection
 import com.mdp.innovation.obd_driving_api.app.core.ConnectOBD
 
 
@@ -97,19 +98,11 @@ class LoginFragment : BaseFragment(), LoginView {
         }
 
         btn_login.setOnClickListener { v ->
-            Log.d(TAG, "CLickkkkkkkk")
+            Log.d(TAG, "Clickkkkkkkk")
 
             if(validate()){
-                val username = et_username.text.toString().trim()
-                val password = et_password.text.toString().trim()
-
-                var tokenPush = preferences.getTokenPush(context)
-                if(tokenPush == "-"){
-                    tokenPush = FirebaseInstanceId.getInstance().token!!
-                    preferences.setTokenPush(context, tokenPush)
-                }
-                firebaseToken = tokenPush
-                presenter.getLogin(username, password, firebaseToken)
+                showLoading()
+                validateInternet()
             }
 
         }
@@ -191,6 +184,44 @@ class LoginFragment : BaseFragment(), LoginView {
 
     override fun hideLoading() {
         loading.visibility = View.GONE
+    }
+
+    private fun validateInternet(){
+        Connection.validate(activity!!, object : Connection.OnConnectionFinishedListener{
+            override fun onConnectionFinished(code: Int) {
+                when(code){
+                    Connection.OK ->{
+                        val username = et_username.text.toString().trim()
+                        val password = et_password.text.toString().trim()
+
+                        var tokenPush = preferences.getTokenPush(context)
+                        if(tokenPush == "-"){
+                            tokenPush = FirebaseInstanceId.getInstance().token!!
+                            preferences.setTokenPush(context, tokenPush)
+                        }
+                        firebaseToken = tokenPush
+                        presenter.getLogin(username, password, firebaseToken)
+                    }
+                    Connection.NO_NETWORK ->{
+                        hideLoading()
+                        Message.toastLong(resources.getString(R.string.no_network), context)
+                    }
+                    Connection.NO_CONNECTION ->{
+                        hideLoading()
+                        Message.toastLong(resources.getString(R.string.no_connection), context)
+                    }
+                    Connection.EXCEPTION ->{
+                        hideLoading()
+                        Message.toastLong(resources.getString(R.string.connection_exception), context)
+                    }
+                }
+            }
+        })
+    }
+
+    override fun onDestroyView() {
+        presenter.onDestroy()
+        super.onDestroyView()
     }
 
 

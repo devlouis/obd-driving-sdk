@@ -18,7 +18,7 @@ import org.koin.android.ext.android.inject
 
 open class BaseServiceFragment : BaseFragment() {
 
-    var collectDataService = CollectTripDataService::class.java
+    /*var collectDataService = CollectTripDataService::class.java
     lateinit var collectDataIntent : Intent
 
     private val preferences by inject<Preferences>()
@@ -98,5 +98,5 @@ open class BaseServiceFragment : BaseFragment() {
             }
         }
         return false
-    }
+    }*/
 }

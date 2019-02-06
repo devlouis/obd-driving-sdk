@@ -33,11 +33,6 @@ class HomeActivity : BaseServiceActivity(), HomeView {
 
     private val TAG = javaClass.simpleName
 
-    var serviceClass = CollectTripDataService::class.java
-    lateinit var myIntent : Intent
-
-    lateinit var myScoreFragment : MyScoreFragment
-
     private val navigator by inject<Navigator>()
     private val preferences by inject<Preferences>()
 
@@ -50,8 +45,6 @@ class HomeActivity : BaseServiceActivity(), HomeView {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_home)
 
-        myIntent = Intent(applicationContext, serviceClass)
-
         dataUser = preferences.getDataUser(applicationContext)!!
         val name = dataUser!!.name
 
@@ -61,7 +54,7 @@ class HomeActivity : BaseServiceActivity(), HomeView {
 
         setDrawerConfig()
 
-        myScoreFragment = navigator.navigateToMyScore(supportFragmentManager, R.id.content)
+        navigator.navigateToMyScore(supportFragmentManager, R.id.content)
 
         //ConnectOBD.getVInDummy()
         //sabe.InitClient()
@@ -83,7 +76,7 @@ class HomeActivity : BaseServiceActivity(), HomeView {
         ConnectOBD.startLiveData(dataUser.userId!!)
     }
 
-    fun simulateSpeed(){
+    /*fun simulateSpeed(){
         var speed = 0F
 
         val fex: FloatArray = floatArrayOf(10f,20f,30f,40f,50f,60f,70f,80f,90f,100f,110f,120f,130f,140f,150f,160f,170f,180f,190f,200f)
@@ -113,7 +106,7 @@ class HomeActivity : BaseServiceActivity(), HomeView {
 
         }
         handler.postDelayed(runnable, 2000)
-    }
+    }*/
 
     fun setOnStartLiveDataListener(startLiveDataInterface: StartLiveDataInterface?){
         this.startLiveDataInterface = startLiveDataInterface
@@ -147,7 +140,7 @@ class HomeActivity : BaseServiceActivity(), HomeView {
                 R.id.action_1 -> {
                     supportFragmentManager.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE)
 
-                    myScoreFragment = navigator.navigateToMyScore(supportFragmentManager, R.id.content)
+                    navigator.navigateToMyScore(supportFragmentManager, R.id.content)
                 }
                 R.id.action_2 -> {
 

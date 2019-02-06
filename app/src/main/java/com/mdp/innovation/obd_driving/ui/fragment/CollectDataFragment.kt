@@ -54,10 +54,6 @@ class CollectDataFragment : BaseServiceFragment(), CollectDataView, HomeActivity
 
     private val preferences by inject<Preferences>()
 
-    var runnable = Runnable {  }
-    var handler = Handler(Looper.getMainLooper())
-
-
     var vinUpdated = false
 
     private lateinit var myReceiver: MyReceiver
@@ -162,11 +158,6 @@ class CollectDataFragment : BaseServiceFragment(), CollectDataView, HomeActivity
             }, 2000)
         }
 
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        handler.removeCallbacks(runnable)
     }
 
     /*fun validateCancel(){
@@ -299,7 +290,10 @@ class CollectDataFragment : BaseServiceFragment(), CollectDataView, HomeActivity
         dialog.show()
     }
 
-
+    override fun onDestroyView() {
+        presenter.onDestroy()
+        super.onDestroyView()
+    }
 
 
 }

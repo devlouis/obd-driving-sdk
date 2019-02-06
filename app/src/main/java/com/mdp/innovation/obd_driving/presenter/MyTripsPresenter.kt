@@ -2,6 +2,7 @@ package com.mdp.innovation.obd_driving.presenter
 
 import com.mdp.innovation.obd_driving.interactor.MyTripsInteractor
 import com.mdp.innovation.obd_driving.service.model.MyTripsResponse
+import com.mdp.innovation.obd_driving.service.model.TripDetailResponse
 import com.mdp.innovation.obd_driving.ui.MyTripsView
 
 class MyTripsPresenter(var myTripsView: MyTripsView?, val myTripsInteractor: MyTripsInteractor) : MyTripsInteractor.OnTripFinishedListener {
@@ -21,5 +22,20 @@ class MyTripsPresenter(var myTripsView: MyTripsView?, val myTripsInteractor: MyT
     override fun onGetMyTripsError(message: String) {
         myTripsView!!.hideLoading()
         myTripsView!!.onGetMyTripsError(message)
+    }
+
+    fun getTripDetail(tripId: String) {
+        myTripsView?.showLoading()
+        myTripsInteractor.getTripDetail( this, tripId)
+    }
+
+    override fun onGetTripDetailSuccess(response: TripDetailResponse) {
+        myTripsView?.hideLoading()
+        myTripsView?.onGetTripDetailSuccess(response)
+    }
+
+    override fun onGetTripDetailError(message: String) {
+        myTripsView?.hideLoading()
+        myTripsView?.onGetTripDetailError(message)
     }
 }

@@ -14,7 +14,7 @@ import retrofit2.Response
 
 class TripDetailInteractor {
 
-    private val TAG = javaClass.simpleName
+    /*private val TAG = javaClass.simpleName
 
     interface OnTripFinishedListener {
         fun onGetTripDetailSuccess(response: TripDetailResponse)
@@ -52,5 +52,5 @@ class TripDetailInteractor {
             }
 
         }
-    }
+    }*/
 }

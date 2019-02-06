@@ -31,8 +31,6 @@ class RegisterFragment : BaseFragment(), RegisterView {
         }
     }
 
-    private val navigator by inject<Navigator>()
-
     private val presenter = RegisterPresenter(this, RegisterInteractor())
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -169,5 +167,9 @@ class RegisterFragment : BaseFragment(), RegisterView {
         loading.visibility = View.GONE
     }
 
+    override fun onDestroyView() {
+        presenter.onDestroy()
+        super.onDestroyView()
+    }
 
 }

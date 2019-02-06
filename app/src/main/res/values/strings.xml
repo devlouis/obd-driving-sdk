@@ -57,6 +57,10 @@
     <string name="notifications_admin_channel_name">Canal 01</string>
     <string name="notifications_admin_channel_description">Canal principal</string>
 
+    <string name="no_network">Debe conectarse a una red.</string>
+    <string name="no_connection">Hay problemas con su señal de internet. Inténtelo nuevamente.</string>
+    <string name="connection_exception">Ocurrió un problema. Inténtelo en unos minutos.</string>
+
 
     <string name="configOption1">Cambiar OBD emparejado</string>
 

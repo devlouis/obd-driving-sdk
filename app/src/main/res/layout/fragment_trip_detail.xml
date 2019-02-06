@@ -5,7 +5,7 @@
              android:layout_width="match_parent"
              android:layout_height="match_parent"
               android:orientation="vertical"
-             tools:context=".ui.fragment.ConfigurationFragment">
+             tools:context=".ui.fragment.TripDetailFragment">
 
     <include
             android:id="@+id/includeToolbar"
