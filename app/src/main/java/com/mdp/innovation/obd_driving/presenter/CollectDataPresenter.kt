@@ -14,11 +14,13 @@ class CollectDataPresenter(var collectDataView: CollectDataView?, val collectDat
     }
 
     override fun onUpdateVinSuccess(response: UpdateVinResponse) {
+        if(collectDataView == null) return
         //myScoreView?.hideLoading()
         collectDataView?.onUpdateVinSuccess(response)
     }
 
     override fun onUpdateVinError(message: String) {
+        if(collectDataView == null) return
         //myScoreView?.hideLoading()
         collectDataView?.onUpdateVinError(message)
     }

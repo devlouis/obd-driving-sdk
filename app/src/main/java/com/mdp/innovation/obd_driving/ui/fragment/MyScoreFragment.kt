@@ -90,6 +90,8 @@ class MyScoreFragment : BaseServiceFragment(), MyScoreView, HomeActivity.StartLi
 
         drawerConfig(activity, toolbar)
 
+        presenter.setView(this)
+
         //validateConsultScore(true)
 
         if(Global.tripIsEnded){
@@ -107,6 +109,10 @@ class MyScoreFragment : BaseServiceFragment(), MyScoreView, HomeActivity.StartLi
         myReceiver = MyReceiver()
         myReceiverPush = MyReceiverPush()
         initUI()
+
+        LocalBroadcastManager.getInstance(requireActivity()).registerReceiver(
+            myReceiver, IntentFilter(ConnectOBD.ACTION_BROADCAST)
+        )
 
         /*if(isActiveCollectDataService()){
             navigator.navigateToCollectData(fragmentManager, R.id.content)
@@ -320,6 +326,7 @@ class MyScoreFragment : BaseServiceFragment(), MyScoreView, HomeActivity.StartLi
     }
 
     private fun refreshButtonRestored(){
+        Log.d(TAG, "refreshButtonRestored")
         img_refresh.clearAnimation()
         img_refresh.isEnabled = true
     }
@@ -329,9 +336,9 @@ class MyScoreFragment : BaseServiceFragment(), MyScoreView, HomeActivity.StartLi
 
         showMyScore()
 
-        LocalBroadcastManager.getInstance(requireActivity()).registerReceiver(
+        /*LocalBroadcastManager.getInstance(requireActivity()).registerReceiver(
             myReceiver, IntentFilter(ConnectOBD.ACTION_BROADCAST)
-        )
+        )*/
         LocalBroadcastManager.getInstance(requireActivity()).registerReceiver(
             myReceiverPush, IntentFilter(Constants.ACTION_BROADCAST_PUSH)
         )
@@ -339,7 +346,7 @@ class MyScoreFragment : BaseServiceFragment(), MyScoreView, HomeActivity.StartLi
     }
 
     override fun onPause() {
-        LocalBroadcastManager.getInstance(requireActivity()).unregisterReceiver(myReceiver)
+        //LocalBroadcastManager.getInstance(requireActivity()).unregisterReceiver(myReceiver)
         LocalBroadcastManager.getInstance(requireActivity()).unregisterReceiver(myReceiverPush)
         super.onPause()
         (activity as HomeActivity).setOnStartLiveDataListener(null)
@@ -476,6 +483,7 @@ class MyScoreFragment : BaseServiceFragment(), MyScoreView, HomeActivity.StartLi
     }
 
     override fun onDestroyView() {
+        LocalBroadcastManager.getInstance(requireActivity()).unregisterReceiver(myReceiver)
         presenter.onDestroy()
         super.onDestroyView()
     }

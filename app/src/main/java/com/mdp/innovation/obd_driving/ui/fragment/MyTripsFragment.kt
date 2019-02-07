@@ -215,8 +215,8 @@ class MyTripsFragment : BaseFragment(), MyTripsView {
     }
 
     override fun onDestroy() {
-        super.onDestroy()
         presenter.onDestroy()
+        super.onDestroy()
         if(mRecyclerView != null) mRecyclerView!!.adapter = null
         mRecyclerView = null
     }

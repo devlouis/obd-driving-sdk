@@ -14,11 +14,13 @@ class RegisterPresenter(var registerView: RegisterView?, val registerInteractor:
     }
 
     override fun onGetRegisterSuccess(response: RegisterResponse) {
+        if(registerView == null) return
         registerView?.hideLoading()
         registerView?.onGetRegisterSuccess(response)
     }
 
     override fun onGetRegisterError(message: String) {
+        if(registerView == null) return
         registerView?.hideLoading()
         registerView?.onGetRegisterError(message)
     }

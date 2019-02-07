@@ -15,11 +15,13 @@ class MyTripsPresenter(var myTripsView: MyTripsView?, val myTripsInteractor: MyT
     }
 
     override fun onGetMyTripsSuccess(response: MyTripsResponse) {
+        if(myTripsView == null) return
         myTripsView!!.hideLoading()
         myTripsView!!.onGetMyTripsSuccess(response)
     }
 
     override fun onGetMyTripsError(message: String) {
+        if(myTripsView == null) return
         myTripsView!!.hideLoading()
         myTripsView!!.onGetMyTripsError(message)
     }
@@ -30,11 +32,13 @@ class MyTripsPresenter(var myTripsView: MyTripsView?, val myTripsInteractor: MyT
     }
 
     override fun onGetTripDetailSuccess(response: TripDetailResponse) {
+        if(myTripsView == null) return
         myTripsView?.hideLoading()
         myTripsView?.onGetTripDetailSuccess(response)
     }
 
     override fun onGetTripDetailError(message: String) {
+        if(myTripsView == null) return
         myTripsView?.hideLoading()
         myTripsView?.onGetTripDetailError(message)
     }

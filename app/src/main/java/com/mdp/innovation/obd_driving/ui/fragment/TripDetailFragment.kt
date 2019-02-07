@@ -418,14 +418,43 @@ class TripDetailFragment : BaseFragment(), TripDetailView, OnMapReadyCallback {
                 .icon(BitmapDescriptorFactory.fromBitmap(smallMarkerEnd))
         )
 
-        polyline = myMap!!.addPolyline(
+        /*polyline = myMap!!.addPolyline(
             PolylineOptions()
                 .clickable(true)
                 .addAll(latLon)
                 .width(6f)
                 .color(Color.BLACK)
-        )
+        )*/
 
+        val po = PolylineOptions()
+            .clickable(true)
+            .width(6f)
+            .color(Color.BLACK)
+
+        for(item in latLon){
+            po.add(item)
+        }
+
+        myMap!!.addPolyline( po )
+
+
+
+        var north: LatLng = latLon.first()
+        var south: LatLng = latLon.first()
+        var east: LatLng = latLon.first()
+        var west: LatLng = latLon.first()
+
+        var first = true
+        for(item in latLon){
+            if(first){
+                first = false
+                continue
+            }
+            if(item.latitude > north.latitude) north = item
+            if(item.latitude < south.latitude) south = item
+            if(item.longitude > east.longitude) east = item
+            if(item.longitude < west.longitude) west = item
+        }
 
 
         val builder = LatLngBounds.Builder()
@@ -433,15 +462,20 @@ class TripDetailFragment : BaseFragment(), TripDetailView, OnMapReadyCallback {
             builder.include(item)
         }*/
 
-        builder.include(latLon.first())
-        builder.include(latLon.last())
+        //builder.include(latLon.first())
+        //builder.include(latLon.last())
 
-        val bounds = builder.build()
+        builder.include(north)
+        builder.include(south)
+        builder.include(east)
+        builder.include(west)
+
+        //val bounds = builder.build()
         //myMap!!.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, 20))
 
-        /*latLngBounds = builder.build()
+        latLngBounds = builder.build()
         cameraUpdate = CameraUpdateFactory.newLatLngBounds(latLngBounds, 20)
-        myMap!!.animateCamera(cameraUpdate)*/
+        myMap!!.animateCamera(cameraUpdate)
 
     }
 
