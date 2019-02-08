@@ -145,7 +145,7 @@ class LoginFragment : BaseFragment(), LoginView {
 
     override fun onGetLoginSuccess(response: LoginResponse) {
         Log.d(TAG, "Successssssssssssssss")
-        Message.toastLong(response.message, context)
+        //Message.toastLong(response.message, context)
 
         val dataUser = DataUserModel()
         dataUser.userId = response.data.userId

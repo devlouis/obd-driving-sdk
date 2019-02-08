@@ -150,7 +150,7 @@ class RegisterFragment : BaseFragment(), RegisterView {
 
     override fun onGetRegisterSuccess(response: RegisterResponse) {
         Log.d(TAG, "Successssssssssssssss")
-        Message.toastLong(response.message, context)
+        //Message.toastLong(response.message, context)
         fragmentManager!!.popBackStack()
     }
 
