@@ -38,7 +38,7 @@ import java.util.HashMap;
 import static com.mdp.innovation.obd_driving_api.enums.AvailableCommandNames.VIN;
 
 /**
- * This service is primarily responsible for establishing and maintaining a
+ * This intentService is primarily responsible for establishing and maintaining a
  * permanent connection between the device where the application runs and a more
  * OBD Bluetooth interface.
  * <p/>
@@ -80,8 +80,8 @@ public class ObdGatewayService extends AbstractGatewayService  {
     private SensorEvent sensorMagneticr;
 
     public void startService() throws IOException {
-        Log.d(TAG, "Starting service..");
-        Log.v(" OBDRestar ", " Starting service...*");
+        Log.d(TAG, "Starting intentService..");
+        Log.v(" OBDRestar ", " Starting intentService...*");
         this.activity = activity;
         initSensor();
         // get the remote Bluetooth device
@@ -98,7 +98,7 @@ public class ObdGatewayService extends AbstractGatewayService  {
             // log error
             Log.e(TAG, "No Bluetooth device has been selected.");
 
-            // TODO kill this service gracefully
+            // TODO kill this intentService gracefully
             stopService();
             throw new IOException();
         } else {
@@ -113,7 +113,7 @@ public class ObdGatewayService extends AbstractGatewayService  {
      * Because discovery is a heavyweight procedure for the Bluetooth adapter,
      * this method should always be called before attempting to connect to a
      * remote device with connect(). Discovery is not managed by the Activity,
-     * but is run as a system service, so an application should always call
+     * but is run as a system intentService, so an application should always call
      * cancel discovery even if it did not directly request a discovery, just to
      * be sure. If Bluetooth state is not STATE_ON, this API will return false.
      *
@@ -135,7 +135,7 @@ public class ObdGatewayService extends AbstractGatewayService  {
                                 + e.getMessage()
                 );
 
-                // in case of failure, stop this service.
+                // in case of failure, stop this intentService.
                 stopService();
                 throw new IOException();
             }
@@ -213,7 +213,7 @@ public class ObdGatewayService extends AbstractGatewayService  {
     }
 
     /**
-     * Runs the queue until the service is stopped
+     * Runs the queue until the intentService is stopped
      */
     protected void executeQueue() throws InterruptedException {
         Log.d(TAG, "Executing queue..");
@@ -273,7 +273,7 @@ public class ObdGatewayService extends AbstractGatewayService  {
                 }
                 send.sendData2();*/
                 final ObdCommandJob job2 = job;
-                ConnectOBD.stateUpdate(job2, sensorAccelerometer ,ctx);
+                ConnectOBD.stateUpdate(job2, sensorAccelerometer /*,ctx*/);
             }
         }
 
@@ -283,7 +283,7 @@ public class ObdGatewayService extends AbstractGatewayService  {
      * Stop OBD connection and queue processing.
      */
     public void stopService() {
-        Log.d(TAG, "Stopping service..");
+        Log.d(TAG, "Stopping intentService..");
         stopSensor();
         //notificationManager.cancel(NOTIFICATION_ID);
         jobsQueue.clear();
@@ -297,7 +297,7 @@ public class ObdGatewayService extends AbstractGatewayService  {
                 Log.e(TAG, e.getMessage());
             }
 
-        // kill service
+        // kill intentService
         stopSelf();
     }
 
@@ -389,9 +389,9 @@ public class ObdGatewayService extends AbstractGatewayService  {
                 switch (event.sensor.getType()){
                     case Sensor.TYPE_ACCELEROMETER :
                         sensorAccelerometer = event;
-                        new LogUtils().v("SENSOR ACCE", "X =" + sensorAccelerometer.values[0]);
+/*                        new LogUtils().v("SENSOR ACCE", "X =" + sensorAccelerometer.values[0]);
                         new LogUtils().v("SENSOR ACCE", "Y =" + sensorAccelerometer.values[1]);
-                        new LogUtils().v("SENSOR ACCE", "Z =" + sensorAccelerometer.values[2]);
+                        new LogUtils().v("SENSOR ACCE", "Z =" + sensorAccelerometer.values[2]);*/
 
                         break;
                     case Sensor.TYPE_GYROSCOPE :

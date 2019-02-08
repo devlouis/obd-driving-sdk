@@ -180,12 +180,12 @@ class MyFirebaseMessagingService : FirebaseMessagingService()  {
 
         /*val stopIntent = Intent(this, CollectTripDataService::class.java)
         stopIntent.action = Constants.STOPFOREGROUND_ACTION
-        val pstopIntent = PendingIntent.getService(this,0, stopIntent, 0)*/
+        val pstopIntent = PendingIntent.getIntentService(this,0, stopIntent, 0)*/
 
         /*var views = RemoteViews(packageName, R.layout.notification_layout)
         var playIntent = Intent(this, CollectTripDataService::class.java)
         playIntent.action = "ACTION_PLAY"
-        var pplayIntent = PendingIntent.getService(this, 0, playIntent, 0);
+        var pplayIntent = PendingIntent.getIntentService(this, 0, playIntent, 0);
         views.setOnClickPendingIntent(R.id.radio, pplayIntent)*/
 
         val icon = BitmapFactory.decodeResource(resources, android.R.drawable.ic_media_pause)

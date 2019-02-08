@@ -12,7 +12,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 
 /**
- * This service is primarily responsible for establishing and maintaining a
+ * This intentService is primarily responsible for establishing and maintaining a
  * permanent connection between the device where the application runs and a more
  * OBD Bluetooth interface.
  * <p/>
@@ -24,7 +24,7 @@ public class MockObdGatewayService extends AbstractGatewayService {
     private static final String TAG = MockObdGatewayService.class.getName();
 
     public void startService() {
-        Log.d(TAG, "Starting " + this.getClass().getName() + " service..");
+        Log.d(TAG, "Starting " + this.getClass().getName() + " intentService..");
 
         // Let's configure the connection.
         Log.d(TAG, "Queing jobs for connection configuration..");
@@ -55,7 +55,7 @@ public class MockObdGatewayService extends AbstractGatewayService {
 
 
     /**
-     * Runs the queue until the service is stopped
+     * Runs the queue until the intentService is stopped
      */
     protected void executeQueue() {
         Log.d(TAG, "Executing queue..");
@@ -104,13 +104,13 @@ public class MockObdGatewayService extends AbstractGatewayService {
      * Stop OBD connection and queue processing.
      */
     public void stopService() {
-        Log.d(TAG, "Stopping service..");
+        Log.d(TAG, "Stopping intentService..");
 
         notificationManager.cancel(NOTIFICATION_ID);
         jobsQueue.clear();
         isRunning = false;
 
-        // kill service
+        // kill intentService
         stopSelf();
     }
 

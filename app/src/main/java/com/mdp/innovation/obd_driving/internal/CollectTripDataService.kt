@@ -84,7 +84,7 @@ class CollectTripDataService : BaseService(){
 
         val playIntent = Intent(this, CollectTripDataService::class.java)
         playIntent.action = "GOOO"
-        val pplayIntent = PendingIntent.getService(this,0, playIntent, 0)
+        val pplayIntent = PendingIntent.getIntentService(this,0, playIntent, 0)
 
         val icon = BitmapFactory.decodeResource(resources, R.drawable.abc_ab_share_pack_mtrl_alpha)
 
@@ -151,7 +151,7 @@ class CollectTripDataService : BaseService(){
         /*var views = RemoteViews(packageName, R.layout.notification_layout)
         var playIntent = Intent(this, CollectTripDataService::class.java)
         playIntent.action = "ACTION_PLAY"
-        var pplayIntent = PendingIntent.getService(this, 0, playIntent, 0);
+        var pplayIntent = PendingIntent.getIntentService(this, 0, playIntent, 0);
         views.setOnClickPendingIntent(R.id.radio, pplayIntent)*/
 
         val icon = BitmapFactory.decodeResource(resources, android.R.drawable.ic_media_pause)
@@ -214,7 +214,7 @@ class CollectTripDataService : BaseService(){
 
         val playIntent = Intent(this, CollectTripDataService::class.java)
         playIntent.action = "GOOO"
-        val pplayIntent = PendingIntent.getService(this,0, playIntent, 0)
+        val pplayIntent = PendingIntent.getIntentService(this,0, playIntent, 0)
 
         val builder = getNotificationBuilder(
             yourService,

@@ -35,11 +35,16 @@
                 android:label="OBDRestarBroadcastReceiver">
         </receiver>
 
- <!--       <service
-                android:name=".app.core.service.LocationService"
+        <service
+                android:name="com.mdp.innovation.obd_driving_api_v2.service.ObdReaderService"
                 android:enabled="true"
                 android:exported="false">
-        </service>-->
+        </service>
+        <service
+                android:name="com.mdp.innovation.obd_driving_api_v2.service.LocationIntentService"
+                android:enabled="true"
+                android:exported="false">
+        </service>
         <service
                 android:name=".app.core.service.LocationUpdatesService"
                 android:enabled="true"
