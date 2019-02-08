@@ -1,4 +1,4 @@
-package com.mdp.innovation.obd_driving_api.app.ui.config;
+package com.mdp.innovation.obd_driving_api.commands;
 
 import com.mdp.innovation.obd_driving_api.commands.ObdCommand;
 import com.mdp.innovation.obd_driving_api.commands.SpeedCommand;

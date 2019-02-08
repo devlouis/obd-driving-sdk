@@ -20,7 +20,7 @@ import retrofit.http.POST;
 */
 
 /**
- * Definition of REST service available in OBD Server.
+ * Definition of REST intentService available in OBD Server.
  */
 public interface ObdService {
 

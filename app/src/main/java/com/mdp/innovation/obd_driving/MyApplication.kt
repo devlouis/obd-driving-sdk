@@ -36,7 +36,7 @@ class MyApplication : Application() {
         /**
          * Init SDK
          */
-        ConnectOBD.initialize(this)
+        //ConnectOBD.initialize(this)
         tripRepository =  TripRepository(this)
         obdRepository =  ObdRepository(this)
         locationRepository =  LocationRepository(this)

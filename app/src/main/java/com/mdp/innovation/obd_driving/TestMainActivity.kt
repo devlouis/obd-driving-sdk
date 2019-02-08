@@ -22,7 +22,9 @@ import java.io.FileOutputStream
 import java.io.IOException
 import java.nio.channels.FileChannel
 import android.os.Bundle
-
+import com.mdp.innovation.obd_driving_api_v2.app.ConnectOBDv2
+import com.mdp.innovation.obd_driving_api_v2.constants.DefineObdReader
+import com.mdp.innovation.obd_driving_api_v2.trip.TripRecord
 
 
 class TestMainActivity : BaseAppCompat() {
@@ -33,12 +35,12 @@ class TestMainActivity : BaseAppCompat() {
     private var isServiceBoundLocation: Boolean = false
 
     //var sendata = SendDataIoTHub()
-    private lateinit var myReceiver: MyReceiver
+    //private lateinit var myReceiver: MyReceiver
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main_test)
-        myReceiver = MyReceiver()
+        //myReceiver = MyReceiver()
         Log.v(TAG, " getSpeedKm: onCreate -- ")
         tripRepository = (application as MyApplication).tripRepository
         obdRepository = (application as MyApplication).obdRepository
@@ -58,7 +60,6 @@ class TestMainActivity : BaseAppCompat() {
 
 
         //ConnectOBD.getAllTrip()
-
     }
 
     var count = 0
@@ -75,10 +76,11 @@ class TestMainActivity : BaseAppCompat() {
             "HostName=DCP-test.azure-devices.net;DeviceId=lois-android;SharedAccessKey=Q37BFPZONbrYKFsaxkpF1nLsgXERPdc6/T+QNhC/HIE="
 
         button.setOnClickListener {
-            if (!ConnectOBD.CheckConecction())
-                ConnectOBD.startLiveData("5c460df4387a710934beb1e7")
+            if (!ConnectOBDv2.CheckConecction())
+                //ConnectOBD.startLiveData("5c460df4387a710934beb1e7")
+                ConnectOBDv2.startLiveData()
             else
-                ConnectOBD.stopLiveData()
+                ConnectOBDv2.stopLiveData()
 
         }
 
@@ -164,13 +166,22 @@ class TestMainActivity : BaseAppCompat() {
     val OBD_NO_PAIRED = 301
     override fun onResume() {
         super.onResume()
+
+        val intentFilter = IntentFilter()
+        intentFilter.addAction(DefineObdReader.ACTION_READ_OBD_REAL_TIME_DATA)
+        intentFilter.addAction(DefineObdReader.ACTION_OBD_CONNECTION_STATUS)
+        intentFilter.addAction(ConnectOBD.ACTION_BROADCAST)
+        //registerReceiver(myReceiver, intentFilter)
+
         LocalBroadcastManager.getInstance(this).registerReceiver(
-            myReceiver, IntentFilter(ConnectOBD.ACTION_BROADCAST)
+            myReceiver,intentFilter
         )
     }
 
     override fun onPause() {
+
         LocalBroadcastManager.getInstance(this).unregisterReceiver(myReceiver)
+
         super.onPause()
     }
 
@@ -264,24 +275,40 @@ class TestMainActivity : BaseAppCompat() {
     /**
      * Receiver for broadcasts sent by [LocationUpdatesService].
      */
-    private inner class MyReceiver : BroadcastReceiver() {
+    private val myReceiver  = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
             val extras = intent.extras
-            val vin = extras.getString(ConnectOBD.EXTRA_VIN)
-            val speed = extras.getString(ConnectOBD.EXTRA_SPEED)
-            val typeError = extras.getInt(ConnectOBD.EXTRA_ERROR_TYPE)
-            val messageError = extras.getString(ConnectOBD.EXTRA_ERROR_MSG)
+/*            val vin = if(extras.getString(ConnectOBD.EXTRA_VIN) != null) extras.getString(ConnectOBD.EXTRA_VIN) else ""
+            val speed = if(extras.getString(ConnectOBD.EXTRA_SPEED) != null) extras.getString(ConnectOBD.EXTRA_SPEED) else ""
+            val typeError = if(extras.getInt(ConnectOBD.EXTRA_ERROR_TYPE) != null) extras.getInt(ConnectOBD.EXTRA_ERROR_TYPE) else 0
+            val messageError = if(extras.getString(ConnectOBD.EXTRA_ERROR_MSG) != null) extras.getString(ConnectOBD.EXTRA_ERROR_MSG) else ""*/
+            //val data = extras.getString(DefineObdReader.ACTION_READ_OBD_REAL_TIME_DATA)
 
-            if (vin.isNotEmpty()) {
-                getVin(vin)
-            }else if (speed.isNotEmpty()){
-                Log.v(TAG, " getSpeedKm: onReceive  ${speed} km/h")
-                tviSpeed.text = "${speed} ::: km/h"
-            }else if (typeError != 0){
-                when (typeError) {
-                    /**
+            val action = intent.action
+
+            when {
+                action == DefineObdReader.ACTION_READ_OBD_REAL_TIME_DATA -> {
+                    LogUtils().v("TEST_"," ACTION_READ_OBD_REAL_TIME_DATA")
+
+                    val tripRecord = TripRecord.getTripRecode(context)
+                    if (tripRecord.getmVehicleIdentificationNumber() != null){
+                        LogUtils().v("TEST_"," getmVehicleIdentificationNumber: ${tripRecord.getmVehicleIdentificationNumber()}")
+                        getVin(tripRecord.getmVehicleIdentificationNumber())
+                    }
+
+                }
+    /*            vin.isNotEmpty() -> getVin(vin)
+                speed.isNotEmpty() -> {
+                    Log.v(TAG, " getSpeedKm: onReceive  ${speed} km/h")
+                    tviSpeed.text = "${speed} ::: km/h"
+                }
+                typeError != 0 -> when (typeError) {
+                    *//**
                      * Se dejo de recibir informacion de OBD
-                     */
+                     *//*
+                    *//**
+                     * Se dejo de recibir informacion de OBD
+                     *//*
                     OBD_LOST -> {
                         showDialodAlert("${messageError} - 5 seg espera")
                         LogUtils().v("CollDataFrag ", " errorConnect: ${messageError} - 5 seg espera")
@@ -299,7 +326,7 @@ class TestMainActivity : BaseAppCompat() {
                     else -> {
                         showDialodAlert("${messageError}")
                     }
-                }
+                }*/
             }
 
         }

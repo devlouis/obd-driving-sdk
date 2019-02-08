@@ -118,6 +118,18 @@ public class SendDataIoTHub {
         }
     }
 
+    public void CloseClient() throws IOException {
+        try {
+            if (client != null)
+                client.closeNow();
+        } catch (Exception e2) {
+            System.err.println("Exception while opening IoTHub connection: " + e2.getMessage());
+            client.closeNow();
+            System.out.println("Shutting down...");
+        }
+
+    }
+
     public void InitClient(String connString) throws URISyntaxException, IOException
     {
 

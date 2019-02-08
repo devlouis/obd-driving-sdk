@@ -1,6 +1,5 @@
 package com.mdp.innovation.obd_driving_api.app.core
 
-import android.annotation.SuppressLint
 import android.app.Application
 import android.content.*
 import android.hardware.SensorEvent
@@ -14,7 +13,7 @@ import android.util.Log
 import android.widget.Toast
 import com.mdp.innovation.obd_driving_api.R
 import com.mdp.innovation.obd_driving_api.app.core.service.LocationUpdatesService
-import com.mdp.innovation.obd_driving_api.app.ui.config.ObdConfig
+import com.mdp.innovation.obd_driving_api.commands.ObdConfig
 import com.mdp.innovation.obd_driving_api.app.ui.io.*
 import com.mdp.innovation.obd_driving_api.app.utils.LogUtils
 import com.mdp.innovation.obd_driving_api.app.utils.UtilsLocationService
@@ -36,7 +35,6 @@ import com.mdp.innovation.obd_driving_api.data.store.TripRepository
 import com.mdp.innovation.obd_driving_api.data.store.repository.FailuresTripValuesRepository
 import com.mdp.innovation.obd_driving_api.data.store.repository.LocationRepository
 import com.mdp.innovation.obd_driving_api.data.store.repository.ObdRepository
-import jnr.posix.HANDLE
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
@@ -45,7 +43,6 @@ import java.nio.channels.FileChannel
 import java.text.SimpleDateFormat
 
 
-@SuppressLint("StaticFieldLeak")
 object ConnectOBD{
     val TAG = javaClass.simpleName
     val TAG_BD = " BD_LOCAL"
@@ -67,9 +64,8 @@ object ConnectOBD{
     //var obdGatewayVin: ObdGatewayVin? = null
     lateinit var appSharedPreference: SharedPreference
     var btStatus = ""
-    var context: Context? = null
+    lateinit var context: Context
 
-    var eo = ""
 
     var contadorTotal = 0
     var initSendDataBD = false
@@ -163,10 +159,18 @@ object ConnectOBD{
         }
     }
 
+    class Dog() {
+        companion object Factory {
+            fun create(): Dog = Dog()
+        }
+    }
+
     fun startLiveData(idUser: String) {
         /**
          *
          */
+        Dog.create()
+
         var getConnectionString = appSharedPreference.getConnStringIoTHub()[appSharedPreference.CONNIOTHUB]!!
         LogUtils().v(TAG, " get ConnectionString:: $getConnectionString")
 
@@ -197,7 +201,9 @@ object ConnectOBD{
             appSharedPreference.saveIdTrip(generateIDTrip())
             doBindService()
             // start command execution
-            Handler().post(mQueueCommands)
+            //Handler().post(mQueueCommands)
+            mHandler.post(mRunnable)
+
             handler.post(mSyncronizarBDtoIothub)
         }else{
             //obdGatewayVin!!.errorConnect(context!!.getString(R.string.mac_bluetooh_empty), OBD_NO_PAIRED)
@@ -206,8 +212,24 @@ object ConnectOBD{
         }
 
 
-        UtilsNetwork().isOnline(context!!)
+        UtilsNetwork().isOnline(context = context)
     }
+
+
+    private class MyHandler : Handler()
+    private val mHandler = MyHandler()
+    private var mRunnable = MyRunnable()
+
+    class MyRunnable: Runnable {
+        override fun run() {
+            Log.d(TAG_BD, " __ MyRunnable __")
+            if (service != null && service!!.isRunning && service!!.queueEmpty()) {
+                queueCommands()
+            }
+            Handler().postDelayed(this, 1000)
+        }
+    }
+
 
     fun stopLiveData(){
 
@@ -284,12 +306,13 @@ object ConnectOBD{
         var numeroAleatorio = 1+generadorAleatorios.nextInt(9999)
         LogUtils().v(TAG, " generate ID: ${numeroAleatorio})")
         return numeroAleatorio.toString()
+        return numeroAleatorio.toString()
     }
 
 
     val serviceConn = object : ServiceConnection {
         override fun onServiceConnected(className: ComponentName, binder: IBinder) {
-            Log.d(TAG, className.toString() + " service is bound")
+            Log.d(TAG, className.toString() + " intentService is bound")
             isServiceBound = true
             service = (binder as AbstractGatewayService.AbstractGatewayServiceBinder).service
             service!!.setContext(context)
@@ -298,7 +321,7 @@ object ConnectOBD{
                 service!!.startService()
                 mLocationUpdatesService!!.requestLocationUpdates()
                 if (preRequisites)
-                    btStatus = context!!.getString(R.string.status_bluetooth_connected)
+                    btStatus = context.getString(R.string.status_bluetooth_connected)
             } catch (ioe: IOException) {
                 LogUtils().v(TAG, "Failure Starting live data ${ioe.message.toString()}" )
                 btStatus = context!!.getString(R.string.status_bluetooth_error_connecting)
@@ -309,13 +332,12 @@ object ConnectOBD{
             }
         }
 
-        // This method is *only* called when the connection to the service is lost unexpectedly
+        // This method is *only* called when the connection to the intentService is lost unexpectedly
         // and *not* when the client unbinds (http://developer.android.com/guide/components/bound-services.html)
-        // So the isServiceBound attribute should also be set to false when we unbind from the service.
+        // So the isServiceBound attribute should also be set to false when we unbind from the intentService.
         override fun onServiceDisconnected(className: ComponentName) {
-            Log.d(TAG, className.toString() + " service is unbound")
+            Log.d(TAG, className.toString() + " intentService is unbound")
             service!!.setContext(this@ConnectOBD.context)
-            eo = "banna"
             isServiceBound = false
 
         }
@@ -339,7 +361,7 @@ object ConnectOBD{
 
 
         if (!isServiceBound) {
-            LogUtils().v(TAG, "Binding OBD service..")
+            LogUtils().v(TAG, "Binding OBD intentService..")
             if (preRequisites) {
                 btStatus = context!!.getString(R.string.status_bluetooth_connecting)
                 val serviceIntent = Intent(context!!.applicationContext, ObdGatewayService::class.java)
@@ -355,9 +377,9 @@ object ConnectOBD{
             if (service!!.isRunning) {
                 service!!.stopService()
                 if (preRequisites)
-                    btStatus = context!!.getString(R.string.status_bluetooth_ok)
+                    btStatus = ApplicationInitProvider().context.getString(R.string.status_bluetooth_ok)
             }
-            Log.d(TAG, "Unbinding OBD service..")
+            Log.d(TAG, "Unbinding OBD intentService..")
             context!!.unbindService(serviceConn)
             //context!!.unbindService(mServiceConnection)
             isServiceBound = false
@@ -371,6 +393,7 @@ object ConnectOBD{
     }
 
     fun doUnbindServiceLocation(){
+        System.gc()
         context!!.unbindService(mServiceConnection)
         isServiceBoundLocation = false
         //mLocationUpdatesService!!.RemoveAll()
@@ -483,7 +506,7 @@ object ConnectOBD{
 
     }
 
-
+    @JvmStatic
     private fun addToBdObd(vin: String, rpm: String, kmh: String, count: Int) {
         val sdf6 = SimpleDateFormat("H:mm:ss")
         val currentDateandTime = sdf6.format(Date())
@@ -510,7 +533,7 @@ object ConnectOBD{
         LogUtils().v(TAG_BD, " OBD ADD : ${currentDateandTime} = ${obdEntity.toString()}")
     }
 
-
+    @JvmStatic
     private fun addToBdLocation(location: Location) {
         val sdf6 = SimpleDateFormat("H:mm:ss")
         val currentDateandTime = sdf6.format(Date())
@@ -536,8 +559,8 @@ object ConnectOBD{
      */
     private var sensorAccelerometer: SensorEvent? = null
     @JvmStatic
-    fun stateUpdate(job: ObdCommandJob, sensorAccelerometer: SensorEvent?,  ctx: Context) {
-        this.context = ctx
+    fun stateUpdate(job: ObdCommandJob, sensorAccelerometer: SensorEvent?/*,  ctx: Context*/) {
+        //this.context = ctx
         this.sensorAccelerometer = sensorAccelerometer
         val cmdName = job.command.name
         val cmdID = LookUpCommand(cmdName)
@@ -577,7 +600,7 @@ object ConnectOBD{
     }
 
     /**
-     * Verificar service OBD
+     * Verificar intentService OBD
      */
     fun CheckConecction(): Boolean{
         return isServiceBound
@@ -592,7 +615,7 @@ object ConnectOBD{
 
     fun restarServiceOBD(){
         Log.v(" OBDRestar ", "broadcast 2")
-        //service!!.setContext(context)
+        //intentService!!.setContext(context)
         service!!.onDestroy()
 
     }
@@ -601,12 +624,12 @@ object ConnectOBD{
     /**
      * GPS
      */
-    // Monitors the state of the connection to the service.
+    // Monitors the state of the connection to the intentService.
     private val mServiceConnection = object : ServiceConnection {
 
         override fun onServiceConnected(name: ComponentName, service: IBinder) {
             //val binder = binder as LocationUpdatesService.LocalBinder
-           /* mLocationUpdatesService = (binder as LocationUpdatesService.LocalBinder).service
+           /* mLocationUpdatesService = (binder as LocationUpdatesService.LocalBinder).intentService
             mLocationUpdatesService!!.requestLocationUpdates()*/
 
             val binder = service as LocationUpdatesService.LocalBinder
@@ -652,7 +675,7 @@ object ConnectOBD{
     var firstLocation = 0
     var start = false
 
-
+    @JvmStatic
     private fun getFirst20OBD(){
 
         ObdRepository(Application()).getFirtsTrips(LIMIT, object : ObdRepository.PopulateCallback{
@@ -673,7 +696,7 @@ object ConnectOBD{
             }
         })
     }
-
+    @JvmStatic
     private fun getFirst20Location(){
         LocationRepository(Application()).getFirtsTrips(LIMIT, object : LocationRepository.PopulateCallback {
             override fun onSuccess(locationEntityList: MutableList<LocationEntity>) {
@@ -710,7 +733,7 @@ object ConnectOBD{
             //Handler().postDelayed(this, 2000)
         }
     }
-
+    @JvmStatic
     private fun validateToSend(date: String, any: Any, table: String){
         TripRepository(Application()).getWhereDate(date, object : TripRepository.GetWhenDateCallback {
           override fun onSuccess(trip: TripEntity) {
@@ -806,6 +829,7 @@ object ConnectOBD{
     var countTotalTrip = 0
     var countTotalTripPost = 0
 
+    @JvmStatic
     private fun getFirstTripSend(){
         TripRepository(Application()).getFirtsTrips(limit , limit2, object : TripRepository.PopulateCallback {
             override fun onSuccess(tripEntityList: MutableList<TripEntity>) {
@@ -919,7 +943,7 @@ object ConnectOBD{
             }
         })
     }
-
+    @JvmStatic
     private fun getAllOBD(){
         LogUtils().v(TAG_BD, "######################### I N I C I O   U L T I M A ######################################")
         ObdRepository(Application()).getAll(object : ObdRepository.PopulateCallback{
@@ -941,7 +965,7 @@ object ConnectOBD{
             }
         })
     }
-
+    @JvmStatic
     private fun getAllLocation(){
 
         LocationRepository(Application()).getAll(object : LocationRepository.PopulateCallback{
@@ -972,7 +996,8 @@ object ConnectOBD{
 
     }
 
-    fun sendBroadcasrReceiver(_EXTRA_VIN: String, _EXTRA_SPEED: String, _EXTRA_ERROR_TYPE: Int, _EXTRA_ERROR_MSG: String){
+    @JvmStatic
+    private fun sendBroadcasrReceiver(_EXTRA_VIN: String, _EXTRA_SPEED: String, _EXTRA_ERROR_TYPE: Int, _EXTRA_ERROR_MSG: String){
         val intent = Intent(ACTION_BROADCAST)
         intent.putExtra(EXTRA_VIN, _EXTRA_VIN)
         intent.putExtra(EXTRA_SPEED, _EXTRA_SPEED)

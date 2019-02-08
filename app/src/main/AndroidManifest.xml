@@ -21,7 +21,7 @@
         <!--  android:name=".TestMainActivity">-->
         <activity
 
-            android:name=".ui.activity.SplashActivity">
+            android:name=".TestMainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -75,6 +75,11 @@
         <meta-data
                 android:name="com.google.android.gms.version"
                 android:value="@integer/google_play_services_version" />
+
+
+        <provider
+                android:name="com.mdp.innovation.obd_driving_api.app.core.ApplicationInitProvider"
+                android:authorities="${applicationId}.ApplicationInitProvider" />
 
     </application>
 

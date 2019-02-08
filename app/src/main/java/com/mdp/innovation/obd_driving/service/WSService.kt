@@ -22,8 +22,8 @@ class WSService {
             .addConverterFactory(GsonConverterFactory.create())
             .build()
 
-        val service: ApiRetrofit? = retrofit?.create(ApiRetrofit::class.java)
-        val call = service?.getScore(request)
+        val intentService: ApiRetrofit? = retrofit?.create(ApiRetrofit::class.java)
+        val call = intentService?.getScore(request)
 
         call?.enqueue(object : Callback<ScoreResponse> {
             override fun onResponse(call: Call<ScoreResponse>, response: Response<ScoreResponse>) {

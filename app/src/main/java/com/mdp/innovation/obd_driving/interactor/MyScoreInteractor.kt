@@ -77,8 +77,8 @@ class MyScoreInteractor {
 
         doAsync{
 
-            val service = WSService()
-            val call = service.updateVin(userId, vin)
+            val intentService = WSService()
+            val call = intentService.updateVin(userId, vin)
             uiThread{
                 call.enqueue(object : Callback<UpdateVinResponse> {
                     override fun onResponse(call: Call<UpdateVinResponse>, response: Response<UpdateVinResponse>) {

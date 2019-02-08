@@ -25,7 +25,7 @@ import com.mdp.innovation.obd_driving_api.app.utils.UtilsLocationService
  * Peru, Lima.
  */
 class LocationUpdatesService : Service() {
-    val PACKAGE_NAME = "com.mdp.innovation.obd_driving_api.app.core.service"
+    val PACKAGE_NAME = "com.mdp.innovation.obd_driving_api.app.core.intentService"
     val TAG = javaClass.simpleName
 
     private val mBinder = LocalBinder()
@@ -250,7 +250,7 @@ class LocationUpdatesService : Service() {
     override fun onUnbind(intent: Intent): Boolean {
         //startForeground(NOTIFICATION_ID, getNotification())
         if (!mChangingConfiguration && UtilsLocationService().requestingLocationUpdates(this)) {
-            LogUtils().v(TAG, " Starting foreground service")
+            LogUtils().v(TAG, " Starting foreground intentService")
             startForeground(NOTIFICATION_ID, getNotification())
         }
         return true
@@ -294,7 +294,7 @@ class LocationUpdatesService : Service() {
     }
 
     /**
-     * Returns the [NotificationCompat] used as part of the foreground service.
+     * Returns the [NotificationCompat] used as part of the foreground intentService.
      */
     private fun getNotification(): Notification {
         val intent = Intent(this, LocationUpdatesService::class.java)
@@ -304,7 +304,7 @@ class LocationUpdatesService : Service() {
         // Extra to help us figure out if we arrived in onStartCommand via the notification or not.
         intent.putExtra(EXTRA_STARTED_FROM_NOTIFICATION, true)
 
-        // The PendingIntent that leads to a call to onStartCommand() in this service.
+        // The PendingIntent that leads to a call to onStartCommand() in this intentService.
         val servicePendingIntent = PendingIntent.getService(
             this, 0, intent,
             PendingIntent.FLAG_UPDATE_CURRENT
@@ -372,11 +372,11 @@ class LocationUpdatesService : Service() {
         ConnectOBD.stateUpdateLocation(location = location)
         mLocation = location
         // Notify anyone listening for broadcasts about the new location.
-    /*    val intent = Intent(ACTION_BROADCAST)
+        val intent = Intent(ACTION_BROADCAST)
         intent.putExtra(EXTRA_LOCATION, location)
-        LocalBroadcastManager.getInstance(applicationContext).sendBroadcast(intent)*/
+        LocalBroadcastManager.getInstance(applicationContext).sendBroadcast(intent)
 
-        // Update notification content if running as a foreground service.
+        // Update notification content if running as a foreground intentService.
         //mNotificationManager.notify(NOTIFICATION_ID, getNotification())
       if (serviceIsRunningInForeground(this)) {
             mNotificationManager.notify(NOTIFICATION_ID, getNotification())
@@ -385,7 +385,7 @@ class LocationUpdatesService : Service() {
     }
 
     /**
-     * Returns true if this is a foreground service.
+     * Returns true if this is a foreground intentService.
      *
      * @param context The [Context].
      */

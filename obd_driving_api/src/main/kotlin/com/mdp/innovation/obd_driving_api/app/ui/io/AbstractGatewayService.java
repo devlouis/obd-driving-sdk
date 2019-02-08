@@ -51,7 +51,7 @@ public abstract class AbstractGatewayService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
-        Log.d(TAG, "Creating service..");
+        Log.d(TAG, "Creating intentService..");
         t.start();
         Log.d(TAG, "Service created.");
     }
@@ -59,7 +59,7 @@ public abstract class AbstractGatewayService extends Service {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        Log.d(TAG, "Destroying service...");
+        Log.d(TAG, "Destroying intentService...");
         //notificationManager.cancel(NOTIFICATION_ID);
         t.interrupt();
         Log.d(TAG, "Service destroyed.");
@@ -94,7 +94,7 @@ public abstract class AbstractGatewayService extends Service {
     }
 
     /**
-     * Show a notification while this service is running.
+     * Show a notification while this intentService is running.
      */
     protected void showNotification(String contentTitle, String contentText, int icon, boolean ongoing, boolean notify, boolean vibrate) {
         final PendingIntent contentIntent = PendingIntent.getActivity(ctx, 0, new Intent(ctx, PairObdActivity.class), 0);
