@@ -4,10 +4,13 @@ import android.support.v4.app.FragmentManager
 import android.support.annotation.IdRes
 import android.app.Activity
 import android.content.Intent
+import com.google.gson.Gson
 import com.mdp.innovation.obd_driving.model.ItemMyTripsModel
+import com.mdp.innovation.obd_driving.service.model.TripDetailResponse
 import com.mdp.innovation.obd_driving.ui.activity.HomeActivity
 import com.mdp.innovation.obd_driving.ui.activity.InitialActivity
 import com.mdp.innovation.obd_driving.ui.activity.MainActivity
+import com.mdp.innovation.obd_driving.ui.activity.TripDetailActivity
 import com.mdp.innovation.obd_driving.ui.fragment.*
 
 
@@ -31,13 +34,23 @@ class Navigator {
         return myTripsFragment
     }
 
-    fun navigateToTripDetail(fragmentManager: FragmentManager , @IdRes containerId: Int, item: ItemMyTripsModel) : TripDetailFragment{
+    fun navigateToTripDetail(fragmentManager: FragmentManager , @IdRes containerId: Int,
+                             trip: ItemMyTripsModel, detail: TripDetailResponse) : TripDetailFragment{
         val ft = fragmentManager.beginTransaction()
-        val myTripsFragment = TripDetailFragment.newInstance(item)
+        val myTripsFragment = TripDetailFragment.newInstance(trip, detail)
         ft.replace(containerId, myTripsFragment)
         ft.addToBackStack(null)
         ft.commit()
         return myTripsFragment
+    }
+    fun navigateToTripDetail2(activity: Activity?, trip: ItemMyTripsModel, detail: TripDetailResponse){
+        if (activity != null) {
+            val gson = Gson()
+            var intent = Intent(activity, TripDetailActivity::class.java)
+            intent.putExtra("TRIP", gson.toJson(trip))
+            intent.putExtra("DETAIL", gson.toJson(detail))
+            activity.startActivity(intent)
+        }
     }
 
     fun navigateToConfiguration(fragmentManager: FragmentManager , @IdRes containerId: Int) : ConfigurationFragment{

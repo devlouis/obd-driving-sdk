@@ -1,9 +1,6 @@
 package com.mdp.innovation.obd_driving.internal.firebase
 
-import android.app.Notification
-import android.app.NotificationChannel
-import android.app.NotificationManager
-import android.app.PendingIntent
+import android.app.*
 import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
@@ -28,6 +25,7 @@ import com.mdp.innovation.obd_driving.ui.activity.HomeActivity
 import com.mdp.innovation.obd_driving.util.Constants
 import com.mdp.innovation.obd_driving.util.Preferences
 import org.koin.android.ext.android.inject
+import java.lang.ref.WeakReference
 import java.util.*
 
 class MyFirebaseMessagingService : FirebaseMessagingService()  {
@@ -93,9 +91,12 @@ class MyFirebaseMessagingService : FirebaseMessagingService()  {
     }
 
     private fun tripFinished(score: String){
-        val handler = Handler(Looper.getMainLooper())
-        handler.post{
-            Toast.makeText(applicationContext, "Llegó el PUSH!: $score", Toast.LENGTH_SHORT).show()
+
+
+
+        //val handler = Handler(Looper.getMainLooper())
+        //handler.post{
+            //Toast.makeText(applicationContext, "Llegó el PUSH!: $score", Toast.LENGTH_SHORT).show()
 
             preferences.setMyScore(applicationContext, score)
 
@@ -104,7 +105,7 @@ class MyFirebaseMessagingService : FirebaseMessagingService()  {
             intent.putExtra(Constants.DATA_NEW_SCORE, score)
             LocalBroadcastManager.getInstance(applicationContext).sendBroadcast(intent)
 
-        }
+        //}
     }
 
     @RequiresApi(api = Build.VERSION_CODES.O)
@@ -125,10 +126,10 @@ class MyFirebaseMessagingService : FirebaseMessagingService()  {
     override fun onNewToken(token: String) {
         Log.d(TAG, "Refreshed token: $token")
 
-        if(preferences.getDataUser(applicationContext) != null){
+        /*if(preferences.getDataUser(applicationContext) != null){
             //ENDPOINT ADD TOKEN PUSH
 
-            /*val dataUser = preferences.getDataUser(applicationContext)
+            val dataUser = preferences.getDataUser(applicationContext)
 
             val interactor = TokenInteractor()
             interactor.updateToken(object: TokenInteractor.OnUpdateTokenFinishedListener{
@@ -139,8 +140,8 @@ class MyFirebaseMessagingService : FirebaseMessagingService()  {
                 override fun onUpdateTokenError(message: String) {
                     Log.d(TAG,"Error: $message")
                 }
-            }, dataUser!!.userId!!, token, dataUser!!.token!!)*/
-        }
+            }, dataUser!!.userId!!, token, dataUser!!.token!!)
+        }*/
 
         preferences.setTokenPush(applicationContext, token)
     }
@@ -214,5 +215,7 @@ class MyFirebaseMessagingService : FirebaseMessagingService()  {
         //startForeground(543, notification)
 
     }
+
+
 
 }

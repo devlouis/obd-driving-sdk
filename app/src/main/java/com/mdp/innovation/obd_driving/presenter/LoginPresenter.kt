@@ -7,22 +7,24 @@ import com.mdp.innovation.obd_driving.service.model.MyTripsResponse
 import com.mdp.innovation.obd_driving.ui.LoginView
 import com.mdp.innovation.obd_driving.ui.MyTripsView
 
-class LoginPresenter(var myTripsView: LoginView?, val loginInteractor: LoginInteractor) : LoginInteractor.OnLoginFinishedListener {
+class LoginPresenter(var loginView: LoginView?, val loginInteractor: LoginInteractor) : LoginInteractor.OnLoginFinishedListener {
     fun onDestroy() {
-        myTripsView = null
+        loginView = null
     }
     fun getLogin(username: String, password: String, token: String) {
-        myTripsView?.showLoading()
+        loginView?.showLoading()
         loginInteractor.getLogin( this, username, password, token)
     }
 
     override fun onGetLoginSuccess(response: LoginResponse) {
-        myTripsView?.hideLoading()
-        myTripsView?.onGetLoginSuccess(response)
+        if(loginView == null) return
+        loginView?.hideLoading()
+        loginView?.onGetLoginSuccess(response)
     }
 
     override fun onGetLoginError(message: String) {
-        myTripsView?.hideLoading()
-        myTripsView?.onGetLoginError(message)
+        if(loginView == null) return
+        loginView?.hideLoading()
+        loginView?.onGetLoginError(message)
     }
 }

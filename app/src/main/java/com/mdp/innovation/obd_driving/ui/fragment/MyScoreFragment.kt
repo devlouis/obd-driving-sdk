@@ -59,9 +59,6 @@ class MyScoreFragment : BaseServiceFragment(), MyScoreView, HomeActivity.StartLi
 
     private val presenter = MyScorePresenter(this, MyScoreInteractor())
 
-    private var runnable = Runnable {  }
-    private var handler = Handler(Looper.getMainLooper())
-
     private var showScorePending = false
 
     private var VIN = ""
@@ -70,6 +67,9 @@ class MyScoreFragment : BaseServiceFragment(), MyScoreView, HomeActivity.StartLi
 
     private lateinit var myReceiver: MyReceiver
     private lateinit var myReceiverPush: MyReceiverPush
+
+    private val START_TRIP = 1
+    private val REFRESH_SCORE = 2
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -90,6 +90,8 @@ class MyScoreFragment : BaseServiceFragment(), MyScoreView, HomeActivity.StartLi
 
         drawerConfig(activity, toolbar)
 
+        presenter.setView(this)
+
         //validateConsultScore(true)
 
         if(Global.tripIsEnded){
@@ -107,6 +109,10 @@ class MyScoreFragment : BaseServiceFragment(), MyScoreView, HomeActivity.StartLi
         myReceiver = MyReceiver()
         myReceiverPush = MyReceiverPush()
         initUI()
+
+        LocalBroadcastManager.getInstance(requireActivity()).registerReceiver(
+            myReceiver, IntentFilter(ConnectOBD.ACTION_BROADCAST)
+        )
 
         /*if(isActiveCollectDataService()){
             navigator.navigateToCollectData(fragmentManager, R.id.content)
@@ -227,13 +233,13 @@ class MyScoreFragment : BaseServiceFragment(), MyScoreView, HomeActivity.StartLi
             return
         }
 
-        var tokenPush = preferences.getTokenPush(context)
+        /*var tokenPush = preferences.getTokenPush(context)
         if(tokenPush == "-"){
             tokenPush = FirebaseInstanceId.getInstance().token!!
             preferences.setTokenPush(context, tokenPush)
             //ENDPOINT ADD TOKEN PUSH
 
-            /*val dataUser = preferences.getDataUser(context)
+            val dataUser = preferences.getDataUser(context)
 
             val interactor = TokenInteractor()
             interactor.updateToken(object: TokenInteractor.OnUpdateTokenFinishedListener{
@@ -244,9 +250,9 @@ class MyScoreFragment : BaseServiceFragment(), MyScoreView, HomeActivity.StartLi
                 override fun onUpdateTokenError(message: String) {
                     Log.d(TAG,"Error: $message")
                 }
-            }, dataUser!!.userId!!, tokenPush, "-")*/
+            }, dataUser!!.userId!!, tokenPush, "-")
 
-        }
+        }*/
 
         CustomAnimate.setButtonAnimation(btnStartTrip)
 
@@ -276,12 +282,10 @@ class MyScoreFragment : BaseServiceFragment(), MyScoreView, HomeActivity.StartLi
         img_refresh.setOnClickListener {
             Log.d(TAG, "clickkkkkkkkk")
 
+            it.isEnabled = false
             val startRotateAnimation = AnimationUtils.loadAnimation(context, R.anim.rotate_spin2)
             it.startAnimation(startRotateAnimation)
-
-            presenter.getMyScore(userId)
-
-            it.isEnabled = false
+            validateInternet(REFRESH_SCORE)
 
         }
 
@@ -289,7 +293,8 @@ class MyScoreFragment : BaseServiceFragment(), MyScoreView, HomeActivity.StartLi
 
     private fun showMyScore(){
         var myScore = preferences.getMyScore(context)
-        if(myScore == "null") myScore = "-"
+        if(myScore == null || myScore == "null") myScore = "-"
+        if(myScore.endsWith(".0")) myScore = myScore.replace(".0","")
         tv_home_prom.text = myScore
     }
 
@@ -297,8 +302,8 @@ class MyScoreFragment : BaseServiceFragment(), MyScoreView, HomeActivity.StartLi
 
         if(context == null || img_refresh == null) return
 
-        img_refresh.clearAnimation()
-        img_refresh.isEnabled = true
+        refreshButtonRestored()
+
         if(response != null){
 
             var scoreStr = "-"
@@ -310,15 +315,20 @@ class MyScoreFragment : BaseServiceFragment(), MyScoreView, HomeActivity.StartLi
             }
 
             preferences.setMyScore(context, scoreStr)
-            tv_home_prom.text = scoreStr
+            showMyScore()
 
         }
     }
 
     override fun onGetMyScoreError(message: String) {
+        refreshButtonRestored()
+        Message.toastLong("Ha ocurrido un error: $message", context)
+    }
+
+    private fun refreshButtonRestored(){
+        Log.d(TAG, "refreshButtonRestored")
         img_refresh.clearAnimation()
         img_refresh.isEnabled = true
-        Message.toastLong("Ha ocurrido un error: $message", context)
     }
 
     override fun onResume() {
@@ -326,9 +336,9 @@ class MyScoreFragment : BaseServiceFragment(), MyScoreView, HomeActivity.StartLi
 
         showMyScore()
 
-        LocalBroadcastManager.getInstance(requireActivity()).registerReceiver(
+        /*LocalBroadcastManager.getInstance(requireActivity()).registerReceiver(
             myReceiver, IntentFilter(ConnectOBD.ACTION_BROADCAST)
-        )
+        )*/
         LocalBroadcastManager.getInstance(requireActivity()).registerReceiver(
             myReceiverPush, IntentFilter(Constants.ACTION_BROADCAST_PUSH)
         )
@@ -336,7 +346,7 @@ class MyScoreFragment : BaseServiceFragment(), MyScoreView, HomeActivity.StartLi
     }
 
     override fun onPause() {
-        LocalBroadcastManager.getInstance(requireActivity()).unregisterReceiver(myReceiver)
+        //LocalBroadcastManager.getInstance(requireActivity()).unregisterReceiver(myReceiver)
         LocalBroadcastManager.getInstance(requireActivity()).unregisterReceiver(myReceiverPush)
         super.onPause()
         (activity as HomeActivity).setOnStartLiveDataListener(null)
@@ -348,14 +358,14 @@ class MyScoreFragment : BaseServiceFragment(), MyScoreView, HomeActivity.StartLi
 
     override fun onDeviceNoConnected(){
         (activity as HomeActivity).goToPairObd()
-        Message.toastLong("Su OBD ha perdido la conexión. Por favor vuélvalo a conectar.", activity?.applicationContext)
+        Message.toastLong("Primero debe conectarse a su OBD.", activity?.applicationContext)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent) {
         if (requestCode == GPS.REQUEST_LOCATION) {
             if(resultCode == Activity.RESULT_OK){
                 //Message.toastLong("El GPS está activo ahora!!!!.", context)
-                validateInternet(btnStartTrip)
+                validateInternet(START_TRIP)
             }else if (resultCode == Activity.RESULT_CANCELED) {
                 hideLoading()
                 Message.toastLong("Debe activar el GPS para continuar.", context)
@@ -383,7 +393,7 @@ class MyScoreFragment : BaseServiceFragment(), MyScoreView, HomeActivity.StartLi
                     GPS.OK ->{
                         //hideLoading()
                         //Message.toastLong("El GPS está activo.", context)
-                        validateInternet(it)
+                        validateInternet(START_TRIP)
                     }
                     GPS.NO_ENABLED ->{
                         //hideLoading()
@@ -406,25 +416,41 @@ class MyScoreFragment : BaseServiceFragment(), MyScoreView, HomeActivity.StartLi
         })
     }
 
-    private fun validateInternet(it: View){
+    private fun validateInternet(action: Int){
         Connection.validate(activity!!, object : Connection.OnConnectionFinishedListener{
             override fun onConnectionFinished(code: Int) {
                 when(code){
                     Connection.OK ->{
-                        //hideLoading()
-                        presenter.isConnected()
+                        when(action){
+                            START_TRIP->{
+                                //hideLoading()
+                                presenter.isConnected()
+                            }
+                            REFRESH_SCORE->{
+                                presenter.getMyScore(userId)
+                            }
+                        }
                     }
                     Connection.NO_NETWORK ->{
-                        hideLoading()
-                        Message.toastLong("Debe conectarse a una red.", context)
+                        when(action){
+                            START_TRIP-> hideLoading()
+                            REFRESH_SCORE-> refreshButtonRestored()
+                        }
+                        Message.toastLong(resources.getString(R.string.no_network), context)
                     }
                     Connection.NO_CONNECTION ->{
-                        hideLoading()
-                        Message.toastLong("Hay problemas con su señal de internet. Inténtelo nuevamente.", context)
+                        when(action){
+                            START_TRIP-> hideLoading()
+                            REFRESH_SCORE-> refreshButtonRestored()
+                        }
+                        Message.toastLong(resources.getString(R.string.no_connection), context)
                     }
                     Connection.EXCEPTION ->{
-                        hideLoading()
-                        Message.toastLong("Ocurrió un problema. Inténtelo en unos minutos.", context)
+                        when(action){
+                            START_TRIP-> hideLoading()
+                            REFRESH_SCORE-> refreshButtonRestored()
+                        }
+                        Message.toastLong(resources.getString(R.string.connection_exception), context)
                     }
                 }
             }
@@ -439,8 +465,6 @@ class MyScoreFragment : BaseServiceFragment(), MyScoreView, HomeActivity.StartLi
     }
 
     private fun goToStartTrip(){
-
-        handler.removeCallbacks(runnable)
 
         //SDK
         showLoading()
@@ -458,9 +482,10 @@ class MyScoreFragment : BaseServiceFragment(), MyScoreView, HomeActivity.StartLi
         //navigator.navigateToCollectData(fragmentManager, R.id.content)
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        handler.removeCallbacks(runnable)
+    override fun onDestroyView() {
+        LocalBroadcastManager.getInstance(requireActivity()).unregisterReceiver(myReceiver)
+        presenter.onDestroy()
+        super.onDestroyView()
     }
 
     private fun showScorePendingProgress(){

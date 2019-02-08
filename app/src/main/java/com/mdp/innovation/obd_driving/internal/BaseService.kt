@@ -9,9 +9,6 @@ import android.os.Handler
 
 open class BaseService : Service() {
 
-    private lateinit var mHandler: Handler
-    private lateinit var mRunnable: Runnable
-
     override fun onBind(intent: Intent): IBinder {
         throw UnsupportedOperationException("Not yet implemented")
     }

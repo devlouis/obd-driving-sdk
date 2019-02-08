@@ -50,7 +50,7 @@
                 <action android:name="android.intent.action.DEFAULT"/>
             </intent-filter>
         </activity>
-        <activity android:name=".ui.activity.CollectTripDataActivity">
+        <activity android:name=".ui.activity.TripDetailActivity">
             <intent-filter>
                 <action android:name="android.intent.action.DEFAULT"/>
             </intent-filter>

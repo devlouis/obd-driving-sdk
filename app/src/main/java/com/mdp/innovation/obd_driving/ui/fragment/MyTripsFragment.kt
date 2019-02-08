@@ -17,9 +17,11 @@ import com.mdp.innovation.obd_driving.interactor.MyTripsInteractor
 import com.mdp.innovation.obd_driving.model.ItemMyTripsModel
 import com.mdp.innovation.obd_driving.presenter.MyTripsPresenter
 import com.mdp.innovation.obd_driving.service.model.MyTripsResponse
+import com.mdp.innovation.obd_driving.service.model.TripDetailResponse
 import com.mdp.innovation.obd_driving.ui.MyTripsView
 import com.mdp.innovation.obd_driving.ui.adapter.ItemMyTripsAdapter
 import com.mdp.innovation.obd_driving.ui.navigation.Navigator
+import com.mdp.innovation.obd_driving.util.Connection
 import com.mdp.innovation.obd_driving.util.Message
 import com.mdp.innovation.obd_driving.util.Preferences
 import org.koin.android.ext.android.inject
@@ -49,7 +51,11 @@ class MyTripsFragment : BaseFragment(), MyTripsView {
 
     private var mRecyclerView: RecyclerView? = null
     var itemMyTripsModelList: ArrayList<ItemMyTripsModel?> = ArrayList()
-    var handler = Handler()
+    //var handler = Handler()
+
+    private val TRIP_LIST = 1
+    private val TRIP_DETAIL = 2
+    private var itemSelected :ItemMyTripsModel? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -64,26 +70,6 @@ class MyTripsFragment : BaseFragment(), MyTripsView {
         toolbar.setNavigationIcon(R.drawable.ic_menu)
 
         drawerConfig(activity, toolbar)
-
-        /*val option1 = ItemMyTripsModel()
-        option1.timeStart = Date()
-        option1.duration = "00:35:51"
-        option1.score = 9.5f
-        itemMyTripsModelList.add(option1)
-        itemMyTripsModelList.add(option1)
-        itemMyTripsModelList.add(option1)
-        itemMyTripsModelList.add(option1)
-        itemMyTripsModelList.add(option1)
-        itemMyTripsModelList.add(option1)
-        itemMyTripsModelList.add(option1)
-        itemMyTripsModelList.add(option1)
-        itemMyTripsModelList.add(option1)
-        itemMyTripsModelList.add(option1)
-        itemMyTripsModelList.add(option1)
-        itemMyTripsModelList.add(option1)
-        itemMyTripsModelList.add(option1)
-        itemMyTripsModelList.add(option1)
-        itemMyTripsModelList.add(option1)*/
 
         itemMyTripsModelList.clear()
 
@@ -124,17 +110,16 @@ class MyTripsFragment : BaseFragment(), MyTripsView {
 
         adapter.setOnClickItemListener(object : ItemMyTripsAdapter.OnClickItemListener{
             override fun onClick(item: ItemMyTripsModel) {
-
                 Log.d(TAG, "Mi score es: " + item.score)
-                navigator.navigateToTripDetail(fragmentManager!!, R.id.content, item)
-
+                itemSelected = item
+                showLoading()
+                validateInternet(TRIP_DETAIL)
+                //navigator.navigateToTripDetail(fragmentManager!!, R.id.content, item)
             }
         })
 
         return view
     }
-
-
 
     override fun onActivityCreated(@Nullable savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
@@ -143,16 +128,17 @@ class MyTripsFragment : BaseFragment(), MyTripsView {
 
     private fun initUI(){
 
-        //presenter.getMyTrips("XXXXXXX", currentPage, elementsByPage, true)
-
         val vin = preferences.getDataUser(context)!!.vin
-        val userId = preferences.getDataUser(context)!!.userId
 
-        presenter.getMyTrips(userId!!, currentPage, elementsByPage, true)
+
+        validateInternet(TRIP_LIST)
+        //val userId = preferences.getDataUser(context)!!.userId
+        //presenter.getMyTrips(userId!!, currentPage, elementsByPage, true)
 
     }
 
     override fun onGetMyTripsSuccess(response: MyTripsResponse) {
+        if (context == null) return
 
         elementsFetched += response.trips.size
         currentPage += 1
@@ -199,12 +185,13 @@ class MyTripsFragment : BaseFragment(), MyTripsView {
     }
 
     override fun onGetMyTripsError(message: String) {
+        if (context == null) return
         Message.toastLong("Ocurrió un error: "+message+". \n Vuelva a intentarlo en unos segundos.", context)
 
         if(!isFirstLoad){
-            itemMyTripsModelList.removeAt(itemMyTripsModelList.size - 1)
+            /*itemMyTripsModelList.removeAt(itemMyTripsModelList.size - 1)
             adapter.notifyItemRemoved(itemMyTripsModelList.size)
-            adapter.stopScroll()
+            adapter.stopScroll()*/
         }
     }
 
@@ -214,6 +201,62 @@ class MyTripsFragment : BaseFragment(), MyTripsView {
 
     override fun hideLoading() {
         if(loading != null) loading.visibility = View.GONE
+    }
+
+    override fun onGetTripDetailSuccess(response: TripDetailResponse) {
+        if (context == null) return
+        navigator.navigateToTripDetail(fragmentManager!!, R.id.content, itemSelected!!, response)
+        //navigator.navigateToTripDetail2(activity, itemSelected!!, response)
+    }
+
+    override fun onGetTripDetailError(message: String) {
+        if (context == null) return
+        Message.toastLong("Ocurrió un error: "+message+". \n Vuelva a intentarlo en unos segundos.", context)
+    }
+
+    override fun onDestroy() {
+        presenter.onDestroy()
+        super.onDestroy()
+        if(mRecyclerView != null) mRecyclerView!!.adapter = null
+        mRecyclerView = null
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        mRecyclerView!!.adapter = null
+        mRecyclerView = null
+    }
+
+    private fun validateInternet(action: Int){
+        Connection.validate(activity!!, object : Connection.OnConnectionFinishedListener{
+            override fun onConnectionFinished(code: Int) {
+                when(code){
+                    Connection.OK ->{
+                        when(action){
+                            TRIP_LIST->{
+                                val userId = preferences.getDataUser(context)!!.userId
+                                presenter.getMyTrips(userId!!, currentPage, elementsByPage, true)
+                            }
+                            TRIP_DETAIL->{
+                                presenter.getTripDetail(itemSelected!!.tripId!!)
+                            }
+                        }
+                    }
+                    Connection.NO_NETWORK ->{
+                        hideLoading()
+                        Message.toastLong(resources.getString(R.string.no_network), context)
+                    }
+                    Connection.NO_CONNECTION ->{
+                        hideLoading()
+                        Message.toastLong(resources.getString(R.string.no_connection), context)
+                    }
+                    Connection.EXCEPTION ->{
+                        hideLoading()
+                        Message.toastLong(resources.getString(R.string.connection_exception), context)
+                    }
+                }
+            }
+        })
     }
 
 

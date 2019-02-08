@@ -14,11 +14,16 @@ class MyScorePresenter(var myScoreView: MyScoreView?, val myScoreInteractor: MyS
     fun onDestroy() {
         myScoreView = null
     }
+    fun setView(myScoreView: MyScoreView){
+        this.myScoreView = myScoreView
+    }
     override fun onDeviceConnected() {
+        if(myScoreView == null) return
         myScoreView?.hideLoading()
         myScoreView?.onDeviceConnected()
     }
     override fun onDeviceNoConnected() {
+        if(myScoreView == null) return
         myScoreView?.hideLoading()
         myScoreView?.onDeviceNoConnected()
     }
@@ -29,11 +34,13 @@ class MyScorePresenter(var myScoreView: MyScoreView?, val myScoreInteractor: MyS
     }
 
     override fun onGetMyScoreSuccess(response: MyScoreResponse) {
+        if(myScoreView == null) return
         //myScoreView?.hideLoading()
         myScoreView?.onGetMyScoreSuccess(response)
     }
 
     override fun onGetMyScoreError(message: String) {
+        if(myScoreView == null) return
         //myScoreView?.hideLoading()
         myScoreView?.onGetMyScoreError(message)
     }
