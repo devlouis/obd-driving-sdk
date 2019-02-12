@@ -1,9 +1,6 @@
 package com.mdp.innovation.obd_driving.ui.fragment
 
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 
 import com.mdp.innovation.obd_driving.R
 import android.support.v7.widget.Toolbar
@@ -24,7 +21,7 @@ import android.graphics.Bitmap
 import android.graphics.Color
 import android.graphics.drawable.BitmapDrawable
 import android.support.v4.content.res.ResourcesCompat
-import android.view.MotionEvent
+import android.view.*
 import android.view.animation.AnimationUtils
 import android.widget.ImageView
 import com.google.android.gms.maps.model.*
@@ -380,7 +377,7 @@ class TripDetailFragment : BaseFragment(), TripDetailView, OnMapReadyCallback {
             events.takingCurves.isEmpty() && events.speeding.isEmpty()){
             //Message.toastLong("En este viaje no ocurrieron eventos.", context)
             tv_events_title.text = "En este viaje no ocurrieron eventos"
-            tv_events_title.textAlignment = View.TEXT_ALIGNMENT_CENTER
+            tv_events_title.gravity = Gravity.CENTER
         }else{
             if(!events.acceleration.isEmpty())
                 addEvent("Aceleración", events.acceleration, R.drawable.ic_acceleration_96,
