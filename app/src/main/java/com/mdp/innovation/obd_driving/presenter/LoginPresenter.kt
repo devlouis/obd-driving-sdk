@@ -11,6 +11,9 @@ class LoginPresenter(var loginView: LoginView?, val loginInteractor: LoginIntera
     fun onDestroy() {
         loginView = null
     }
+    fun setView(loginView: LoginView){
+        this.loginView = loginView
+    }
     fun getLogin(username: String, password: String, token: String) {
         loginView?.showLoading()
         loginInteractor.getLogin( this, username, password, token)
@@ -18,7 +21,7 @@ class LoginPresenter(var loginView: LoginView?, val loginInteractor: LoginIntera
 
     override fun onGetLoginSuccess(response: LoginResponse) {
         if(loginView == null) return
-        loginView?.hideLoading()
+        //loginView?.hideLoading()
         loginView?.onGetLoginSuccess(response)
     }
 

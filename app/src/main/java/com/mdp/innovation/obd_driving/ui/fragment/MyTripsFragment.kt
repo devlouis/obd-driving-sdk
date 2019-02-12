@@ -71,6 +71,8 @@ class MyTripsFragment : BaseFragment(), MyTripsView {
 
         drawerConfig(activity, toolbar)
 
+        presenter.setView(this)
+
         itemMyTripsModelList.clear()
 
         mRecyclerView = view.findViewById(R.id.rv_my_trips)
