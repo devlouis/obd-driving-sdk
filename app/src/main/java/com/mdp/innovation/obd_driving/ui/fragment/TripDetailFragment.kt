@@ -378,7 +378,7 @@ class TripDetailFragment : BaseFragment(), TripDetailView, OnMapReadyCallback {
         var scores = modelDetail!!.scores
         if(events.acceleration.isEmpty() && events.braking.isEmpty() &&
             events.takingCurves.isEmpty() && events.speeding.isEmpty()){
-            Message.toastLong("En este viaje no ocurrieron eventos.", context)
+            //Message.toastLong("En este viaje no ocurrieron eventos.", context)
             tv_events_title.text = "En este viaje no ocurrieron eventos"
             tv_events_title.textAlignment = View.TEXT_ALIGNMENT_CENTER
         }else{
@@ -397,6 +397,11 @@ class TripDetailFragment : BaseFragment(), TripDetailView, OnMapReadyCallback {
         }
 
         val latLon = decodePolygon(modelDetail!!.polygon)
+
+        if(latLon.isEmpty()){
+            Message.toastLong("Por el momento no puede ver la ruta del viaje.", context)
+            return
+        }
 
         val iconHeight = 65
         val iconWidth = 65

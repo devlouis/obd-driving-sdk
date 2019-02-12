@@ -4,15 +4,17 @@ import android.util.Log
 import com.google.gson.Gson
 import com.mdp.innovation.obd_driving.service.model.*
 import com.mdp.innovation.obd_driving.service.retrofit.ApiRetrofit
+import okhttp3.OkHttpClient
 import retrofit2.Call
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import java.util.concurrent.TimeUnit
 
 class WSService {
     private val TAG = javaClass.simpleName
     //private val WS_URL_SCORE = "https://1ae4befc.ngrok.io"
-    //private val WS_URL_SCORE = "https://dcp-test.azurewebsites.net"
-    private val WS_URL_SCORE = "https://dcp-api.azurewebsites.net"
+    private val WS_URL_SCORE = "https://dcp-test.azurewebsites.net"
+    //private val WS_URL_SCORE = "https://dcp-api.azurewebsites.net"
     //private val WS_URL_SCORE = "http://192.168.137.1:8080"
 
     private val gson = Gson()
@@ -42,8 +44,15 @@ class WSService {
     }*/
 
     private fun getRetrofit(url: String) : Retrofit{
+        val httpClient = OkHttpClient().newBuilder()
+            .connectTimeout(10, TimeUnit.SECONDS)
+            .writeTimeout(10, TimeUnit.SECONDS)
+            .readTimeout(10, TimeUnit.SECONDS)
+            .build()
+
         return Retrofit.Builder()
             .baseUrl(url)
+            .client(httpClient)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
     }

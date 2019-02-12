@@ -79,6 +79,8 @@ class LoginFragment : BaseFragment(), LoginView {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,savedInstanceState: Bundle?): View? {
         var view = inflater.inflate(R.layout.fragment_login, container, false)
 
+        presenter.setView(this)
+
         return view
     }
 
@@ -145,7 +147,7 @@ class LoginFragment : BaseFragment(), LoginView {
 
     override fun onGetLoginSuccess(response: LoginResponse) {
         Log.d(TAG, "Successssssssssssssss")
-        Message.toastLong(response.message, context)
+        //Message.toastLong(response.message, context)
 
         val dataUser = DataUserModel()
         dataUser.userId = response.data.userId

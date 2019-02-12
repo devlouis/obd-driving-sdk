@@ -9,6 +9,9 @@ class MyTripsPresenter(var myTripsView: MyTripsView?, val myTripsInteractor: MyT
     fun onDestroy() {
         myTripsView = null
     }
+    fun setView(myTripsView: MyTripsView){
+        this.myTripsView = myTripsView
+    }
     fun getMyTrips(userId: String, page: Int, elements: Int, showLoading: Boolean) {
         if(showLoading) myTripsView!!.showLoading()
         myTripsInteractor.getMyTrips( this, userId, page, elements)

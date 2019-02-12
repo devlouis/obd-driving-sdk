@@ -21,7 +21,7 @@
         <!--  android:name=".TestMainActivity">-->
         <activity
 
-            android:name=".TestMainActivity">
+            android:name=".ui.activity.SplashActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
