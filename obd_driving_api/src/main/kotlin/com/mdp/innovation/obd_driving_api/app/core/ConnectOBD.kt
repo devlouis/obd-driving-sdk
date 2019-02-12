@@ -377,7 +377,7 @@ object ConnectOBD{
             if (service!!.isRunning) {
                 service!!.stopService()
                 if (preRequisites)
-                    btStatus = ApplicationInitProvider().context.getString(R.string.status_bluetooth_ok)
+                    btStatus = context.getString(R.string.status_bluetooth_ok)
             }
             Log.d(TAG, "Unbinding OBD intentService..")
             context!!.unbindService(serviceConn)
