@@ -24,7 +24,12 @@ import java.nio.channels.FileChannel
 import android.os.Bundle
 import com.mdp.innovation.obd_driving_api_v2.app.ConnectOBDv2
 import com.mdp.innovation.obd_driving_api_v2.constants.DefineObdReader
+import com.mdp.innovation.obd_driving_api_v2.constants.DefineObdReader.INTENT_OBD_EXTRA_DATA
+import com.mdp.innovation.obd_driving_api_v2.constants.utils.L
 import com.mdp.innovation.obd_driving_api_v2.trip.TripRecord
+import com.mdp.innovation.obd_driving_api_v2.service.ObdReaderService
+
+
 
 
 class TestMainActivity : BaseAppCompat() {
@@ -79,8 +84,13 @@ class TestMainActivity : BaseAppCompat() {
             if (!ConnectOBDv2.CheckConecction())
                 //ConnectOBD.startLiveData("5c460df4387a710934beb1e7")
                 ConnectOBDv2.startLiveData()
-            else
+            else{
                 ConnectOBDv2.stopLiveData()
+                //cacheDir.deleteRecursively()
+                System.gc()
+                L.i(" deleteRecursively::  ${cacheDir.deleteRecursively()}")
+            }
+
 
         }
 
@@ -294,9 +304,15 @@ class TestMainActivity : BaseAppCompat() {
                     if (tripRecord.getmVehicleIdentificationNumber() != null){
                         LogUtils().v("TEST_"," getmVehicleIdentificationNumber: ${tripRecord.getmVehicleIdentificationNumber()}")
                         getVin(tripRecord.getmVehicleIdentificationNumber())
+
                     }
 
                 }
+                action == DefineObdReader.ACTION_OBD_CONNECTION_STATUS -> {
+                    val connectionStatusMsg = intent.getStringExtra(INTENT_OBD_EXTRA_DATA)
+                    showDialodAlert("$connectionStatusMsg")
+                }
+
     /*            vin.isNotEmpty() -> getVin(vin)
                 speed.isNotEmpty() -> {
                     Log.v(TAG, " getSpeedKm: onReceive  ${speed} km/h")

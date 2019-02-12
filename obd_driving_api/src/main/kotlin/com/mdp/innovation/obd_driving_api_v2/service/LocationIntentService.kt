@@ -85,6 +85,34 @@ class LocationIntentService: IntentService("LocationIntentService") {
         L.i("onHandleIntent-local" + "Thread is :: " + Thread.currentThread().id)
         L.i("shouldContinueLoca $shouldContinueLoca")
 
+
+        findLocationConnect()
+
+        L.i("onHandleIntent-local bottom")
+    }
+
+    fun findLocationConnect(){
+
+        val newThread = Thread(Runnable {
+            try {
+               // L.i("shouldContinueLoca::: $shouldContinueLoca")
+                findLocationConnect()
+                Thread.sleep(1000)
+                // this thread is required because in Headunit command.run method block infinitly ,
+
+            } catch (e: Exception) {
+
+                L.i(if ("In new thread reset command  exception :: $e" != null) e.message else "")
+            }
+        })
+        newThread.start()
+    }
+
+    override fun onCreate() {
+        super.onCreate()
+
+        mNotificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
 
         createLocationRequest()
@@ -104,13 +132,6 @@ class LocationIntentService: IntentService("LocationIntentService") {
 
 
         requestLocationUpdates()
-        L.i("onHandleIntent-local bottom")
-    }
-
-    override fun onCreate() {
-        super.onCreate()
-
-        mNotificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
         // Android O requiere un canal de notificación.
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
