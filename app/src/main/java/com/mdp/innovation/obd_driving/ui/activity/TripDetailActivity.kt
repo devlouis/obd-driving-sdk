@@ -61,7 +61,7 @@ class TripDetailActivity : BaseAppCompat(), OnMapReadyCallback {
 
         initUI()
 
-        myMapView =  findViewById(R.id.map_dashBoard) as MapView
+        //myMapView =  findViewById(R.id.map_dashBoard) as MapView
         myMapView!!.onCreate(savedInstanceState)
         myMapView!!.onResume()
 

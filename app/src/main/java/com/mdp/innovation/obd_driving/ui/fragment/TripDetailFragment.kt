@@ -43,7 +43,7 @@ class TripDetailFragment : BaseFragment(), TripDetailView, OnMapReadyCallback {
     private val sdfDateTime = SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
     private val sdfTime = SimpleDateFormat("HH:mm:ss")
 
-    private var myMapView: MapView? = null
+    //private var myMapView: MapView? = null
     private var myMap: GoogleMap? = null
 
     private var model : ItemMyTripsModel? = null
@@ -65,7 +65,7 @@ class TripDetailFragment : BaseFragment(), TripDetailView, OnMapReadyCallback {
         //val mapFragment = fragmentManager?.findFragmentById(R.id.fr_map) as? SupportMapFragment
         //mapFragment?.getMapAsync(this)
 
-        myMapView =  view.findViewById(R.id.map_dashBoard) as MapView
+        /*myMapView =  view.findViewById(R.id.map_dashBoard) as MapView
         myMapView!!.onCreate(savedInstanceState)
         myMapView!!.onResume()
 
@@ -75,7 +75,10 @@ class TripDetailFragment : BaseFragment(), TripDetailView, OnMapReadyCallback {
             ex.printStackTrace()
         }
 
-        myMapView!!.getMapAsync(this)
+        myMapView!!.getMapAsync(this)*/
+
+        val mapFragment = childFragmentManager.findFragmentById(R.id.frg_map) as SupportMapFragment
+        mapFragment.getMapAsync(this)
 
         return view
     }
@@ -85,35 +88,6 @@ class TripDetailFragment : BaseFragment(), TripDetailView, OnMapReadyCallback {
         myMap!!.uiSettings.isMapToolbarEnabled = false
 
         fillTripDetailData()
-
-        // Add a marker in Sydney and move the camera
-        /*val sydney = LatLng(-34.0, 151.0)
-        mMap.addMarker(MarkerOptions().position(sydney).title("Marker in Sydney"))
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney))*/
-
-        /*myMap.mapType = GoogleMap.MAP_TYPE_NORMAL
-
-        myMap.addMarker(
-            MarkerOptions()
-                .position(LatLng(37.4233438, -122.0728817))
-                .title("LinkedIn")
-                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN))
-        )
-
-        myMap.addMarker(
-            MarkerOptions()
-                .position(LatLng(37.4629101, -122.2449094))
-                .title("Facebook")
-                .snippet("Facebook HQ: Menlo Park")
-        )
-
-        myMap.addMarker(
-            MarkerOptions()
-                .position(LatLng(37.3092293, -122.1136845))
-                .title("Apple")
-        )
-
-        myMap.animateCamera(CameraUpdateFactory.newLatLngZoom(LatLng(37.4233438, -122.0728817), 10f))*/
     }
 
     private fun decodePolygon(encoded: String): List<LatLng> {
@@ -181,7 +155,6 @@ class TripDetailFragment : BaseFragment(), TripDetailView, OnMapReadyCallback {
         }
 
         fillTripData()
-        //presenter.getTripDetail(model.tripId!!)
 
         transparent_image.setOnTouchListener{v: View, event: MotionEvent ->
             when (event.action) {
@@ -207,78 +180,6 @@ class TripDetailFragment : BaseFragment(), TripDetailView, OnMapReadyCallback {
         }
 
     }
-
-    /*override fun onGetTripDetailSuccess(response: TripDetailResponse) {
-
-        if(context == null) return
-
-        var events = response.events
-        var scores = response.scores
-        if(events.acceleration.isEmpty() && events.braking.isEmpty() &&
-            events.takingCurves.isEmpty() && events.speeding.isEmpty()){
-            Message.toastLong("En este viaje no ocurrieron eventos.", context)
-            tv_events_title.text = "En este viaje no ocurrieron eventos"
-            tv_events_title.textAlignment = View.TEXT_ALIGNMENT_CENTER
-        }else{
-            if(!events.acceleration.isEmpty())
-                addEvent("Aceleración", events.acceleration, R.drawable.ic_acceleration_96,
-                    scores.acceleration, ll_trip_detail_bottom)
-            if(!events.braking.isEmpty())
-                addEvent("Frenado", events.braking, R.drawable.ic_braking_96,
-                    scores.braking, ll_trip_detail_bottom)
-            if(!events.takingCurves.isEmpty())
-                addEvent("Toma de Curvas", events.takingCurves, R.drawable.ic_taking_curves_96,
-                    scores.takingCurves, ll_trip_detail_bottom)
-            if(!events.speeding.isEmpty())
-                addEvent("Exceso de Velocidad", events.speeding, R.drawable.ic_speeding_96,
-                    scores.speeding, ll_trip_detail_bottom)
-        }
-
-        val latLon = decodePolygon(response.polygon)
-
-        val iconHeight = 65
-        val iconWidth = 65
-        val bitmapDrawStart = ResourcesCompat.getDrawable(resources, R.drawable.ic_start_point_96, null) as BitmapDrawable
-        val bitmapDrawEnd = ResourcesCompat.getDrawable(resources, R.drawable.ic_end_point_96, null) as BitmapDrawable
-        val bitmapStart = bitmapDrawStart.bitmap
-        val bitmapEnd = bitmapDrawEnd.bitmap
-        val smallMarkerStart = Bitmap.createScaledBitmap(bitmapStart, iconWidth, iconHeight, false)
-        val smallMarkerEnd = Bitmap.createScaledBitmap(bitmapEnd, iconWidth, iconHeight, false)
-
-        myMap.addMarker(
-            MarkerOptions().position(latLon.first()).title("Inicio").anchor(0.5f, 0.85f)
-                //.icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_start_point_32))
-                .icon(BitmapDescriptorFactory.fromBitmap(smallMarkerStart))
-        )
-        myMap.addMarker(
-            MarkerOptions().position(latLon.last()).title("Fin").anchor(0.5f, 0.85f)
-                //.icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_start_point_32))
-                .icon(BitmapDescriptorFactory.fromBitmap(smallMarkerEnd))
-        )
-
-        val polyline1 = myMap.addPolyline(
-            PolylineOptions()
-                .clickable(true)
-                .addAll(latLon)
-                .width(6f)
-                .color(Color.BLACK)
-        )
-
-        val builder = LatLngBounds.Builder()
-        for(item in latLon){
-            builder.include(item)
-        }
-        val bounds = builder.build()
-        myMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, 20))
-
-
-    }
-
-    override fun onGetTripDetailError(message: String) {
-        if(context == null)  return
-
-        Message.toastLong("Ocurrió un error: "+message+". \n Vuelva a intentarlo en unos segundos.", context)
-    }*/
 
     private fun addEvent(eventType: String, events: List<TripDetailResponse.EventItem>, icon: Int,
                          score: Float, container: LinearLayout){
@@ -553,10 +454,10 @@ class TripDetailFragment : BaseFragment(), TripDetailView, OnMapReadyCallback {
             myMap!!.clear()
             myMap = null
         }
-        if(myMapView != null){
+        /*if(myMapView != null){
             myMapView!!.onDestroy()
             myMapView = null
-        }
+        }*/
         latLngBounds = null
         cameraUpdate = null
         polyline = null
@@ -565,17 +466,17 @@ class TripDetailFragment : BaseFragment(), TripDetailView, OnMapReadyCallback {
 
     override fun onResume() {
         super.onResume()
-        myMapView!!.onResume()
+        //myMapView!!.onResume()
     }
 
     override fun onPause() {
         super.onPause()
-        myMapView!!.onPause()
+        //myMapView!!.onPause()
     }
 
     override fun onLowMemory() {
         super.onLowMemory()
-        myMapView!!.onLowMemory()
+        //myMapView!!.onLowMemory()
     }
 
 }
